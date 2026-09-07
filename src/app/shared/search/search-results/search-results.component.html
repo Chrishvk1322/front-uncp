@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-between">
+    <h1 *ngIf="!disableHeader">{{ (configuration ? configuration + '.search.results.head' : 'search.results.head') | translate }}</h1>
+    <ds-search-export-csv *ngIf="showCsvExport" [total]="searchResults?.payload?.totalElements"
+                          [searchConfig]="searchConfig"></ds-search-export-csv>
+</div>
+<div *ngIf="searchResults && searchResults?.hasSucceeded && !searchResults?.isLoading && searchResults?.payload?.page.length > 0" @fadeIn>
+    <ds-viewable-collection
+            [config]="searchConfig.pagination"
+            [sortConfig]="searchConfig.sort"
+            [objects]="searchResults"
+            [hideGear]="true"
+            [selectable]="selectable"
+            [selectionConfig]="selectionConfig"
+            [linkType]="linkType"
+            [context]="context"
+            [hidePaginationDetail]="hidePaginationDetail"
+            [showThumbnails]="showThumbnails"
+            (contentChange)="contentChange.emit($event)"
+            (deselectObject)="deselectObject.emit($event)"
+            (selectObject)="selectObject.emit($event)">
+    </ds-viewable-collection>
+</div>
+
+<ds-search-results-skeleton
+  *ngIf="isLoading()"
+  [showThumbnails]="showThumbnails"
+  [numberOfResults]="searchConfig.pagination.pageSize"
+></ds-search-results-skeleton>
+
+<ds-error *ngIf="showError()"
+          message="{{errorMessageLabel() | translate}}"></ds-error>
+<div *ngIf="searchResults?.payload?.page.length == 0 || searchResults?.statusCode == 400">
+    {{ 'search.results.no-results' | translate }}
+    <a [routerLink]="['/search']"
+       [queryParams]="{ query: surroundStringWithQuotes(searchConfig?.query) }"
+       queryParamsHandling="merge" role="link" tabindex="0">
+        {{"search.results.no-results-link" | translate}}
+    </a>
+</div>
