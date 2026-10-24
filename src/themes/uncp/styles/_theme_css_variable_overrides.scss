@@ -1,0 +1,30 @@
+// Override or add CSS variables for your theme here
+
+:root {
+
+  // Header/navbar larger than the stock DSpace size (stock: 80px header, 40px logo)
+  @include media-breakpoint-up(md) {
+    --ds-header-logo-height: 66px;
+    --ds-header-height: 104px;
+  }
+  @include media-breakpoint-down(sm) {
+    --ds-header-logo-height: 60px;
+    --ds-header-height: 96px;
+  }
+
+  --ds-banner-text-background: rgba(0, 0, 0, 0.58);
+  --ds-banner-background-gradient-width: 300px;
+
+  --ds-header-navbar-border-bottom-height: 0;
+
+  // Navbar links dark like the production site (text-body), green on hover
+  --ds-navbar-link-color: #343a40;
+  --ds-navbar-link-color-hover: #067a5a;
+
+  /* set the next two properties as `--ds-header-navbar-border-bottom-*`
+  in order to keep the bottom border of the header when navbar is expanded */
+
+  --ds-expandable-navbar-border-top-color: #{$white};
+  --ds-expandable-navbar-border-top-height: 0;
+  --ds-expandable-navbar-padding-top: 0;
+}

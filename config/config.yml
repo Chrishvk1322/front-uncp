@@ -3,3 +3,26 @@ rest:
   host: demo.dspace.org
   port: 443
   nameSpace: /server
+
+# UNCP theme (src/themes/uncp) for every page. The favicons are the UNCP ones in the theme's assets.
+themes:
+  - name: uncp
+    headTags:
+      - tagName: link
+        attributes:
+          rel: icon
+          href: assets/uncp/images/favicons/favicon.ico
+          sizes: any
+      - tagName: link
+        attributes:
+          rel: icon
+          href: assets/uncp/images/favicons/favicon.svg
+          type: image/svg+xml
+      - tagName: link
+        attributes:
+          rel: apple-touch-icon
+          href: assets/uncp/images/favicons/apple-touch-icon.png
+      - tagName: link
+        attributes:
+          rel: manifest
+          href: assets/uncp/images/favicons/manifest.webmanifest

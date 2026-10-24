@@ -1,0 +1,19 @@
+@import '../../../../../../../../../styles/variables';
+
+.item-list-supervision {
+    a {
+        cursor: pointer;
+    }
+}
+
+// UNCP item card typography (recovered from the production bundle)
+.item-list-title {
+    font-weight: 700 !important;
+    line-height: .75rem !important;
+}
+.item-list-authors {
+    color: #158264 !important;
+    font-weight: 700 !important;
+    font-style: normal;
+    font-size: 1.1rem;
+}

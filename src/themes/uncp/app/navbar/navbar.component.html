@@ -1,0 +1,23 @@
+<ng-container *ngIf="(isMobile$ | async) && (isAuthenticated$ | async)">
+  <ds-user-menu [inExpandableNavbar]="true"></ds-user-menu>
+</ng-container>
+<div class="navbar-nav h-100 align-items-md-stretch gapx-3" role="menubar" id="main-site-navigation" [ngClass]="(isMobile$ | async) ? 'navbar-nav-mobile' : 'navbar-nav-desktop'">
+  <div class="ds-menu-item-wrapper text-md-center">
+    <a routerLink="/" class="ds-menu-item" role="menuitem">Repositorio</a>
+  </div>
+  <div class="ds-menu-item-wrapper text-md-center" ngbDropdown>
+    <a href="javascript:void(0);" ngbDropdownToggle role="menuitem" class="ds-menu-item ds-menu-toggler-wrapper">Tutoriales</a>
+    <div ngbDropdownMenu>
+      <a ngbDropdownItem target="_blank" href="https://uncpedu-my.sharepoint.com/:b:/g/personal/edgarrojas_uncp_edu_pe/ESM2VDKhNzFJjFO0Y8ke5HMBBSlgXrzJ19x01shuiz31EQ?e=utbq3f">Guía de Usuario del Repositorio</a>
+      <a ngbDropdownItem target="_blank" href="https://orcid.org/signin">Crear Código ORCID</a>
+      <a ngbDropdownItem target="_blank" href="https://uncpedu-my.sharepoint.com/:b:/g/personal/edgarrojas_uncp_edu_pe/EY5yW-MaXyVEvv5spX-w8Q4B0Xg7Wea4hwpHpa3N0yPZTQ?e=698gwB">Citar Documentos con APA</a>
+      <a ngbDropdownItem target="_blank" href="https://uncpedu-my.sharepoint.com/:b:/g/personal/edgarrojas_uncp_edu_pe/EeFfuuiXU1hOhYj1si1QtigB1_PJFoPVPn9OlQBilP29Lw?e=reikSO">Modelo de Portada de Tesis</a>
+    </div>
+  </div>
+  <div class="ds-menu-item-wrapper text-md-center">
+    <a href="https://files.uncp.edu.pe/La%20Universidad/Resoluciones/CU/4494-CU-2024.pdf" target="_blank" class="ds-menu-item" role="menuitem">Reglamento</a>
+  </div>
+  <div class="ds-menu-item-wrapper text-md-center">
+    <a routerLink="/statistics" class="ds-menu-item" role="menuitem">Estadísticas</a>
+  </div>
+</div>

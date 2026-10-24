@@ -1,0 +1,33 @@
+<div class="institutions-section bg-footer w-100 float-left mt-3">
+  <div class="container">
+    <div class="institutions-header">
+      <h3 class="institutions-title">
+        Conectados con las Principales <span class="highlight">Plataformas de Investigación</span>
+      </h3>
+      <p class="institutions-subtitle">
+        Nuestro repositorio está integrado con las mejores bases de datos y plataformas académicas mundiales
+      </p>
+    </div>
+    <div class="institutions-carousel">
+      <div class="carousel-track">
+        <div class="institution-item" *ngFor="let institution of carouselItems">
+          <div class="institution-card">
+            <div class="card-header">
+              <img [src]="institution.logo" [alt]="institution.name" class="institution-logo"/>
+            </div>
+            <div class="card-body">
+              <h6 class="institution-title">{{ institution.title }}</h6>
+              <span class="institution-type">{{ institution.type }}</span>
+            </div>
+            <div class="card-footer">
+              <a [href]="institution.url" target="_blank" rel="noopener noreferrer" class="visit-link">
+                <span>Visitar sitio</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

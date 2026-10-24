@@ -5651,7 +5651,9 @@
   "repository.title": "Repositorio DSpace",
 
   // "repository.title.prefix": "DSpace Repository :: ",
-  "repository.title.prefix": "Repositorio DSpace :: ",
+  "repository.title.prefix": "Repositorio Institucional UNCP :: ",
+
+  "repository.title.prefixDSpace": "Repositorio Institucional UNCP ::",
 
   // "resource-policies.add.button": "Add",
   "resource-policies.add.button": "Agregar",
@@ -8203,7 +8205,7 @@
   "person.orcid-tooltip.not-authenticated": "{{orcid}} (unconfirmed)",
 
   // "home.recent-submissions.head": "Recent Submissions",
-  "home.recent-submissions.head": "Envíos recientes",
+  "home.recent-submissions.head": "Publicaciones recientes",
 
   // "listable-notification-object.default-message": "This object couldn't be retrieved",
   "listable-notification-object.default-message": "Este objeto no se pudo recuperar",

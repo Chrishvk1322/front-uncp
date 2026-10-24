@@ -1,0 +1,252 @@
+:host .institutions-section {
+  padding: 4rem 0;
+  overflow: hidden;
+  border-bottom: 3px solid #dee2e6;
+  margin-bottom: -30px;
+}
+:host .institutions-section .institutions-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+:host .institutions-section .institutions-header .institutions-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+:host .institutions-section .institutions-header .institutions-title .highlight {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+:host .institutions-section .institutions-header .institutions-subtitle {
+  font-size: 1.1rem;
+  color: #6c757d;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+:host .institutions-section .institutions-carousel {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+:host .institutions-section .institutions-carousel:before, :host .institutions-section .institutions-carousel:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+:host .institutions-section .institutions-carousel:before {
+  left: 0;
+  background: linear-gradient(90deg, #f8f9fa 0%, transparent 100%);
+}
+:host .institutions-section .institutions-carousel:after {
+  right: 0;
+  background: linear-gradient(270deg, #f8f9fa 0%, transparent 100%);
+}
+:host .institutions-section .institutions-carousel .carousel-track {
+  display: flex;
+  width: 2640px;
+  animation: sub-footer-scroll-infinite 40s linear infinite;
+}
+:host .institutions-section .institutions-carousel .carousel-track:hover {
+  animation-play-state: paused;
+}
+:host .institutions-section .institutions-carousel .institution-item {
+  min-width: 250px;
+  padding: 0 1rem;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  transition: all .4s ease;
+  position: relative;
+  overflow: hidden;
+  height: fit-content;
+  display: block;
+  flex-direction: column;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+  transform: translateX(-100%);
+  transition: transform .4s ease;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card:hover:before {
+  transform: translateX(0);
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card:hover .visit-link {
+  color: #219a52;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card:hover .visit-link i {
+  transform: translateX(3px);
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-header {
+  border-bottom: none !important;
+  background: none !important;
+  padding: .8rem 1.5rem;
+  margin-top: 10px;
+  height: 75px;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-header .institution-logo {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-body {
+  padding: .5rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-body .institution-title {
+  font-size: .9rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 .5rem;
+  line-height: 1.3;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-body .institution-type {
+  font-size: .75rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  padding: .2rem .5rem;
+  background: #e9ecef;
+  border-radius: 12px;
+  display: inline-block;
+  align-self: center;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer {
+  background-color: transparent !important;
+  padding: .4rem 1rem;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer .visit-link {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: #27ae60;
+  text-decoration: none;
+  font-size: .8rem;
+  font-weight: 600;
+  transition: all .3s ease;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer .visit-link i {
+  font-size: .7rem;
+  transition: transform .3s ease;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer .visit-link:hover {
+  color: #219a52;
+  text-decoration: none;
+}
+:host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer .visit-link:hover i {
+  transform: translateX(3px);
+}
+
+@keyframes sub-footer-scroll-infinite {
+  0% {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-1320px);
+  }
+}
+
+@media (max-width: 768px) {
+  :host .institutions-section {
+    padding: 3rem 0;
+  }
+  :host .institutions-section .institutions-header {
+    margin-bottom: 2rem;
+  }
+  :host .institutions-section .institutions-header .institutions-title {
+    font-size: 1.8rem;
+  }
+  :host .institutions-section .institutions-header .institutions-subtitle {
+    font-size: 1rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item {
+    min-width: 180px;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card {
+    height: fit-content;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-header {
+    padding: 1rem 1rem .5rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-header .institution-logo {
+    width: 100%;
+    height: auto;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-body .institution-title {
+    font-size: .85rem;
+  }
+  :host .institutions-section .institutions-carousel .carousel-track {
+    width: 2160px;
+    animation-duration: 25s;
+  }
+}
+
+@media (max-width: 576px) {
+  :host .institutions-section .institutions-header .institutions-title {
+    font-size: 1.5rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item {
+    min-width: 160px;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card {
+    height: fit-content;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-header {
+    padding: .75rem .75rem .25rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-header .institution-logo {
+    width: 100%;
+    height: auto;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-body {
+    padding: .2rem .75rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-body .institution-title {
+    font-size: .8rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer {
+    padding: .5rem .75rem .75rem;
+  }
+  :host .institutions-section .institutions-carousel .institution-item .institution-card .card-footer .visit-link {
+    font-size: .75rem;
+  }
+  :host .institutions-section .institutions-carousel .carousel-track {
+    width: 1920px;
+    animation-duration: 22s;
+  }
+}

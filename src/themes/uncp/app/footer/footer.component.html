@@ -1,0 +1,137 @@
+<footer class="modern-footer">
+  <div class="footer-header">
+    <div class="container">
+      <div class="header-content text-center">
+        <h2 class="header-title">
+          Mantente Actualizado con las Últimas <span class="highlight">Investigaciones</span>
+        </h2>
+        <p class="header-subtitle">
+          Trabajamos por un futuro mejor, donde investigar explora nuevas realidades.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-main">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="footer-brand">
+            <div class="logo-container">
+              <img src="assets/uncp/images/logo-blanco.png" alt="UNCP Logo" class="footer-logo"/>
+            </div>
+            <p class="brand-description">
+              El repositorio institucional líder en investigación académica, conectando el conocimiento con la
+              comunidad global:
+            </p>
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Av. Mariscal Castilla N° 3909 El Tambo - Huancayo</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>repositorio@uncp.edu.pe</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 mb-4">
+          <div class="footer-section">
+            <h5 class="section-title"><i class="fas fa-book-open"></i> Acceso Rápido</h5>
+            <ul class="footer-links">
+              <li><a routerLink="/search">Tesis de Grado</a></li>
+              <li><a routerLink="/search">Tesis de Maestría</a></li>
+              <li><a routerLink="/search">Tesis Doctorales</a></li>
+              <li><a routerLink="/search">Artículos Científicos</a></li>
+              <li><a routerLink="/search">Búsqueda Avanzada</a></li>
+              <li><a routerLink="/statistics">Estadísticas</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 mb-4">
+          <div class="footer-section">
+            <h5 class="section-title"><i class="fas fa-cog"></i> Recursos</h5>
+            <ul class="footer-links">
+              <li *ngIf="showEndUserAgreement"><a routerLink="/info/end-user-agreement">Guía de Usuario</a></li>
+              <li><a routerLink="/info/end-user-agreement">Manual de Autoarchivo</a></li>
+              <li *ngIf="showPrivacyPolicy"><a routerLink="/info/privacy">Políticas del Repositorio</a></li>
+              <li><a routerLink="/info/end-user-agreement">Derechos de Autor</a></li>
+              <li *ngIf="showSendFeedback$ | async"><a routerLink="/info/feedback">FAQ</a></li>
+              <li *ngIf="showSendFeedback$ | async"><a routerLink="/info/feedback">Soporte Técnico</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="footer-section">
+            <h5 class="section-title"><i class="fas fa-chart-line"></i> Estadísticas</h5>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-number stat-primary">11,568</div>
+                <div class="stat-label">Documentos</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number stat-info">1896</div>
+                <div class="stat-label">Autores</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number stat-accent">28</div>
+                <div class="stat-label">Comunidades</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number stat-success">75</div>
+                <div class="stat-label">Colecciones</div>
+              </div>
+            </div>
+            <div class="social-section">
+              <h6 class="social-title">Síguenos en todas nuestras redes sociales</h6>
+              <div class="social-links">
+                <a href="#" target="_blank" rel="noopener noreferrer" class="social-link facebook" aria-label="Facebook">
+                  <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="social-link youtube" aria-label="YouTube">
+                  <i class="fab fa-youtube"></i>
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="social-link twitter" aria-label="Twitter">
+                  <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="social-link tiktok" aria-label="TikTok">
+                  <i class="fab fa-tiktok"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <p class="copyright">
+            &copy; {{ dateObj | date:'y' }} UNCP - Todos los derechos reservados.
+          </p>
+        </div>
+        <div class="col">
+          <div class="footer-bottom-right">
+            <ul class="footer-bottom-links">
+              <li *ngIf="showEndUserAgreement"><a routerLink="/info/end-user-agreement">Términos de Uso</a></li>
+              <li *ngIf="showPrivacyPolicy"><a routerLink="/info/privacy">Política de Privacidad</a></li>
+              <li><a routerLink="/info/accessibility">Accesibilidad</a></li>
+              <li *ngIf="showSendFeedback$ | async"><a routerLink="/info/feedback">Contacto</a></li>
+            </ul>
+            <div class="access-badge">
+              <i class="fas fa-globe"></i>
+              <span>Acceso Abierto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

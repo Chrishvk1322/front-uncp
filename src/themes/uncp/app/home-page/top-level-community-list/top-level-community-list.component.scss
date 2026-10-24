@@ -1,0 +1,142 @@
+.contenido-comunidades {
+  padding: 2rem 1rem;
+}
+.contenido-comunidades .community-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.2rem 1.1rem;
+  text-align: center;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all .3s ease;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.contenido-comunidades .community-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+.contenido-comunidades .community-card .card-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 1.5rem;
+  color: #fff;
+}
+.contenido-comunidades .community-card .card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: .5rem;
+  line-height: 1.2;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.contenido-comunidades .community-card .card-count {
+  display: inline-block;
+  padding: 0 1.8rem;
+  background: #fff;
+  border-radius: 10px;
+  font-size: .95rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+.contenido-comunidades .community-card .card-link {
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .9rem;
+  transition: all .3s ease;
+}
+.contenido-comunidades .community-card .card-link:hover {
+  color: #2980b9;
+  text-decoration: none;
+}
+.contenido-comunidades .community-card .card-link i {
+  margin-left: 5px;
+  font-size: .8rem;
+  transition: transform .3s ease;
+}
+.contenido-comunidades .community-card .card-link:hover i {
+  transform: translateX(3px);
+}
+.contenido-comunidades .card-arquitectura {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%);
+}
+.contenido-comunidades .card-administrativas {
+  background: linear-gradient(135deg, #f3e5ff 0%, #faf0ff 100%);
+}
+.contenido-comunidades .card-agrarias {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+}
+.contenido-comunidades .card-salud {
+  background: linear-gradient(135deg, #fff2e6 0%, #fff8f0 100%);
+}
+.contenido-comunidades .card-sociales {
+  background: linear-gradient(135deg, #fde8e8 0%, #fff0f0 100%);
+}
+.contenido-comunidades .card-tesis {
+  background: linear-gradient(135deg, #e8f0ff 0%, #f0f6ff 100%);
+}
+.contenido-comunidades .card-libros {
+  background: linear-gradient(135deg, #ffe8f7 0%, #fff0fc 100%);
+}
+.contenido-comunidades .card-articulos {
+  background: linear-gradient(135deg, #e8fffa 0%, #f0fffe 100%);
+}
+
+@media (max-width: 768px) {
+  .contenido-comunidades {
+    padding: 1rem;
+  }
+  .contenido-comunidades .community-card {
+    height: auto;
+    min-height: 220px;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .contenido-comunidades .community-card .card-title {
+    font-size: 1.2rem;
+    min-height: 40px;
+  }
+  .contenido-comunidades .community-card .card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@keyframes community-card-fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.community-card {
+  animation: community-card-fadeInUp .6s ease forwards;
+}
+.community-card:nth-child(1) { animation-delay: .1s; }
+.community-card:nth-child(2) { animation-delay: .2s; }
+.community-card:nth-child(3) { animation-delay: .3s; }
+.community-card:nth-child(4) { animation-delay: .4s; }
+.community-card:nth-child(5) { animation-delay: .5s; }
+.community-card:nth-child(6) { animation-delay: .6s; }
+.community-card:nth-child(7) { animation-delay: .7s; }
+.community-card:nth-child(8) { animation-delay: .8s; }

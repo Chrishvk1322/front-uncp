@@ -1,0 +1,190 @@
+// Add any global css for the theme here
+
+// imports the base global style
+@import '../../../styles/_global-styles.scss';
+
+.facet-filter, .setting-option {
+  background-color: var(--bs-light);
+  border-radius: var(--bs-border-radius);
+
+  &.p-3 {
+    // Needs !important because the original bootstrap class uses it
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .badge-secondary {
+    background-color: var(--bs-primary);
+  }
+
+  h4 {
+    font-size: 1.1rem
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// UNCP global rules, copied in order from the tail of the production dspace-theme.css
+// (everything after the stock .facet-filter rules). Bootstrap-5-style utilities (fs-*, fw-*)
+// are needed because this project uses Bootstrap 4 but the UNCP templates use those classes.
+// ---------------------------------------------------------------------------------------------
+.fs-1 { font-size: 2.5rem !important; }
+.fs-2 { font-size: 2rem !important; }
+.fs-3 { font-size: 1.75rem !important; }
+.fs-4 { font-size: 1.5rem !important; }
+.fs-5 { font-size: 1.25rem !important; }
+.fs-6 { font-size: 1.1rem !important; }
+.fs-7 { font-size: 1rem !important; }
+.fs-8 { font-size: .875rem !important; }
+.fw-lighter { font-weight: lighter !important; }
+.fw-light { font-weight: 300 !important; }
+.fw-normal { font-weight: 400 !important; }
+.fw-medium { font-weight: 500 !important; }
+.fw-semibold { font-weight: 600 !important; }
+.fw-bold { font-weight: 700 !important; }
+.fw-bolder { font-weight: bolder !important; }
+
+.vertical-center {
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-block;
+  position: relative;
+}
+
+.text-success { color: #067a5a !important; }
+.text-primary { color: #2a7eff !important; }
+.text-black { color: #383838 !important; }
+.text-danger { color: #ff0101 !important; }
+.bg-success { background: linear-gradient(90deg, #28b36a 0%, #0ca65a 100%); }
+.bg-success-light { background: #f2fdf7 !important; }
+.bg-success-badge { background: #d1f9e4 !important; }
+.bg-danger { background: #f9d1d1 !important; }
+.bg-footer { background: #edfdf5 !important; }
+.bg-light { background: #f2f4f6 !important; }
+.container { max-width: 1350px; }
+
+// The main content area should always occupy at least 80% of the viewport width,
+// even on wide screens where Bootstrap's fixed per-breakpoint container widths
+// (540px/720px/960px/1140px) would otherwise shrink to a smaller percentage.
+// max() keeps whichever is larger, so this never makes the container narrower
+// than Bootstrap's own default.
+#main-content {
+  @include media-breakpoint-up(sm) {
+    .container { max-width: max(540px, 80vw); }
+  }
+  @include media-breakpoint-up(md) {
+    .container { max-width: max(720px, 80vw); }
+  }
+  @include media-breakpoint-up(lg) {
+    .container { max-width: max(960px, 80vw); }
+  }
+  @include media-breakpoint-up(xl) {
+    .container { max-width: max(1140px, 80vw); }
+  }
+}
+
+// Navbar links enlarged (user request); dropdown contents keep their normal size.
+// The right-hand side (search, language, login) keeps the production sizes.
+// The header must stay on one line: with the larger links it used to wrap on narrow screens and
+// the right-hand buttons (search, language, login) ended up hidden below the fixed header height.
+#main-site-header {
+  // Header layout. The search box opens leftwards from the magnifier (210px, see expandSearchInput in
+  // shared/animations/slide.ts) and must not cover the links, at any width. Measured with
+  // ~/.local/pwtool/overlap.js. The container is wider than the 1350px content one so the logo and
+  // links sit further left; the spacing between them grows with the screen width (16px to 32px).
+  #main-site-header-container {
+    flex-wrap: nowrap;
+    max-width: 1760px;
+  }
+  #header-left {
+    min-width: 0;
+    column-gap: clamp(1rem, 1.45vw, 2rem);
+  }
+  #main-site-navigation {
+    column-gap: clamp(1rem, 1.45vw, 2rem);
+  }
+  #header-right {
+    flex-shrink: 0;
+  }
+  #main-site-navigation {
+    font-size: clamp(1rem, 1.3vw, 1.35rem);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  // As in production (there up to 1100px): on medium screens hide "Tutoriales" and "Reglamento" to make room
+  // (!important: the header-navbar-wrapper component sets display:flex with a more specific selector)
+  @media (min-width: 768px) and (max-width: 1140px) {
+    #main-site-navigation > .ds-menu-item-wrapper:nth-child(2),
+    #main-site-navigation > .ds-menu-item-wrapper:nth-child(3) {
+      display: none !important;
+    }
+    img#header-logo {
+      height: 54px;
+    }
+  }
+  // Narrowest desktop range: smaller logo and text, and a shorter open search box
+  // (!important: the animation sets the width inline)
+  @media (min-width: 768px) and (max-width: 1023px) {
+    #main-site-navigation {
+      font-size: .95rem;
+    }
+    img#header-logo {
+      height: 50px;
+    }
+    [data-test="header-search-box"] {
+      width: 160px !important;
+    }
+  }
+  @media (min-width: 768px) and (max-width: 860px) {
+    #header-left,
+    #main-site-navigation {
+      column-gap: .5rem;
+    }
+    img#header-logo {
+      height: 44px;
+    }
+    [data-test="header-search-box"] {
+      width: 130px !important;
+    }
+  }
+  // Between 1141px and 1260px all four links are shown: slightly smaller logo and text so the
+  // open search box still fits
+  @media (min-width: 1141px) and (max-width: 1260px) {
+    #main-site-navigation {
+      font-size: 1rem;
+    }
+    img#header-logo {
+      height: 58px;
+    }
+  }
+  .dropdown-menu {
+    font-size: 1rem;
+  }
+}
+
+// Login button and the "Buscar" button below the banner: solid UNCP green with white text
+// (element selector needed: Bootstrap's `button.bg-success:hover/:focus` uses !important too)
+button.dropdownLogin.btn-success,
+button.search-button.btn-success {
+  background: #26b269 !important;
+  border-color: #26b269 !important;
+  color: #fff !important;
+
+  &:hover, &:focus, &:active, &.active, .show > &.dropdown-toggle {
+    background: #1f9a5a !important;
+    border-color: #1f9a5a !important;
+    color: #fff !important;
+  }
+}
+
+// Production header has a soft shadow instead of the stock thick green bottom border
+#header-navbar-wrapper {
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+}
+
+// Truncated texts (e.g. abstracts) in italics, capped at 3 lines (recovered from production, where it was
+// in the truncatable-part component styles; that component can't be themed, so it lives here)
+ds-truncatable-part .content {
+  font-style: italic;
+  line-height: 1.4rem;
+  max-height: 4.2rem;
+}

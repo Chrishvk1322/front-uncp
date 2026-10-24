@@ -1,0 +1,7 @@
+<ds-themed-home-news></ds-themed-home-news>
+<div class="container">
+  <ds-themed-search-form [inPlaceSearch]="false" [searchPlaceholder]="'home.search-form.placeholder' | translate"></ds-themed-search-form>
+  <ds-themed-top-level-community-list></ds-themed-top-level-community-list>
+  <ds-uncp-recent-item-list *ngIf="recentSubmissionspageSize>0"></ds-uncp-recent-item-list>
+</div>
+<ds-sub-footer></ds-sub-footer>

@@ -1,0 +1,65 @@
+<div class="p-md-3 p-2 border" style="border-radius: 15px;">
+<div class="row">
+  <div *ngIf="showThumbnails" class="col-auto col-md-auto">
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" [attr.rel]="(linkType == linkTypes.ExternalLink) ? 'noopener noreferrer' : null"
+       [routerLink]="[itemPageRoute]" class="dont-break-out" role="link" tabindex="-1">
+    <ds-themed-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+    </ds-themed-thumbnail>
+    </a>
+    <span *ngIf="linkType == linkTypes.None" class="dont-break-out">
+    <ds-themed-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+    </ds-themed-thumbnail>
+    </span>
+  </div>
+  <div [ngClass]="showThumbnails ? 'col' : 'col-md'">
+    <div class="d-flex" style="display: none !important;">
+      <ds-themed-badges *ngIf="showLabel" [object]="dso" [context]="context" [showAccessStatus]="true"></ds-themed-badges>
+    </div>
+
+    <ds-truncatable [id]="dso.id" *ngIf="object !== undefined && object !== null">
+      <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" [attr.rel]="(linkType == linkTypes.ExternalLink) ? 'noopener noreferrer' : null"
+         [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out text-black"
+         [innerHTML]="dsoTitle" role="link" tabindex="0"></a>
+      <span *ngIf="linkType == linkTypes.None" class="lead item-list-title dont-break-out"
+            [innerHTML]="dsoTitle"></span>
+      <span class="text-muted">
+        <ds-truncatable-part [id]="dso.id" [minLines]="1" [showToggle]="false">
+          <span *ngIf="dso.allMetadata(['dc.contributor.author', 'dc.creator', 'dc.contributor.*']).length > 0" class="item-list-authors text-success">
+            <span *ngFor="let author of allMetadataValues(['dc.contributor.author', 'dc.creator', 'dc.contributor.*']); let last=last;">
+                <span [innerHTML]="author"><span [innerHTML]="author"></span></span>
+                <span *ngIf="!last">; </span>
+            </span>
+          </span>
+        </ds-truncatable-part>
+      </span>
+      <div *ngIf="dso.firstMetadataValue('dc.description.abstract')" class="item-list-abstract">
+        <ds-truncatable-part [id]="dso.id" [minLines]="3" [showToggle]="false"><span style="white-space: normal !important;"
+          [innerHTML]="firstMetadataValue('dc.description.abstract')"></span>
+        </ds-truncatable-part>
+        <span class="badge badge-light bg-light fs-7 px-2 py-1 mr-2 text-black fw-semibold">
+          <i class="fa-solid fa-book pr-2"></i><span>{{ tipoItem(firstMetadataValue('dc.type')) }}</span>
+        </span>
+        <span class="badge badge-light bg-light fs-7 px-2 py-1 mx-2 text-black fw-semibold">
+          <i class="fa-solid fa-calendar-days pr-2"></i><span [innerHTML]="firstMetadataValue('dc.date.issued')"></span>
+        </span>
+        <a class="fs-6 text-primary mx-2" [routerLink]="'/items/' + dso.id + '/full'">
+          <i class="fa-solid fa-circle-info me-2"></i> Ver todos los metadatos</a>
+      </div>
+    </ds-truncatable>
+  </div>
+  <div class="col-auto">
+    <span *ngIf="hasRights('info:eu-repo/semantics/openAccess', 'http://purl.org/coar/access_right/c_abf2')"
+          class="alert alert-success bg-success-badge text-success fs-8 px-2 py-1 rounded-pill" role="alert">
+      <i class="fa-solid fa-unlock mr-0"></i> Acceso abierto
+    </span>
+    <span *ngIf="hasRights('info:eu-repo/semantics/embargoedAccess', 'http://purl.org/coar/access_right/c_f1cf')"
+          class="alert alert-danger bg-danger text-danger fs-8 px-2 py-1 rounded-pill" role="alert">
+      <i class="fa-solid fa-lock mr-0"></i> Embargado
+    </span>
+    <span *ngIf="hasRights('info:eu-repo/semantics/restrictedAccess', 'http://purl.org/coar/access_right/c_14cb')"
+          class="alert alert-warning fs-8 px-2 py-1 rounded-pill" role="alert">
+      <i class="fa-solid fa-lock mr-0"></i> Restringido
+    </span>
+  </div>
+</div>
+</div>

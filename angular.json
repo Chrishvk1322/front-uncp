@@ -58,6 +58,11 @@
                 "input": "src/themes/dspace/styles/theme.scss",
                 "inject": false,
                 "bundleName": "dspace-theme"
+              },
+              {
+                "input": "src/themes/uncp/styles/theme.scss",
+                "inject": false,
+                "bundleName": "uncp-theme"
               }
             ],
             "scripts": [],

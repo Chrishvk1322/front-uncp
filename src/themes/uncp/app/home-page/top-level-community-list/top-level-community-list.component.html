@@ -1,0 +1,32 @@
+<ng-container *ngVar="(communitiesRD$ | async) as communitiesRD">
+  <div class="d-none" *ngIf="communitiesRD?.hasSucceeded ">
+    <h2>
+      {{'home.top-level-communities.head' | translate}}
+    </h2>
+  <p class="lead">{{'home.top-level-communities.help' | translate}}</p>
+  <ds-viewable-collection
+    [config]="config"
+    [sortConfig]="sortConfig"
+    [objects]="communitiesRD$ | async"
+    [hideGear]="true">
+  </ds-viewable-collection>
+</div>
+<ds-error *ngIf="communitiesRD?.hasFailed " message="{{'error.top-level-communities' | translate}}"></ds-error>
+<ds-themed-loading *ngIf="communitiesRD?.isLoading " message="{{'loading.top-level-communities' | translate}}"></ds-themed-loading></ng-container>
+
+<div class="contenido-comunidades">
+  <div class="container-fluid px-0">
+    <div class="row g-3 justify-content-around">
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-md-4 mb-2" *ngFor="let community of communityCards">
+        <div class="community-card {{community.cardClass}}" [routerLink]="['/communities', community.uuid]" style="cursor: pointer;" tabindex="0">
+          <div class="card-icon"><img [src]="community.icon" alt="" width="100%"></div>
+          <h5 class="card-title">{{community.title}}</h5>
+          <div class="w-100 text-center">
+            <p class="card-count">{{community.count}} documentos</p>
+          </div>
+          <a class="card-link" [routerLink]="['/communities', community.uuid]"> Explorar colección <i class="fas fa-arrow-right text-success"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

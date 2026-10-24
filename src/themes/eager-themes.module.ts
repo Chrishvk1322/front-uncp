@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { EagerThemeModule as DSpaceEagerThemeModule } from './dspace/eager-theme.module';
+import { EagerThemeModule as UncpEagerThemeModule } from './uncp/eager-theme.module';
 // import { EagerThemeModule as CustomEagerThemeModule } from './custom/eager-theme.module';
 
 /**
@@ -12,6 +13,7 @@ import { EagerThemeModule as DSpaceEagerThemeModule } from './dspace/eager-theme
 @NgModule({
   imports: [
     DSpaceEagerThemeModule,
+    UncpEagerThemeModule,
     // CustomEagerThemeModule,
   ],
 })
