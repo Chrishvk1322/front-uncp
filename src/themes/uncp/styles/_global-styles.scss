@@ -188,3 +188,49 @@ ds-truncatable-part .content {
   line-height: 1.4rem;
   max-height: 4.2rem;
 }
+
+// Item page: thumbnail at twice the stock size (250px instead of --ds-thumbnail-max-width, 125px),
+// never wider than its column
+ds-untyped-item .thumbnail.limit-width {
+  max-width: min(250px, 100%);
+}
+ds-untyped-item .thumbnail img.thumbnail-content {
+  width: 100%;
+}
+
+// Item page: justified citation, and the keywords as a bulleted list instead of a comma-separated line
+// (the fields are rendered by stock components, so the rules have to be global)
+ds-untyped-item .uncp-justify .simple-view-element-body {
+  text-align: justify;
+}
+ds-untyped-item .uncp-subjects .simple-view-element-body {
+  > .separator {
+    display: none;
+  }
+  > a,
+  > span:not(.separator) {
+    display: list-item;
+    list-style: disc;
+    margin-left: 1.25rem;
+  }
+}
+
+// Item page: from 992px on, the left column (thumbnail, files, statistics, date, authors, publisher) is as
+// wide as its longest line, so no file name or value wraps (at least 310px, which puts the right column at
+// x=423 on a 1366px screen; at most 38%, beyond which long lines do wrap), and the right column takes all
+// the remaining width, starting right next to it
+@include media-breakpoint-up(lg) {
+  ds-untyped-item .uncp-item-left {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 310px;
+    max-width: 38%;
+    // a bit more room between the two columns than the stock 30px gutter (user request)
+    padding-right: calc(#{$grid-gutter-width / 2} + 1rem);
+  }
+  ds-untyped-item .uncp-item-right {
+    flex: 1 1 0;
+    max-width: none;
+    min-width: 0;
+  }
+}

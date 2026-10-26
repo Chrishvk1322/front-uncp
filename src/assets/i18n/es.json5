@@ -3828,7 +3828,7 @@
   "item.page.journal-title": "Título de la revista",
 
   // "item.page.publisher": "Publisher",
-  "item.page.publisher": "Editor",
+  "item.page.publisher": "Editorial",
 
   // "item.page.titleprefix": "Item: ",
   "item.page.titleprefix": "Ítem: ",
@@ -3879,10 +3879,10 @@
   "item.page.author": "Autores",
 
   // "item.page.citation": "Citation",
-  "item.page.citation": "Citación",
+  "item.page.citation": "Cita",
 
   // "item.page.collections": "Collections",
-  "item.page.collections": "Colecciones",
+  "item.page.collections": "Colección a la que pertenece",
 
   // "item.page.collections.loading": "Loading...",
   "item.page.collections.loading": "Cargando...",
@@ -3954,7 +3954,7 @@
   "item.page.subject": "Palabras clave",
 
   // "item.page.uri": "URI",
-  "item.page.uri": "URI",
+  "item.page.uri": "Identificador único - URI",
 
   // "item.page.bitstreams.view-more": "Show more",
   "item.page.bitstreams.view-more": "Mostrar más",
@@ -8468,5 +8468,7 @@
   "uncp.item-stats.visits": "Visitas",
 
   "uncp.item-stats.downloads": "Descargas",
+
+  "uncp.item-stats.link-title": "Ver estadísticas detalladas del ítem",
 
 }

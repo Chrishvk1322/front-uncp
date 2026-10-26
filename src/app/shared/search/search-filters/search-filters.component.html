@@ -10,4 +10,4 @@
 <ng-container *ngIf="getFinalFiltersComputed(this.currentConfiguration) !== (filters | async)?.payload?.length">
   <ngx-skeleton-loader [count]="defaultFilterCount"/>
 </ng-container>
-<a class="btn btn-primary" [routerLink]="[searchLink]" [queryParams]="clearParams | async" queryParamsHandling="merge" role="button"><i class="fas fa-undo"></i> {{"search.filters.reset" | translate}}</a>
+<a class="btn btn-primary" rel="nofollow" [routerLink]="[searchLink]" [queryParams]="clearParams | async" queryParamsHandling="merge" role="button"><i class="fas fa-undo"></i> {{"search.filters.reset" | translate}}</a>

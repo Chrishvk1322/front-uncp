@@ -4,9 +4,11 @@
  * ============================================================================================
  *
  *  Componente propio del Repositorio Institucional UNCP; no existe en DSpace de serie.
- *  Bloque "Estadísticas" (👁 Visitas · ⬇ Descargas) que se muestra después de la sección de
- *  archivos, en la ficha simple y en la completa. Se agregó para la evaluación de repositorios
- *  de Concytec; en el frontend anterior lo insertaba el script assets/custom/uncp-estadisticas.js
+ *  Bloque "Estadísticas" (👁 Visitas · ⬇ Descargas, en dos tarjetas) que se muestra después de la
+ *  sección de archivos, en la ficha simple y en la completa. El título enlaza a la página de
+ *  estadísticas del ítem de DSpace (/statistics/items/{uuid}), que en producción es pública.
+ *  Se agregó para la evaluación de repositorios de Concytec; en el frontend anterior lo insertaba
+ *  el script assets/custom/uncp-estadisticas.js
  *  (ver frontend-personalizacion.md, sección 3 y anexo A).
  *
  *  Datos: informes de uso de la API de estadísticas, consultados sin sesión:
@@ -39,6 +41,7 @@ export interface UncpItemStats {
 @Component({
   selector: 'ds-uncp-item-stats',
   templateUrl: './uncp-item-stats.component.html',
+  styleUrls: ['./uncp-item-stats.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Not provided in root by DSpace (only in the lazy statistics page module)
   providers: [UsageReportDataService],

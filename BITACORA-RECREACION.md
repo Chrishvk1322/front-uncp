@@ -84,6 +84,7 @@ Verificación: compilado en modo SSR y comprobado con `curl` que el HTML final c
   1. `src/index.html`: jQuery + Bootstrap JS por CDN (carrusel) y `<title>`.
   2. `src/assets/i18n/es.json5` y `en.json5`: 3 textos de UNCP en `es`, más las etiquetas `uncp.item-type.*` y `uncp.access-right.*` en los dos idiomas (bloque al final, marcado con un comentario "UNCP"). Los i18n de un tema no se cargan automáticamente.
   3. `src/app/shared/form/builder/.../dynamic-lookup-relation-search-tab.component.html`: se quitó `data-toggle="dropdown"`, que choca con el Bootstrap JS de `index.html` (ver sección 6).
+  4. `rel="nofollow"` en 5 plantillas de `src/app/shared/search/`: `search-facet-option`, `search-facet-range-option`, `search-facet-selected-option`, `search-label` y `search-filters` (ver 7.11).
 - **Verificado tras la migración**:
   - Compilación y lint del tema limpios.
   - En el HTML aparece `data-used-theme="uncp"`.
@@ -129,6 +130,20 @@ Verificación: compilado en modo SSR y comprobado con `curl` que el HTML final c
 - **Conflicto de desplegables por el JS de Bootstrap**: al cargar jQuery + Bootstrap JS (necesarios para el carrusel), los botones que tenían a la vez `ngbDropdownToggle` y `data-toggle="dropdown"` se abrían y cerraban en el mismo clic. Le pasaba al selector de idioma y al desplegable de resultados del formulario de depósito. Se quitó `data-toggle="dropdown"`, que sobraba. Si aparece otro desplegable que "no abre", revisar esto primero.
 - **Sin "Más..." en los registros** (2026-10-24): `[showToggle]="false"` en los dos `ds-truncatable-part` del registro de resultados. Resumen y autores siguen cortados (3 y 1 líneas), pero no se expanden.
 - **Separación entre resumen y etiquetas** (2026-10-24): `margin-bottom: .5rem` en `.item-list-abstract ds-truncatable-part` (SCSS del registro de resultados en el tema). Medido: unos 9px entre el resumen y las etiquetas de tipo, fecha y "Ver todos los metadatos".
+- **Ficha del ítem: miniatura más grande y etiquetas** (25/10/2026):
+  - **Miniatura**: de 125px a **250px**, sin pasar nunca del ancho de su columna (a 800px de pantalla queda en 210px). Está en `_global-styles.scss` del tema (`ds-untyped-item .thumbnail.limit-width`). **Ojo**: las miniaturas que genera el backend miden 135×175px, así que a 250px se ven algo menos nítidas. Para que se vean mejor hay que cambiarlo en el backend: subir `thumbnail.maxwidth`/`maxheight` y regenerarlas con `dspace filter-media -f`. Es un proceso largo y no se ha hecho.
+  - **Etiquetas** en `src/assets/i18n/es.json5`, cambiando el valor de las claves de serie, así que aplica en todas las páginas que las usan: `item.page.citation` "Citación" → **"Cita"**; `item.page.uri` "URI" → **"Identificador único - URI"**; `item.page.collections` "Colecciones" → **"Colección a la que pertenece"** (también en la ficha completa); `item.page.publisher` "Editor" → **"Editorial"**. Las de inglés no cambiaron.
+- **Ficha del ítem: columnas, etiquetas, resumen y palabras clave** (25/10/2026), en `src/themes/uncp/app/item-page/simple/item-types/untyped-item/` y `_global-styles.scss`:
+  - **Columnas**: la derecha pasa de `col-md-6` a `col-md-8` y ocupa el espacio que quedaba libre. Desde 992px, la columna izquierda (`.uncp-item-left`) mide **lo que su línea más larga**, para que no se parta ningún nombre de archivo ni valor (pedido del usuario). Tiene un mínimo de 310px (la columna derecha arrancaría en x=423 a 1366px) y un máximo del 38%; pasado ese tope, en pantallas chicas, sí se parte. La derecha (`.uncp-item-right`) toma el resto.
+    - **x=423 exacto no es posible sin partir líneas**: "Universidad Nacional del Centro del Perú" (Editorial, en todos los ítems) mide 297px y los nombres de archivo llegan a 348–373px.
+    - **Separación extra** de 1rem (16px) entre columnas, a pedido del usuario ("se sigue viendo muy junto"): `padding-right: calc(15px + 1rem)` en `.uncp-item-left`, así que el espacio total entre el texto de las dos columnas pasa de 30 a 46px.
+    - **Medido a 1366px**: la columna derecha empieza en x=456 (ítem 13558), x=507 (10160) y x=532 (11198), sin renglones partidos.
+    - **Medido a 1024px**: el tope del 38% (365px) parte el tamaño "(414.94 KB)" del archivo más largo.
+    - Entre 768 y 991px sigue 4/8, y por debajo de 768px las columnas se apilan. Sin desbordes, medido a 1920, 1366, 1024, 800 y 390px.
+  - **Pastillas arriba del Resumen**: tipo de documento y acceso, iguales a las de las tarjetas de resultados. Usan `getItemTypeLabel()`/`getAccessRightBadge()` de `uncp-metadata-labels.ts` y se calculan en `ngOnInit`. Salen en el SSR porque vienen de los metadatos.
+  - **Resumen justificado**: en los ítems de UNCP el resumen viene pegado del PDF, con un salto de línea fijo (`\r\n`) en cada renglón. El DSpace de serie los respeta (`preserve-line-breaks`) y se veían renglones cortados. El tema une los saltos simples con un espacio y solo separa párrafos donde hay una línea en blanco (`abstractParagraphs`). **No se hizo**: las palabras cortadas con guion al final del renglón quedan como "investiga- ción" si existen en los datos.
+  - **Cita justificada** (`.uncp-justify`).
+  - **Palabras clave** como lista con viñetas (`.uncp-subjects`). Siguen siendo enlaces a la navegación por materia.
 - Diferencia consciente con la referencia: en `uncp-home.png` el carrusel y el contenido llegan casi de borde a borde (contenedor de 1350px). Aquí `#main-content` usa `max(<bootstrap>, 80vw)`, que el usuario aprobó, así que en pantallas de ~1265px queda algo más angosto que en la captura.
 
 ## 7. Pendiente: diseño y personalización
@@ -182,15 +197,32 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
      - el HTML del SSR deja el componente vacío y sin consultas;
      - forzando un error en `TotalDownloads` (`FAIL_PATH` en el proxy), el bloque no aparece.
    - **Cifras**: incluyen visitas de bots que DSpace no reconoce (FP §10.4.5); se corrigen en el backend (8.10).
+   - **Mejora visual** (25/10/2026, a pedido del usuario):
+     - **dos tarjetas** con fondo verde claro (`#f2fdf7`, borde `#d1f9e4`), ícono en círculo verde, número grande en `#067a5a` y etiqueta en gris debajo. Estilos en `uncp-item-stats.component.scss`;
+     - el **título "Estadísticas" enlaza** a `/statistics/items/{uuid}`, la página de estadísticas del ítem de DSpace, con visitas por mes y país, y lleva el ícono `fa-chart-line`. Es pública en producción: un visitante anónimo tiene `canViewUsageStatistics` sobre el sitio, que es lo que pide `StatisticsAdministratorGuard`;
+     - tooltip i18n `uncp.item-stats.link-title`;
+     - verificado: tarjetas de 168×67px a 1366px y 153×67px a 1024px; el clic abre la página de estadísticas del ítem.
 10. **Pie de página, enlaces** (FP §5.3):
     - redes sociales con `href="#"`: poner las direcciones reales o quitar los iconos;
     - enlaces `/info/policies`, `/rights`, `/faq`, `/support`, `/terms`, `/accessibility` y `/contact`, que probablemente no existen: crear las páginas o redirigir, y quitar `href="#"`;
     - comprobar que los bloques "Acceso rápido" y "Recursos" lleven a páginas o búsquedas reales.
-11. **Medidas contra rastreadores en el tema** (FP §10.4):
-    - `rel="nofollow"` en los enlaces que añaden filtros a una búsqueda (facetas de autor, año y materia, y "ver más");
-    - **mantener las direcciones** `/search?f.xxx=`: las reglas de nginx y `robots.txt` dependen de ellas;
-    - comprobar que la portada, las fichas y las búsquedas no hagan peticiones que respondan 401 a un visitante sin sesión, y que no se consulte Google Analytics.
+11. ~~**Medidas contra rastreadores en el tema**~~ **Hecho el 26/10/2026** (FP §10.4). Beneficia tanto en estático como con SSR; con SSR es más importante, porque los enlaces de filtros quedan en el HTML para todos los bots.
+    - **`rel="nofollow"`** en los 5 enlaces que añaden o quitan filtros: opción de faceta, opción de rango (fechas), faceta seleccionada, etiqueta de filtro aplicado y "Restablecer filtros". **Son cambios en el núcleo** (un atributo por archivo en `src/app/shared/search/...`), porque esos componentes no se pueden sobrescribir desde un tema en 7.6.5 (ver 5b). Verificado: los 16 enlaces de `/search` y los 9 de `/search?f.subject=…` llevan `nofollow`.
+    - **Forma de las URL**: todos los enlaces de filtros siguen siendo `/search?…f.xxx=…`, la forma que reconocen `uncp-bots.conf` y `robots.txt`. El tema solo enlaza a `/search` sin filtros (pie, carrusel, "Cargar más" con `spc.*`). **Regla para el futuro**: si un rediseño (7.1/7.13) cambia esa forma, actualizar antes nginx y `robots.txt` (FP §10.4.2).
+    - **401**: ninguno para un visitante sin sesión en portada, búsqueda con y sin filtro, ficha simple y completa, comunidad, colección y `/browse/author`. Medido el 26/10/2026.
+    - **Google Analytics**: el tema no carga GA. Queda **un 404 por visita** a `config/properties/google.analytics.key`, que piden el `GoogleAnalyticsService` y el aviso de cookies (Klaro) del núcleo; es el origen de los avisos en `dspace.log`. **No se cambió en el frontend**: requeriría modificar 2 archivos del núcleo y quitaría la opción de activar GA más adelante. Se resuelve en el backend (8.14).
 12. ~~**Locale `es-PE`**~~ **Hecho el 25/10/2026**: `registerLocaleData(localeEsPe)` en `src/themes/uncp/eager-theme.module.ts`. Las cifras usan `number:'1.0-0':'es-PE'` y quedan como "14,626". En producción se mezclaban "11,568" y "1896".
+13. **Estilo UNCP en todas las páginas posibles** (pedido del usuario, 25/10/2026; para más adelante). Hoy tienen estilo UNCP la portada, los resultados de búsqueda (tarjetas), la ficha simple y completa del ítem (parcial), el header y el pie. El resto son páginas de serie de DSpace. Lista inicial, a revisar en este orden:
+    - **páginas de comunidad y colección** y **búsqueda** (incluye 7.1);
+    - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
+    - **navegación** (`/browse/...`: por autor, materia, fecha, título);
+    - **lista de comunidades** (`/community-list`);
+    - **páginas informativas** (`/info/privacy`, `/info/end-user-agreement`, `/info/feedback`; ver 7.10);
+    - **inicio de sesión**, registro y recuperación de clave;
+    - **páginas de error** (404, 500);
+    - **opcional**: el área de usuario y administración (MyDSpace, envío, edición), que usa solo personal interno.
+    
+    **Criterio**: reutilizar los colores, tipografía y componentes ya hechos (tarjetas, pastillas, botones verdes) y sobrescribir en el tema solo lo necesario. Revisar antes en la réplica y en los chunks si producción ya tenía algo propio en cada página.
 
 ## 8. Pendiente: despliegue
 
@@ -209,7 +241,7 @@ Lo que hay que hacer o revisar al llevar este código a producción. **Situació
    - además, `mediaViewer` desactivado, `vocabularies` con `srsc` y `handle.prefix: 20.500.12894`.
 3. Commitear los cambios cuando el usuario lo pida. El usuario hizo un commit "tema UNCP" (`24bace4`) después de la migración; las tablas de mapeo y los ajustes posteriores aún no están commiteados.
 4. **Compilar con `yarn run build:prod`** (no `build:ssr` directo), con `NODE_OPTIONS=--max-old-space-size` alto; ver sección 9.
-5. **Archivos del núcleo modificados** (`src/index.html`, `es.json5`/`en.json5`, formulario de depósito; ver 5b): revisarlos cuando se actualice DSpace.
+5. **Archivos del núcleo modificados** (`src/index.html`, `es.json5`/`en.json5`, formulario de depósito y 5 plantillas de filtros de búsqueda con `nofollow`; ver 5b): revisarlos cuando se actualice DSpace.
 6. **Idioma por defecto `es`** (FP §6): hoy es `en`, con 23 idiomas activos. Dejar solo los que se quieran ofrecer y poner `lang="es"` en el `<html>` de `src/index.html`.
 7. **`robots.txt` exacto** (FP §1), generado desde `src/robots.txt.ejs`: `Disallow: /search?f.` y `Disallow: /search?*&f.`, `Allow: /` y el `Sitemap`. Verificado el 24/10/2026: es lo que sirve hoy producción. Si se decide bloquear Bytespider, añadir un `Disallow: /` específico para ese agente.
 8. **Decidir SSR o estático** (FP §7). Se recomienda SSR, por Google Scholar (`citation_*`), el sitemap y `/server/actuator/health`. Si se pasa a SSR:
@@ -230,8 +262,24 @@ Lo que hay que hacer o revisar al llevar este código a producción. **Situació
 10. **Decisiones de la gestión del repositorio** (FP §4.3, §10.4):
     - bloquear Bytespider por completo;
     - limpiar las visitas de bots de las estadísticas (`dspace stats-util`, con respaldo previo del núcleo `statistics`). Es una tarea del backend.
-11. **Cron de totales con `comunidades_inicio`** (7.5): reemplazar `/opt/dspace/scripts/uncp_totales_pie.sh` por `servidor/uncp_totales_pie.sh`, siguiendo los pasos de `servidor/LEEME.md` (respaldo, `bash -n`, prueba con `UNCP_DESTINO` temporal, ejecución). **Se puede aplicar ya**, antes del despliegue, porque el pie actual ignora el campo nuevo.
+11. ~~**Cron de totales con `comunidades_inicio`**~~ **Aplicado por el usuario el 25/10/2026**: el JSON de producción ya trae las 8 comunidades. (7.5): reemplazar `/opt/dspace/scripts/uncp_totales_pie.sh` por `servidor/uncp_totales_pie.sh`, siguiendo los pasos de `servidor/LEEME.md` (respaldo, `bash -n`, prueba con `UNCP_DESTINO` temporal, ejecución). **Se puede aplicar ya**, antes del despliegue, porque el pie actual ignora el campo nuevo.
 12. **Ruta fija para `uncp-totales.json`** al desplegar: `location /assets/custom/ { alias /opt/dspace/uncp-public/; }` en nginx y `DESTINO` del cron apuntando ahí. Así ningún despliegue borra el archivo y con SSR no lo atiende Node. Pasos sin corte en `servidor/LEEME.md`. Complementa 8.9.
+13. **Opcional: miniaturas más nítidas solo para los registros nuevos** (backend). La ficha del ítem muestra la miniatura a 250px (sección 6), pero el backend las genera de 135×175px y se ven algo borrosas.
+    - **Revisar antes**, desde la sesión de la oficina:
+      - cómo se generan hoy: `crontab -l -u dspace | grep filter-media`. **Si el cron usa `-f`, quitárselo**; si no, se regenerarían todas cada vez;
+      - los valores actuales de `thumbnail.maxwidth` y `thumbnail.maxheight`.
+    - **Cambio**: subir `thumbnail.maxwidth`/`maxheight` en `local.cfg` a unos 270×350, el doble. `filter-media` sin `-f` solo procesa archivos sin miniatura, así que **las ~35 000 actuales no se tocan** y solo los ítems nuevos salen al tamaño nuevo.
+    - **Espacio**: medido el 25/10/2026, hoy hay ~35 000 miniaturas de 6,3 KB de promedio, ~220 MB en total. Cada miniatura nueva pesaría ~16–25 KB, así que el aumento es despreciable. Regenerarlas todas costaría unos +0,3–0,7 GB, horas de CPU y una copia de Proxmox grande ese día.
+    - **Efectos**:
+      - en la ficha, las nuevas se ven nítidas y las antiguas algo borrosas; en las listas de búsqueda no se nota;
+      - si se reemplaza el PDF de un ítem antiguo, su miniatura se regenera con el tamaño nuevo.
+    - **Más adelante, si se quiere**: actualizar las antiguas por partes, una colección por noche, con `dspace filter-media -f -i <handle>`, lejos del reinicio de las 00:00 y con respaldo previo del assetstore.
+    - **Frontend**: no requiere cambios.
+14. **Avisos de `google.analytics.key` en `dspace.log`** (backend, FP §10.4.7). Cada visita pide esa propiedad una vez, desde el `GoogleAnalyticsService` y Klaro del frontend de serie, y como no está definida el backend responde 404 y escribe un aviso. Opciones:
+    - si se va a usar GA, definir la clave real en `local.cfg`;
+    - si no, bajar el nivel de log de ese aviso en la configuración de log4j2 del backend.
+    
+    El frontend no se modificó (ver 7.11).
 
 ## 9. Cómo compilar, levantar y revisar
 

@@ -1,8 +1,26 @@
-<ds-metadata-field-wrapper *ngIf="stats$ | async as stats" [label]="'uncp.item-stats.head' | translate">
-  <span class="mr-4 text-nowrap">
-    <i class="fas fa-eye mr-1" aria-hidden="true"></i><strong>{{ 'uncp.item-stats.visits' | translate }}:</strong> {{ stats.visitas | number:'1.0-0':'es-PE' }}
-  </span>
-  <span class="text-nowrap">
-    <i class="fas fa-download mr-1" aria-hidden="true"></i><strong>{{ 'uncp.item-stats.downloads' | translate }}:</strong> {{ stats.descargas | number:'1.0-0':'es-PE' }}
-  </span>
-</ds-metadata-field-wrapper>
+<!-- Same structure and spacing as ds-metadata-field-wrapper, with the title linking to the item's statistics page -->
+<div *ngIf="stats$ | async as stats" class="simple-view-element">
+  <h2 class="simple-view-element-header">
+    <a [routerLink]="['/statistics/items', item.uuid]" class="uncp-stats-link" [title]="'uncp.item-stats.link-title' | translate">
+      {{ 'uncp.item-stats.head' | translate }}<i class="fas fa-chart-line ml-2" aria-hidden="true"></i>
+    </a>
+  </h2>
+  <div class="simple-view-element-body">
+    <div class="uncp-stat-cards">
+      <div class="uncp-stat-card">
+        <span class="uncp-stat-icon" aria-hidden="true"><i class="fas fa-eye"></i></span>
+        <span class="uncp-stat-text">
+          <span class="uncp-stat-number">{{ stats.visitas | number:'1.0-0':'es-PE' }}</span>
+          <span class="uncp-stat-label">{{ 'uncp.item-stats.visits' | translate }}</span>
+        </span>
+      </div>
+      <div class="uncp-stat-card">
+        <span class="uncp-stat-icon" aria-hidden="true"><i class="fas fa-download"></i></span>
+        <span class="uncp-stat-text">
+          <span class="uncp-stat-number">{{ stats.descargas | number:'1.0-0':'es-PE' }}</span>
+          <span class="uncp-stat-label">{{ 'uncp.item-stats.downloads' | translate }}</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

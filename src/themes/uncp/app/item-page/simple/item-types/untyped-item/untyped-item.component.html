@@ -15,7 +15,7 @@
   <ds-dso-edit-menu></ds-dso-edit-menu>
 </div>
 <div class="row">
-  <div class="col-xs-12 col-md-4">
+  <div class="col-xs-12 col-md-4 uncp-item-left">
     <ng-container *ngIf="!(mediaViewer.image || mediaViewer.video)">
       <ds-metadata-field-wrapper [hideIfNoTextContent]="false">
         <ds-themed-thumbnail [thumbnail]="object?.thumbnail | async"></ds-themed-thumbnail>
@@ -50,19 +50,32 @@
       [label]="'item.page.publisher'">
     </ds-generic-item-page-field>
   </div>
-  <div class="col-xs-12 col-md-6">
-    <ds-item-page-abstract-field [item]="object"></ds-item-page-abstract-field>
+  <div class="col-xs-12 col-md-8 uncp-item-right">
+    <!-- UNCP: document type and access badges, as in the search result cards -->
+    <div class="uncp-item-badges mb-4">
+      <span class="badge badge-light bg-light fs-7 px-2 py-1 mr-2 text-black fw-semibold">
+        <i class="fa-solid fa-book pr-2"></i><span>{{ itemTypeLabel | translate }}</span>
+      </span>
+      <span *ngIf="accessRight" [ngClass]="accessRight.cssClass"
+            class="alert d-inline-block mb-0 fs-8 px-2 py-1 rounded-pill" role="alert">
+        <i class="fa-solid mr-0" [ngClass]="accessRight.icon"></i> {{ accessRight.label | translate }}
+      </span>
+    </div>
+    <!-- UNCP: abstract as justified paragraphs (the hard line breaks copied from the PDF are joined) -->
+    <ds-metadata-field-wrapper *ngIf="abstractParagraphs.length > 0" class="uncp-abstract" [label]="'item.page.abstract' | translate">
+      <p *ngFor="let paragraph of abstractParagraphs" class="text-justify mb-2">{{ paragraph }}</p>
+    </ds-metadata-field-wrapper>
     <ds-generic-item-page-field [item]="object"
       [fields]="['dc.description']"
       [label]="'item.page.description'">
     </ds-generic-item-page-field>
 
-    <ds-generic-item-page-field [item]="object"
+    <ds-generic-item-page-field [item]="object" class="uncp-subjects"
       [fields]="['dc.subject']"
       [separator]="', '"
       [label]="'item.page.subject'">
     </ds-generic-item-page-field>
-    <ds-generic-item-page-field [item]="object"
+    <ds-generic-item-page-field [item]="object" class="uncp-justify"
       [fields]="['dc.identifier.citation']"
       [label]="'item.page.citation'">
     </ds-generic-item-page-field>

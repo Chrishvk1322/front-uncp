@@ -1,0 +1,71 @@
+// Same as ds-metadata-field-wrapper, so the block lines up with the other fields of the item page
+.simple-view-element {
+  margin-bottom: 15px;
+}
+.simple-view-element-header {
+  font-size: 1.25rem;
+}
+
+// The title links to the item's statistics page, but keeps the look of the other field titles
+.uncp-stats-link {
+  color: inherit;
+
+  i {
+    color: #067a5a;
+    font-size: .9rem;
+  }
+
+  &:hover,
+  &:focus {
+    color: #067a5a;
+    text-decoration: none;
+  }
+}
+
+// Two cards in the UNCP greens (same light green as .bg-success-light), side by side
+.uncp-stat-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.uncp-stat-card {
+  flex: 1 1 8.5rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .6rem .85rem;
+  background: #f2fdf7;
+  border: 1px solid #d1f9e4;
+  border-radius: .6rem;
+}
+
+.uncp-stat-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: #d1f9e4;
+  color: #067a5a;
+}
+
+.uncp-stat-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.uncp-stat-number {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #067a5a;
+}
+
+.uncp-stat-label {
+  font-size: .85rem;
+  color: #6c757d;
+}
