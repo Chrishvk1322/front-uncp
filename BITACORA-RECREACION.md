@@ -1,6 +1,6 @@
 # Bitácora — Recreación del frontend de producción (repositorio.uncp.edu.pe)
 
-Última actualización: 2026-10-25.
+Última actualización: 2026-10-26.
 
 ## 1. Objetivo
 
@@ -8,11 +8,28 @@ Recrear en este repo (`dspace-angular`, base **7.6.5**) el diseño personalizado
 
 ## 2. Estado actual (resumen)
 
-- La **página de inicio** está recreada completa y verificada (ver sección 5).
-- Ajustes extra pedidos por el usuario (no venían de producción): contenedor principal al 80% del ancho y navbar 30% más grande.
-- **Pendiente principal**: analizar a fondo las páginas de comunidad/colección y de búsqueda (sección 7).
-- Nada está commiteado en git todavía (el usuario no lo ha pedido).
-- **Todo vive en un tema propio `uncp`** (`src/themes/uncp/`, migrado el 2026-10-24, ver sección 5b). El tema de ejemplo `dspace` y `src/app/` volvieron a su versión original, salvo 3 archivos del núcleo que no se pueden sobrescribir desde un tema. Respaldo del estado anterior a la migración en `~/.local/uncp-backup/` (`pre-uncp-theme.patch` + `pre-uncp-theme-untracked.tgz`).
+- **Todo vive en un tema propio `uncp`** (`src/themes/uncp/`, desde el 24/10/2026, ver 5b). El tema `dspace` y `src/app/` están en su versión original, salvo unos pocos archivos del núcleo que no se pueden sobrescribir desde un tema (lista en 5b). Respaldo del estado anterior a la migración: `~/.local/uncp-backup/`.
+- **Hecho y verificado**:
+  - **Portada** completa (sección 5): carrusel, adaptado también a móvil; tarjetas de comunidades con conteos reales del JSON del cron; publicaciones recientes; sub-footer; pie con cifras reales.
+  - **Tarjetas de resultados**: etiquetas de tipo y acceso según ALICIA 2.1.0, a partir de tablas de mapeo e i18n.
+  - **Ficha del ítem**:
+    - bloque "Estadísticas" en tarjetas que enlaza a la página de estadísticas del ítem;
+    - columnas ajustadas;
+    - pastillas de tipo y acceso;
+    - resumen y cita justificados;
+    - palabras clave en lista;
+    - miniatura de 250px;
+    - etiquetas renombradas.
+  - **Medidas contra rastreadores**: `nofollow` en los enlaces de filtros y verificación de que no hay peticiones 401.
+  - **Vista móvil** revisada.
+  - Ajustes visuales pedidos por el usuario (sección 6).
+- **Commits**: todo está commiteado por el usuario. El último es `ef31c61` "fix en celulares", del 26/10/2026.
+- **Servidor**: el usuario ya aplicó el cron nuevo de totales con `comunidades_inicio` (`servidor/uncp_totales_pie.sh`).
+- **Siguiente paso acordado**: **7.1 + 7.13**, es decir, búsqueda, comunidades y colecciones con el estilo UNCP y luego el resto de páginas. Antes de cambiar nada, extraer de la réplica y de los chunks cómo se ven hoy en producción.
+- **Forma de trabajo**:
+  - el servidor local se levanta con el proxy en modo producción solo lectura (sección 9);
+  - las capturas y mediciones se hacen con los scripts de `~/.local/pwtool/`;
+  - cada cambio se compila (`build:prod`), se reinicia el SSR, se verifica y se anota aquí.
 
 ## 3. Material de partida
 
