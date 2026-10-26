@@ -152,10 +152,21 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
 
 1. **Páginas de comunidad/colección y búsqueda**: aplicar el método de las secciones 4 y 10 (extraer el HTML real de la réplica y el CSS de los chunks). Es probable que tengan más personalización.
 2. Confirmar si los estilos de los componentes compartidos (buscador, tarjetas de ítems) aplican igual fuera de la home en producción.
-3. **Sin verificar por falta de datos o de pruebas**:
+3. ~~**Sin verificar por falta de datos o de pruebas**~~ **Verificado el 26/10/2026**:
    - ~~pastillas "Embargado" y "Restringido"~~: verificadas el 24/10/2026 con los 39 embargados y los 4 `c_14cb` de producción (ver 7.7);
-   - miniatura por defecto `PORTADA.png`: todos los ítems vistos tenían portada;
-   - vista móvil (< 768px): los ajustes del header se midieron de 768 a 1920px.
+   - **portada por defecto `PORTADA.png`**: probada con los 8 ítems sin archivos de producción (`f.has_content_in_original_bundle=false`). Se ve bien en la lista y en la ficha; en la ficha mide 236px, su tamaño natural, en lugar de 250px (diferencia mínima, no corregida);
+   - **vista móvil** (360, 390 y 414px; home, búsqueda, ficha y ficha completa): **sin scroll horizontal**. El menú hamburguesa muestra Repositorio, Tutoriales (con su desplegable de 4 enlaces), Reglamento y Estadísticas. La ficha y el pie se apilan bien. La tabla de la ficha completa se desplaza dentro de su recuadro (`table-responsive`, de serie).
+   - **Corregido: carrusel en móvil.** Medía ~110px de alto, el título quedaba encimado con las flechas y la descripción y los botones no se veían. Producción también los ocultaba con `d-none d-md-*`. Ahora, por debajo de 768px:
+     - el banner mide 270px;
+     - se ven el título más chico, la descripción corta y los dos botones (más pequeños);
+     - las flechas son más chicas y quedan centradas a los lados.
+     
+     En escritorio no cambia nada: la descripción larga sigue solo desde 992px. Archivos: `home-news.component.{html,scss}` del tema. Verificado a 360/390/414/768/1366.
+   - **Detectado y no corregido** (el usuario eligió solo el carrusel; quedan como mejoras opcionales de móvil):
+     - tarjetas de comunidades en 1 columna de ~250px de alto (la home mide ~7300px en móvil);
+     - en publicaciones recientes, la miniatura ocupa ~40% del ancho y el título queda en una columna angosta;
+     - el menú móvil tiene el estilo de serie, sin separación, con "Repositorio" en azul y los demás en gris;
+     - "Iniciar sesión" en móvil es un enlace azul y no el botón verde.
 4. **Textos fijos en español** que no cambian con el idioma: navbar, carrusel, tarjetas de comunidades, sub-footer, footer y "Ver todos los metadatos". Es igual que en producción; pasarlos a i18n solo si se quiere el sitio en inglés.
 5. ~~**Conteos de las 8 tarjetas de comunidades**~~ **Hecho el 25/10/2026** (frontend). Antes estaban fijos, igual que en producción, y al 24/10/2026 había 7 de 8 desactualizados. Ahora:
    - `TopLevelCommunityListComponent` del tema (`counts$`) toma cada conteo de `comunidades_inicio` en `/assets/custom/uncp-totales.json`, por UUID, mediante `UncpTotalesService`;

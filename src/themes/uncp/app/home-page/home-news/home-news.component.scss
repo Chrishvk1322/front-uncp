@@ -122,3 +122,47 @@
 }
 
 
+
+/* UNCP mobile (< 768px): taller banner so the title, the short description and both buttons fit,
+   and smaller arrows that do not cover the text. Desktop is unchanged (the long description stays lg+). */
+@media (max-width: 767.98px) {
+  .carousel-item img {
+    height: 270px;
+    object-fit: cover;
+  }
+  .carousel-caption {
+    left: 13% !important;
+    right: 13% !important;
+    padding: 0;
+
+    h1 {
+      font-size: 1.45rem;
+      line-height: 1.2;
+      margin-bottom: .4rem;
+    }
+    .uncp-hero-short {
+      font-size: .95rem;
+      margin-bottom: .75rem;
+    }
+    .btn {
+      font-size: .8rem;
+      padding: .3rem .6rem;
+      margin: .2rem .4rem .2rem 0 !important;
+    }
+  }
+  .carousel-control-prev, .carousel-control-next {
+    padding: 6px;
+    top: 50% !important;
+    transform: translateY(-50%);
+  }
+  .carousel-control-prev {
+    left: 6px;
+  }
+  .carousel-control-next {
+    right: 6px;
+  }
+  .carousel-control-prev-icon, .carousel-control-next-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
