@@ -5498,4 +5498,38 @@
   "dynamic-form-array.sortable-list.label": "Sortable list",
 
   "metadata-export-search.submit.error.limit-exceeded": "Only the first {{limit}} items will be exported",
+
+  // UNCP: document type and access badges of the search result cards (src/themes/uncp/app/shared/uncp-metadata-labels.ts)
+  "uncp.item-type.book": "Book",
+
+  "uncp.item-type.article": "Article",
+
+  "uncp.item-type.doctoral-thesis": "Doctoral thesis",
+
+  "uncp.item-type.master-thesis": "Master's thesis",
+
+  "uncp.item-type.bachelor-thesis": "Bachelor's thesis",
+
+  "uncp.item-type.patent": "Patent",
+
+  "uncp.item-type.report": "Technical report",
+
+  "uncp.item-type.working-paper": "Working paper",
+
+  "uncp.item-type.preprint": "Preprint",
+
+  "uncp.item-type.postprint": "Postprint",
+
+  "uncp.item-type.other": "Other",
+
+  "uncp.item-type.others": "Others",
+
+  "uncp.access-right.open": "Open access",
+
+  "uncp.access-right.embargoed": "Embargoed",
+
+  "uncp.access-right.restricted": "Restricted",
+
+  "uncp.access-right.metadata-only": "Metadata only",
+
 }

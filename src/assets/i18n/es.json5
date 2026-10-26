@@ -8429,5 +8429,37 @@
   // TODO New key - Add a translation
   "metadata-export-search.submit.error.limit-exceeded": "Only the first {{limit}} items will be exported",
 
+  // UNCP: document type and access badges of the search result cards (src/themes/uncp/app/shared/uncp-metadata-labels.ts)
+  "uncp.item-type.book": "Libro",
+
+  "uncp.item-type.article": "Artículo",
+
+  "uncp.item-type.doctoral-thesis": "Tesis doctoral",
+
+  "uncp.item-type.master-thesis": "Tesis de maestría",
+
+  "uncp.item-type.bachelor-thesis": "Tesis de pregrado",
+
+  "uncp.item-type.patent": "Patente",
+
+  "uncp.item-type.report": "Informe técnico",
+
+  "uncp.item-type.working-paper": "Documento de trabajo",
+
+  "uncp.item-type.preprint": "Preprint",
+
+  "uncp.item-type.postprint": "Postprint",
+
+  "uncp.item-type.other": "Otro",
+
+  "uncp.item-type.others": "Otros",
+
+  "uncp.access-right.open": "Acceso abierto",
+
+  "uncp.access-right.embargoed": "Embargado",
+
+  "uncp.access-right.restricted": "Restringido",
+
+  "uncp.access-right.metadata-only": "Solo metadatos",
 
 }

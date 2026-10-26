@@ -22,7 +22,7 @@
           <div class="card-icon"><img [src]="community.icon" alt="" width="100%"></div>
           <h5 class="card-title">{{community.title}}</h5>
           <div class="w-100 text-center">
-            <p class="card-count">{{community.count}} documentos</p>
+            <p class="card-count">{{ ((counts$ | async)?.[community.uuid] ?? community.count) | number:'1.0-0':'es-PE' }} documentos</p>
           </div>
           <a class="card-link" [routerLink]="['/communities', community.uuid]"> Explorar colección <i class="fas fa-arrow-right text-success"></i></a>
         </div>

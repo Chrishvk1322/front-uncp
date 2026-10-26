@@ -17,3 +17,8 @@
     font-style: normal;
     font-size: 1.1rem;
 }
+// Small gap between the abstract and the type/date/metadata badges below it
+.item-list-abstract ds-truncatable-part {
+    display: block;
+    margin-bottom: .5rem;
+}

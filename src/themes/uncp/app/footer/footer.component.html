@@ -68,21 +68,21 @@
         <div class="col-lg-4 col-md-6 mb-4">
           <div class="footer-section">
             <h5 class="section-title"><i class="fas fa-chart-line"></i> Estadísticas</h5>
-            <div class="stats-grid">
+            <div class="stats-grid" *ngIf="stats$ | async as stats">
               <div class="stat-item">
-                <div class="stat-number stat-primary">11,568</div>
+                <div class="stat-number stat-primary">{{ stats.documentos | number:'1.0-0':'es-PE' }}</div>
                 <div class="stat-label">Documentos</div>
               </div>
               <div class="stat-item">
-                <div class="stat-number stat-info">1896</div>
+                <div class="stat-number stat-info">{{ stats.autores | number:'1.0-0':'es-PE' }}</div>
                 <div class="stat-label">Autores</div>
               </div>
               <div class="stat-item">
-                <div class="stat-number stat-accent">28</div>
+                <div class="stat-number stat-accent">{{ stats.comunidades | number:'1.0-0':'es-PE' }}</div>
                 <div class="stat-label">Comunidades</div>
               </div>
               <div class="stat-item">
-                <div class="stat-number stat-success">75</div>
+                <div class="stat-number stat-success">{{ stats.colecciones | number:'1.0-0':'es-PE' }}</div>
                 <div class="stat-label">Colecciones</div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   listableObjectComponent
 } from '../../../../../../../../../app/shared/object-collection/shared/listable-object/listable-object.decorator';
@@ -10,6 +10,7 @@ import {
   ItemSearchResultListElementComponent as BaseComponent
 } from '../../../../../../../../../app/shared/object-list/search-result-list-element/item-search-result/item-types/item/item-search-result-list-element.component';
 import { Context } from '../../../../../../../../../app/core/shared/context.model';
+import { AccessRightBadge, getAccessRightBadge, getItemTypeLabel } from '../../../../../uncp-metadata-labels';
 
 /**
  * UNCP search result card (recovered from production): bold title and authors, translated item type badge,
@@ -22,49 +23,21 @@ import { Context } from '../../../../../../../../../app/core/shared/context.mode
   styleUrls: ['./item-search-result-list-element.component.scss'],
   templateUrl: './item-search-result-list-element.component.html',
 })
-export class ItemSearchResultListElementComponent extends BaseComponent {
+export class ItemSearchResultListElementComponent extends BaseComponent implements OnInit {
 
   /**
-   * Whether the item's dc.rights matches one of the given access-right URIs (info:eu-repo or COAR).
+   * i18n key of the document type badge, from dc.type
    */
-  hasRights(...uris: string[]): boolean {
-    return uris.includes(this.dso.firstMetadataValue('dc.rights'));
-  }
+  itemTypeLabel: string;
 
   /**
-   * Spanish label for a dc.type value expressed as an info:eu-repo or COAR resource type URI.
+   * Access badge from dc.rights, or undefined when no badge applies
    */
-  tipoItem(type: string): string {
-    switch ((type ?? '').trim()) {
-      case 'info:eu-repo/semantics/book':
-      case 'http://purl.org/coar/resource_type/c_2f33':
-        return 'Libro';
-      case 'info:eu-repo/semantics/article':
-      case 'http://purl.org/coar/resource_type/c_6501':
-        return 'Artículo';
-      case 'info:eu-repo/semantics/doctoralThesis':
-      case 'http://purl.org/coar/resource_type/c_db06':
-        return 'Tesis doctoral';
-      case 'info:eu-repo/semantics/masterThesis':
-      case 'http://purl.org/coar/resource_type/c_bdcc':
-        return 'Tesis de maestría';
-      case 'info:eu-repo/semantics/bachelorThesis':
-      case 'http://purl.org/coar/resource_type/c_7a1f':
-        return 'Tesis de pregrado';
-      case 'info:eu-repo/semantics/patent':
-        return 'Patente';
-      case 'info:eu-repo/semantics/report':
-        return 'Informe técnico';
-      case 'info:eu-repo/semantics/workingPaper':
-        return 'Documento de trabajo';
-      case 'info:eu-repo/semantics/preprint':
-        return 'Preprint';
-      case 'info:eu-repo/semantics/postprint':
-        return 'Postprint';
-      case 'info:eu-repo/semantics/other':
-        return 'Otro';
-      default:
-        return 'Otros';
-    }
+  accessRight: AccessRightBadge;
+
+  ngOnInit(): void {
+    super.ngOnInit();
+    this.itemTypeLabel = getItemTypeLabel(this.dso.firstMetadataValue('dc.type'));
+    this.accessRight = getAccessRightBadge(this.dso.firstMetadataValue('dc.rights'));
   }
 }

@@ -37,7 +37,7 @@
           [innerHTML]="firstMetadataValue('dc.description.abstract')"></span>
         </ds-truncatable-part>
         <span class="badge badge-light bg-light fs-7 px-2 py-1 mr-2 text-black fw-semibold">
-          <i class="fa-solid fa-book pr-2"></i><span>{{ tipoItem(firstMetadataValue('dc.type')) }}</span>
+          <i class="fa-solid fa-book pr-2"></i><span>{{ itemTypeLabel | translate }}</span>
         </span>
         <span class="badge badge-light bg-light fs-7 px-2 py-1 mx-2 text-black fw-semibold">
           <i class="fa-solid fa-calendar-days pr-2"></i><span [innerHTML]="firstMetadataValue('dc.date.issued')"></span>
@@ -48,17 +48,9 @@
     </ds-truncatable>
   </div>
   <div class="col-auto">
-    <span *ngIf="hasRights('info:eu-repo/semantics/openAccess', 'http://purl.org/coar/access_right/c_abf2')"
-          class="alert alert-success bg-success-badge text-success fs-8 px-2 py-1 rounded-pill" role="alert">
-      <i class="fa-solid fa-unlock mr-0"></i> Acceso abierto
-    </span>
-    <span *ngIf="hasRights('info:eu-repo/semantics/embargoedAccess', 'http://purl.org/coar/access_right/c_f1cf')"
-          class="alert alert-danger bg-danger text-danger fs-8 px-2 py-1 rounded-pill" role="alert">
-      <i class="fa-solid fa-lock mr-0"></i> Embargado
-    </span>
-    <span *ngIf="hasRights('info:eu-repo/semantics/restrictedAccess', 'http://purl.org/coar/access_right/c_14cb')"
-          class="alert alert-warning fs-8 px-2 py-1 rounded-pill" role="alert">
-      <i class="fa-solid fa-lock mr-0"></i> Restringido
+    <span *ngIf="accessRight" [ngClass]="accessRight.cssClass"
+          class="alert fs-8 px-2 py-1 rounded-pill" role="alert">
+      <i class="fa-solid mr-0" [ngClass]="accessRight.icon"></i> {{ accessRight.label | translate }}
     </span>
   </div>
 </div>
