@@ -1,0 +1,8 @@
+<ds-metadata-field-wrapper *ngIf="stats$ | async as stats" [label]="'uncp.item-stats.head' | translate">
+  <span class="mr-4 text-nowrap">
+    <i class="fas fa-eye mr-1" aria-hidden="true"></i><strong>{{ 'uncp.item-stats.visits' | translate }}:</strong> {{ stats.visitas | number:'1.0-0':'es-PE' }}
+  </span>
+  <span class="text-nowrap">
+    <i class="fas fa-download mr-1" aria-hidden="true"></i><strong>{{ 'uncp.item-stats.downloads' | translate }}:</strong> {{ stats.descargas | number:'1.0-0':'es-PE' }}
+  </span>
+</ds-metadata-field-wrapper>

@@ -55,6 +55,7 @@ Rutas relativas a `src/themes/uncp/app/` salvo que se indique otra cosa.
 | 6f | Textos en español: "Publicaciones recientes", título de pestaña "Repositorio Institucional UNCP :: …", `<title>` del `index.html` | `src/assets/i18n/es.json5`, `src/index.html` (núcleo) | En el primer análisis solo se había comparado el i18n en inglés |
 | 7 | Sub-footer: carrusel infinito de plataformas (Google Scholar, Scopus, ALICIA, Open Access, LA Referencia, Web of Science) | `home-page/sub-footer/*`, `home-page/home-page.component.{ts,html}` | Componente 100% nuevo, declarado en el `lazy-theme.module.ts` del tema |
 | 8 | Footer oscuro "modern-footer" | `footer/footer.component.{ts,html,scss}` | CSS recuperado byte-fiel del chunk JS. Cifras de "Estadísticas" desde `uncp-totales.json` con respaldo (ver 7.8) |
+| 9 | Bloque "Estadísticas" (visitas y descargas) en la ficha simple y completa, después de Archivos | `item-page/uncp-item-stats/*`, `item-page/simple/item-types/untyped-item/*`, `item-page/full/*` | Reemplaza el script inyectado `uncp-estadisticas.js` (evaluación de Concytec). Ver 7.9 |
 
 Reglas globales del tema en `src/themes/uncp/styles/_global-styles.scss`: copia **en orden** del tramo final de `dspace-theme.css` de producción (todo lo que viene después de las reglas stock `.facet-filter`). Incluye `.fs-1…8`, `.fw-*`, `.vertical-center`, colores redefinidos (`.text-success #067a5a`, `.text-primary #2a7eff`, `.text-danger`, `.bg-success` degradado esmeralda, `.bg-danger`, `.bg-light #f2f4f6`), `.bg-success-light`, `.bg-success-badge`, `.bg-footer`, y `.container { max-width: 1350px }`. **Ese tramo final es la forma confiable de ver lo que UNCP agregó al tema global**: comparar solo nombres de clases no detecta las redefiniciones de clases que ya existen en Bootstrap.
 
@@ -163,7 +164,24 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
      - con un JSON de prueba con cifras distintas: el pie y la tarjeta con valor válido lo usan; las tarjetas con valor negativo, de texto o ausente muestran su respaldo;
      - con un JSON roto: todo con respaldo y sin errores;
      - el HTML del SSR trae los respaldos y Node no pide el archivo.
-9. **Visitas y descargas en la ficha de cada ítem** (FP §3). En producción las agrega un script inyectado (`uncp-estadisticas.js`). Va como componente del tema (`ds-uncp-estadisticas`), con `UsageReportDataService`, solo en el navegador y después de la sección de archivos, en la ficha simple y en la completa. Si falla una de las dos consultas, no se muestra nada. Requiere sobrescribir en el tema las plantillas de la ficha.
+9. ~~**Visitas y descargas en la ficha de cada ítem**~~ **Hecho el 25/10/2026** (FP §3). Es el bloque que se agregó para la evaluación de Concytec y que en producción inserta el script `uncp-estadisticas.js`.
+   - **Revisión del bundle**: las fichas simple (`ds-untyped-item`, `8134.*.js`) y completa (`ds-full-item-page`, `1635.*.js` / `9255.*.js`) de producción son las de serie de 7.6.0. No hay otras personalizaciones en la ficha.
+   - **Componente** `src/themes/uncp/app/item-page/uncp-item-stats/` (`ds-uncp-item-stats`, con su `UncpItemStatsModule`):
+     - consulta `{uuid}_TotalVisits` y `{uuid}_TotalDownloads` con `UsageReportDataService`, provisto en el propio componente porque DSpace solo lo provee en el módulo de la página de estadísticas;
+     - suma los `views` de todos los puntos (en descargas hay un punto por archivo);
+     - consulta solo en el navegador;
+     - si falla cualquiera de las dos consultas, no muestra nada. Se usa `getFirstCompletedRemoteData`, porque `getStatistic()` se queda esperando para siempre si la consulta falla;
+     - textos i18n `uncp.item-stats.*`;
+     - formato `es-PE`.
+   - **Ojo**: el modelo `Point` de DSpace declara `values` como lista, pero la API lo envía como objeto. El componente acepta las dos formas.
+   - **Fichas sobrescritas en el tema**: `item-page/simple/item-types/untyped-item/` (todos los ítems UNCP son de este tipo: no tienen `dspace.entity.type`) y `item-page/full/`. Son las plantillas de serie de 7.6.5 más `<ds-uncp-item-stats>` después de la sección de archivos.
+   - **Registro**: `UntypedItemComponent` como entry component en `eager-theme.module.ts`, que además importa `ItemPageModule`, `ItemSharedModule`, `DsoPageModule` y `UncpItemStatsModule`, igual que el tema `custom`. `FullItemPageComponent` va en `lazy-theme.module.ts`, que además importa `UncpItemStatsModule` y `DsoPageModule`.
+   - **Verificado** con el ítem 10160:
+     - ficha simple y completa con "Estadísticas · Visitas: 132 · Descargas: 68" (39 + 29), en el mismo orden que producción: Archivos → Estadísticas → Fecha → Autores. En la completa va antes de Colecciones;
+     - 2 consultas por ficha;
+     - el HTML del SSR deja el componente vacío y sin consultas;
+     - forzando un error en `TotalDownloads` (`FAIL_PATH` en el proxy), el bloque no aparece.
+   - **Cifras**: incluyen visitas de bots que DSpace no reconoce (FP §10.4.5); se corrigen en el backend (8.10).
 10. **Pie de página, enlaces** (FP §5.3):
     - redes sociales con `href="#"`: poner las direcciones reales o quitar los iconos;
     - enlaces `/info/policies`, `/rights`, `/faq`, `/support`, `/terms`, `/accessibility` y `/contact`, que probablemente no existen: crear las páginas o redirigir, y quitar `href="#"`;
@@ -225,6 +243,7 @@ Lo que hay que hacer o revisar al llevar este código a producción. **Situació
 - Todo lo demás → el SSR en `http://localhost:4000`.
 - Usa `express` y `http-proxy-middleware` del `node_modules` del repo.
 - `REMOTE=https://otro.servidor` permite apuntar a otro backend. Para el backend real de producción, usar el modo solo lectura descrito más abajo.
+- `FAIL_PATH=<texto>`: responde 500 a toda petición a `/server` cuya URL contenga ese texto. Sirve para probar cómo reacciona la UI cuando falla una consulta, por ejemplo `FAIL_PATH=TotalDownloads`.
 - `/assets/custom/*` (`uncp-totales.json`): con `READ_ONLY=1` se pide a producción, solo `GET`, sin cookies ni token. `TOTALES_FILE=/ruta/archivo.json` sirve en su lugar un archivo local de prueba, por ejemplo para probar cifras distintas o un JSON roto.
 
 ### Compilar y levantar

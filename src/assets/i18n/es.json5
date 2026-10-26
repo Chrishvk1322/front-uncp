@@ -8462,4 +8462,11 @@
 
   "uncp.access-right.metadata-only": "Solo metadatos",
 
+  // UNCP: "Estadísticas" block of the item page (src/themes/uncp/app/item-page/uncp-item-stats)
+  "uncp.item-stats.head": "Estadísticas",
+
+  "uncp.item-stats.visits": "Visitas",
+
+  "uncp.item-stats.downloads": "Descargas",
+
 }

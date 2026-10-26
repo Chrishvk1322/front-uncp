@@ -5532,4 +5532,11 @@
 
   "uncp.access-right.metadata-only": "Metadata only",
 
+  // UNCP: "Estadísticas" block of the item page (src/themes/uncp/app/item-page/uncp-item-stats)
+  "uncp.item-stats.head": "Statistics",
+
+  "uncp.item-stats.visits": "Visits",
+
+  "uncp.item-stats.downloads": "Downloads",
+
 }

@@ -66,6 +66,9 @@ import { SubFooterComponent } from './app/home-page/sub-footer/sub-footer.compon
 import { SearchFormComponent } from './app/shared/search-form/search-form.component';
 import { AuthNavMenuComponent } from './app/shared/auth-nav-menu/auth-nav-menu.component';
 import { ThumbnailComponent } from './app/thumbnail/thumbnail.component';
+import { FullItemPageComponent } from './app/item-page/full/full-item-page.component';
+import { UncpItemStatsModule } from './app/item-page/uncp-item-stats/uncp-item-stats.module';
+import { DsoPageModule } from '../../app/shared/dso-page/dso-page.module';
 
 const DECLARATIONS = [
   HomePageComponent,
@@ -74,6 +77,7 @@ const DECLARATIONS = [
   SearchFormComponent,
   AuthNavMenuComponent,
   ThumbnailComponent,
+  FullItemPageComponent,
 ];
 
 @NgModule({
@@ -97,6 +101,8 @@ const DECLARATIONS = [
     DragDropModule,
     ItemSharedModule,
     ItemPageModule,
+    UncpItemStatsModule,
+    DsoPageModule,
     EditItemPageModule,
     ItemVersionsModule,
     FormsModule,
