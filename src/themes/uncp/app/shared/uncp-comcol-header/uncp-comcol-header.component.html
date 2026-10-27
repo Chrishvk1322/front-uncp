@@ -1,0 +1,18 @@
+<header class="uncp-comcol-header">
+  <div class="uncp-comcol-icon" aria-hidden="true">
+    <img *ngIf="icon$ | async as icon; else genericIcon" [src]="icon" alt="">
+    <ng-template #genericIcon><i class="fas fa-folder-open"></i></ng-template>
+  </div>
+  <h1 class="uncp-comcol-title">{{ name }}</h1>
+  <div class="uncp-comcol-actions">
+    <ng-content select="[uncpComcolActions]"></ng-content>
+  </div>
+  <div class="uncp-comcol-body">
+    <p *ngIf="dso.shortDescription" class="uncp-comcol-description">{{ dso.shortDescription }}</p>
+    <p *ngIf="uri" class="uncp-comcol-uri">
+      <span class="uncp-comcol-uri-label">{{ uriLabel | translate }}</span>
+      <a [href]="uri"><i class="fas fa-link" aria-hidden="true"></i>{{ uri }}</a>
+    </p>
+    <ng-content></ng-content>
+  </div>
+</header>

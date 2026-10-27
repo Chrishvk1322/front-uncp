@@ -1,0 +1,23 @@
+<div class="container">
+  <!-- UNCP: header and "Examinar" tabs of the community or collection, as on the other browse pages -->
+  <ng-container *ngIf="(parent$ | async) as parentContext">
+    <ds-uncp-comcol-header [dso]="parentContext" [uriLabel]="parentContext.type + '.page.handle'">
+    </ds-uncp-comcol-header>
+    <ds-themed-comcol-page-browse-by [id]="parentContext.id" [contentType]="parentContext.type"></ds-themed-comcol-page-browse-by>
+  </ng-container>
+  <h1 [class.h4]="(parent$ | async)">{{ ('browse.taxonomy_' + vocabularyName + '.title') | translate }}</h1>
+  <div class="mb-3">
+    <ds-vocabulary-treeview [vocabularyOptions]=vocabularyOptions
+                            [multiSelect]="true"
+                            (select)="onSelect($event)"
+                            (deselect)="onDeselect($event)">
+    </ds-vocabulary-treeview>
+  </div>
+  <a class="btn btn-primary"
+     [routerLink]="['/search']"
+     [queryParams]="queryParams"
+     [queryParamsHandling]="'merge'"
+     role="link"
+     tabindex="0">
+    {{ 'browse.taxonomy.button' | translate }}</a>
+</div>

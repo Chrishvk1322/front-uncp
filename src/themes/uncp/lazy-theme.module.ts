@@ -68,6 +68,13 @@ import { AuthNavMenuComponent } from './app/shared/auth-nav-menu/auth-nav-menu.c
 import { ThumbnailComponent } from './app/thumbnail/thumbnail.component';
 import { FullItemPageComponent } from './app/item-page/full/full-item-page.component';
 import { UncpItemStatsModule } from './app/item-page/uncp-item-stats/uncp-item-stats.module';
+import { CommunityPageComponent } from './app/community-page/community-page.component';
+import { CollectionPageComponent } from './app/collection-page/collection-page.component';
+import { UncpComcolHeaderComponent } from './app/shared/uncp-comcol-header/uncp-comcol-header.component';
+import { BrowseByMetadataPageComponent } from './app/browse-by/browse-by-metadata-page/browse-by-metadata-page.component';
+import { BrowseByDatePageComponent } from './app/browse-by/browse-by-date-page/browse-by-date-page.component';
+import { BrowseByTitlePageComponent } from './app/browse-by/browse-by-title-page/browse-by-title-page.component';
+import { BrowseByTaxonomyPageComponent } from './app/browse-by/browse-by-taxonomy-page/browse-by-taxonomy-page.component';
 import { DsoPageModule } from '../../app/shared/dso-page/dso-page.module';
 
 const DECLARATIONS = [
@@ -78,6 +85,13 @@ const DECLARATIONS = [
   AuthNavMenuComponent,
   ThumbnailComponent,
   FullItemPageComponent,
+  CommunityPageComponent,
+  CollectionPageComponent,
+  UncpComcolHeaderComponent,
+  BrowseByMetadataPageComponent,
+  BrowseByDatePageComponent,
+  BrowseByTitlePageComponent,
+  BrowseByTaxonomyPageComponent,
 ];
 
 @NgModule({

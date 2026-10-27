@@ -1,0 +1,37 @@
+<div class="container" *ngVar="(communityRD$ | async) as communityRD">
+  <div class="community-page" *ngIf="communityRD?.hasSucceeded" @fadeInOut>
+    <div *ngIf="communityRD?.payload; let communityPayload">
+      <!-- UNCP header: icon, name, short description, permanent URI (hdl.handle.net) -->
+      <ds-uncp-comcol-header [dso]="communityPayload" [uriLabel]="'community.page.handle'">
+        <!-- Community logo -->
+        <ds-comcol-page-logo *ngIf="logoRD$" [logo]="(logoRD$ | async)?.payload" [alternateText]="'community.logo' | translate">
+        </ds-comcol-page-logo>
+        <!-- Introductory text -->
+        <ds-comcol-page-content [content]="communityPayload.introductoryText" [hasInnerHtml]="true">
+        </ds-comcol-page-content>
+        <!-- News -->
+        <ds-comcol-page-content [content]="communityPayload.sidebarText" [hasInnerHtml]="true"
+          [title]="'community.page.news'">
+        </ds-comcol-page-content>
+        <ds-dso-edit-menu uncpComcolActions></ds-dso-edit-menu>
+      </ds-uncp-comcol-header>
+      <section class="comcol-page-browse-section">
+
+        <!-- Browse-By Links -->
+        <ds-themed-comcol-page-browse-by [id]="communityPayload.id" [contentType]="communityPayload.type">
+        </ds-themed-comcol-page-browse-by>
+
+        <ds-themed-community-page-sub-community-list [community]="communityPayload"></ds-themed-community-page-sub-community-list>
+        <ds-themed-community-page-sub-collection-list [community]="communityPayload"></ds-themed-community-page-sub-collection-list>
+      </section>
+      <footer  *ngIf="communityPayload.copyrightText"  class="border-top my-5 pt-4">
+        <!-- Copyright -->
+        <ds-comcol-page-content [content]="communityPayload.copyrightText" [hasInnerHtml]="true">
+        </ds-comcol-page-content>
+      </footer>
+    </div>
+  </div>
+
+  <ds-error *ngIf="communityRD?.hasFailed" message="{{'error.community' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="communityRD?.isLoading" message="{{'loading.community' | translate}}"></ds-themed-loading>
+</div>

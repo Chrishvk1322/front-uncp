@@ -167,7 +167,12 @@ Verificación: compilado en modo SSR y comprobado con `curl` que el HTML final c
 
 Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = sección n de `frontend-personalizacion.md`: análisis hecho desde la sesión conectada al servidor de producción el 23/10/2026.
 
-1. **Páginas de comunidad/colección y búsqueda**: aplicar el método de las secciones 4 y 10 (extraer el HTML real de la réplica y el CSS de los chunks). Es probable que tengan más personalización.
+1. ~~**Páginas de comunidad/colección y búsqueda**: aplicar el método de las secciones 4 y 10.~~ **Analizado el 27/10/2026**: en producción estas páginas **no tienen personalización propia**, solo heredan el header, el pie y las tarjetas de ítems.
+   - Réplica (capturas offline, sin peticiones a producción): Buscar (guardada desde "Cargar más", `spc.sf=dc.date.accessioned`), comunidad `/handle/20.500.12894/37`, subcomunidad `/971` y colección Embargo `/6577`. Todas tienen el diseño de serie de DSpace (título, URI, pestañas "Examinar", lista de enlaces y paginación).
+   - Chunks y CSS: ningún color UNCP ni clase propia en los 9 chunks de comunidad, colección y búsqueda. En `styles`/`*-theme.css` no hay reglas para estas páginas.
+   - La versión local ya es equivalente o mejor: mismas secciones, tarjetas de ítems UNCP en la búsqueda, "Por categoría" en lugar de "By Subject Category" y ancho del 80%.
+   - Diferencia esperada: `/search` sin orden muestra primero colecciones y comunidades (con la etiqueta "Colección"). Es el comportamiento de serie, igual que en producción. La réplica solo mostraba ítems porque se guardó ordenada por fecha.
+   - Conclusión: no hay nada que recuperar. Lo que sigue es **diseño nuevo** con estilo UNCP (7.13).
 2. Confirmar si los estilos de los componentes compartidos (buscador, tarjetas de ítems) aplican igual fuera de la home en producción.
 3. ~~**Sin verificar por falta de datos o de pruebas**~~ **Verificado el 26/10/2026**:
    - ~~pastillas "Embargado" y "Restringido"~~: verificadas el 24/10/2026 con los 39 embargados y los 4 `c_14cb` de producción (ver 7.7);
@@ -241,7 +246,21 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
     - **Google Analytics**: el tema no carga GA. Queda **un 404 por visita** a `config/properties/google.analytics.key`, que piden el `GoogleAnalyticsService` y el aviso de cookies (Klaro) del núcleo; es el origen de los avisos en `dspace.log`. **No se cambió en el frontend**: requeriría modificar 2 archivos del núcleo y quitaría la opción de activar GA más adelante. Se resuelve en el backend (8.14).
 12. ~~**Locale `es-PE`**~~ **Hecho el 25/10/2026**: `registerLocaleData(localeEsPe)` en `src/themes/uncp/eager-theme.module.ts`. Las cifras usan `number:'1.0-0':'es-PE'` y quedan como "14,626". En producción se mezclaban "11,568" y "1896".
 13. **Estilo UNCP en todas las páginas posibles** (pedido del usuario, 25/10/2026; para más adelante). Hoy tienen estilo UNCP la portada, los resultados de búsqueda (tarjetas), la ficha simple y completa del ítem (parcial), el header y el pie. El resto son páginas de serie de DSpace. Lista inicial, a revisar en este orden:
-    - **páginas de comunidad y colección** y **búsqueda** (incluye 7.1);
+    - **páginas de comunidad y colección** y **búsqueda** (incluye 7.1). Propuestas del 27/10/2026: (1) encabezado de comunidad/colección, (2) subcomunidades y colecciones como tarjetas, (3) pestañas y paginación en verde, (4) filtros y resultados de colección en la búsqueda, (5) aviso de cookies.
+      - **(3) Hecho el 27/10/2026** (`styles/_global-styles.scss`, al final): pestañas "Examinar" (`.comcol-browse .list-group-item`) y todas las barras de paginación (`.pagination`, también en búsqueda y navegación). Texto `#067A5A`, hover con fondo `#f2fdf7` y borde `#d1f9e4`, activo con fondo `#067A5A` y texto blanco. Se usa `#067A5A` y no `#26B269` para el estado activo por contraste (5,6:1 contra 2,8:1). Verificado con colores computados y recortes (`pwtool/tabspag.js`). También el botón "Examinar" de las páginas de navegación (`ds-starts-with-text`/`ds-starts-with-date .btn-primary`): fondo `#067A5A`, hover `#05634A`, texto blanco (verificado con `pwtool/browsebtn.js` en `/browse/author` y `/browse/dateissued`);
+      - **(1) Hecho el 27/10/2026**: encabezado de comunidad y colección (`shared/uncp-comcol-header/`). **Rediseñado el mismo día con la skill Impeccable** (instalada solo en el proyecto, en `.claude/`, sin hook), porque la primera versión, una franja verde con caja, no convenció. Ahora es sobrio: sin caja ni fondo, título 1,75rem/600 en tinta verdosa `#1f2d28`, textos secundarios `#52615b`, icono de 44px y una línea fina `#dfe7e3` debajo. Lleva:
+        - el icono de la comunidad de primer nivel (el de la tarjeta de la home). Se obtiene de las migas de pan, sin consultas extra; si no se puede determinar, un icono genérico verde;
+        - el título;
+        - la descripción corta (`dc.description.abstract`), si existe;
+        - la URI como `https://hdl.handle.net/{handle}` (ver 8.15);
+        - el logo, el texto introductorio y las noticias, si existen, y el menú de edición.
+        
+        Por pedido del usuario no lleva etiqueta "Comunidad"/"Colección" ni cantidad de documentos. Páginas temadas `app/community-page/` y `app/collection-page/` (plantilla de serie con el encabezado reemplazado). La tabla de las 8 comunidades pasó a `shared/uncp-communities.ts`, que comparten la home y el encabezado. Verificado (`pwtool/comcolhead.js`) en comunidad, subcomunidad, colección, "7. Libros" (con descripción) y una colección de Salud; el icono también sale en SSR; en móvil (390px) la URI va en su propia línea.
+        - **Corregido el 27/10/2026**: el encabezado desaparecía al pasar a las otras pestañas de "Examinar". Esas pestañas son otras páginas: "Por fecha", "Por autor", "Por título" y "Por materia" usan la de navegación, que tenía su propio encabezado de serie y mostraba la IP; "Por categoría" usa la de vocabulario, sin encabezado ni pestañas. Se temaron en `app/browse-by/`:
+          - `browse-by-metadata-page`, con plantilla propia que usa `ds-uncp-comcol-header`. Las de fecha y título comparten esa plantilla;
+          - `browse-by-taxonomy-page`, que ahora lee `?scope=`, muestra el encabezado y las pestañas, y deja su título como subtítulo.
+          
+          Sin `scope` (navegación general) no hay encabezado, como antes. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
@@ -308,8 +327,33 @@ Lo que hay que hacer o revisar al llevar este código a producción. **Situació
     - si no, bajar el nivel de log de ese aviso en la configuración de log4j2 del backend.
     
     El frontend no se modificó (ver 7.11).
+15. **URI permanente de comunidades y colecciones con la IP pública** (backend, detectado el 27/10/2026). Las 54 comunidades y las 104 colecciones guardan en `dc.identifier.uri` el valor `http://38.43.155.155:4000/handle/...`, que expone la IP y el puerto del servidor. Los ítems están bien (`http://hdl.handle.net/20.500.12894/...`).
+    - El handle server sí funciona: `hdl.handle.net` resuelve `20.500.12894/37` a `https://repositorio.uncp.edu.pe/handle/20.500.12894/37`.
+    - **Frontend (ya resuelto en el tema)**: el encabezado de comunidad y colección arma la URI desde el handle como `https://hdl.handle.net/{handle}`. Así ya no muestra la IP, aunque el metadato siga mal. Solo queda en el JSON de la API y en el estado SSR, que no se ve en la página.
+    - **Backend (pendiente)**:
+      - revisar `handle.canonical.prefix` y `dspace.ui.url` en `local.cfg`. La forma correcta del prefijo es `https://hdl.handle.net/`;
+      - corregir el metadato de las 158 comunidades y colecciones (respaldo previo de la base de datos), por ejemplo con un `UPDATE` sobre `metadatavalue` del campo `dc.identifier.uri` que reemplace `http://38.43.155.155:4000/handle/` por `https://hdl.handle.net/`;
+      - luego reindexar con `dspace index-discovery -b`;
+      - comprobar que una comunidad o colección nueva ya se cree con la forma correcta.
 
 ## 9. Cómo compilar, levantar y revisar
+
+### Pruebas de regresión (después de cada cambio)
+Pedido del usuario (27/10/2026): **probar todos los cambios para verificar que nada se rompa**. Suite en el repo, `pruebas/regresion-uncp.js` (Playwright, el de `~/.local/pwtool`). Se ejecuta con el build nuevo levantado y el proxy en modo solo lectura:
+
+```bash
+LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node pruebas/regresion-uncp.js
+```
+
+- Recorre, a 1366px y a 390px: home, búsqueda, comunidad, comunidad con descripción, subcomunidad, colección, las 5 pestañas de "Examinar" de una comunidad, la navegación de una subcomunidad y de una colección, la navegación general, la ficha y la ficha completa. Además comprueba el SSR del encabezado.
+- En cada página verifica:
+  - que cargue sin errores JS ni HTTP (salvo los esperados: la clave de GA y los 403 de estadísticas);
+  - que no haya scroll horizontal persistente;
+  - que no muestre la IP del servidor;
+  - los elementos propios de esa página.
+- No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
+- Al agregar una personalización, **sumar sus comprobaciones a la suite**.
+- Resultado al 27/10/2026: **288/288 correctas**.
 
 ### Por qué hace falta un proxy
 `config.yml` apunta a `demo.dspace.org`. Si el navegador lo consulta directamente desde `localhost`, el backend lo bloquea por CORS y la app salta a la página **500** apenas Angular arranca en el cliente (el HTML inicial del SSR se ve un instante y luego cae). Para revisar en un navegador real se usa un proxy local que sirve todo desde un mismo origen.
