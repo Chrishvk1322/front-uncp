@@ -19,12 +19,14 @@
   position: relative;
   overflow: hidden;
 }
-// hover (and keyboard focus): green border and the icon circle filled with UNCP green
+// hover (and keyboard focus): gold border and warm shadow around, icon circle filled with UNCP green; the
+// gold-around-green of the university seal. The gold is a bit deeper than the seal's #CDB370, which is hardly
+// visible on the light green card
 .contenido-comunidades .community-card:hover,
 .contenido-comunidades .community-card:focus-visible {
   transform: translateY(-4px);
-  border-color: #067a5a;
-  box-shadow: 0 2px 4px rgba(31, 45, 40, .05), 0 12px 28px rgba(6, 122, 90, .14);
+  border-color: #c9a24f;
+  box-shadow: 0 2px 4px rgba(31, 45, 40, .05), 0 12px 28px rgba(201, 162, 79, .22);
   outline: none;
 }
 .contenido-comunidades .community-card .uncp-community-icon {
@@ -69,9 +71,16 @@
   font-size: .9rem;
   transition: all .3s ease;
 }
-.contenido-comunidades .community-card .card-link:hover {
-  color: #067a5a;
+// hovering the link text itself: deep blue, the color of links (the arrow too; it has .text-success, which is
+// !important)
+.contenido-comunidades .community-card .card-link:hover,
+.contenido-comunidades .community-card .card-link:focus-visible {
+  color: #1f4e79;
   text-decoration: none;
+
+  i {
+    color: #1f4e79 !important;
+  }
 }
 .contenido-comunidades .community-card .card-link i {
   margin-left: 5px;

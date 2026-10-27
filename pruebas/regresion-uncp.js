@@ -173,7 +173,12 @@ async function run() {
     const hover = await card.evaluate((e) => ({
       border: getComputedStyle(e).borderTopColor, icon: getComputedStyle(e.querySelector('.uncp-community-icon')).backgroundColor,
     }));
-    check(label, 'hover: borde e icono en verde', hover.border === 'rgb(6, 122, 90)' && hover.icon === 'rgb(6, 122, 90)', JSON.stringify(hover));
+    check(label, 'hover: borde dorado e icono en verde', hover.border === 'rgb(201, 162, 79)' && hover.icon === GREEN, JSON.stringify(hover));
+    const link = await card.$('.card-link');
+    await link.hover();
+    await p.page.waitForTimeout(400);
+    const linkColor = await link.evaluate((a) => ({ text: getComputedStyle(a).color, arrow: getComputedStyle(a.querySelector('i')).color }));
+    check(label, 'hover en "Explorar comunidad": texto y flecha en azul', linkColor.text === 'rgb(31, 78, 121)' && linkColor.arrow === 'rgb(31, 78, 121)', JSON.stringify(linkColor));
     check(label, 'publicaciones recientes', (await p.page.$$('ds-item-search-result-list-element')).length > 0);
     const footer = await p.page.$$eval('.stat-number', (els) => els.map((e) => e.textContent.trim()));
     check(label, 'cifras del pie', footer.length === 4 && footer.every((n) => /^\d[\d,]*$/.test(n)), footer.join(' '));

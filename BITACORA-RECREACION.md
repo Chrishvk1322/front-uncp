@@ -285,7 +285,13 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
           Están en `shared/uncp-communities.ts`. Las tarjetas dicen ahora **"Explorar comunidad"** en lugar de "Explorar colección".
         - **Tarjetas de la home con fondo uniforme** (27/10/2026, opción B elegida por el usuario frente a la A, blanco; las dos se probaron antes con `pwtool/cardopts.js`). Se quitaron los degradados pastel por facultad de producción y el campo `cardClass`.
           - **Normal**: fondo verde muy claro `#f4faf7`, borde `#e1efe8`, sombra suave, y el círculo del icono en blanco.
-          - **Al pasar el mouse o con foco de teclado**: la tarjeta sube 4px, el borde pasa a `#067A5A`, el círculo se rellena de `#067A5A` con el icono en blanco, y "Explorar comunidad" se pone verde.
+          - **Al pasar el mouse o con foco de teclado** (ajustado el 27/10/2026, variante 1 elegida por el usuario):
+            - la tarjeta sube 4px;
+            - **borde dorado `#C9A24F`** con sombra dorada suave, y el círculo se rellena de verde `#067A5A` con el icono en blanco. Es el dorado alrededor del verde del escudo; el dorado es algo más intenso que el del escudo (`#CDB370`), que casi no se ve sobre el fondo verde claro;
+            - al pasar el mouse sobre el propio texto "Explorar comunidad", el texto y la flecha pasan a **azul profundo `#1F4E79`**, el color propuesto para los enlaces.
+          - **Paleta en discusión** (27/10/2026): verde `#067A5A` para acción y selección, azul profundo `#1F4E79` para enlaces y navegación, dorado del escudo para superficies de identidad, carbón `#272625` para textos. Se aplica de a poco, empezando por la home; el usuario pidió ir despacio. Vistas previas en `pwtool/out/` (`dorado-*`, `azul-*`, `verde-*`, `hover-*`). Colores de referencia:
+            - escudo (`uncp-logo.png`): verde oliva `#577A40`, dorado `#CDB370`, negro `#272625`;
+            - Facebook oficial (`recuperado/logo-uncp.jpg`): verde `#00760D`, dorado `#E4B565`, negro.
           - **Alturas iguales por fila**: la columna es `d-flex`.
           - **Animación de entrada**: pasó a `backwards`. Con `forwards`, la animación terminada fijaba su `transform` final y anulaba la elevación del hover.
       - **(2) Hecho el 27/10/2026: subcomunidades y colecciones como tarjetas** (con los puntos 3 a 5 de la propuesta; el 6, cantidades de documentos, se descartó por innecesario). Componentes temados `app/community-page/sub-community-list/` y `sub-collection-list/`.
@@ -393,7 +399,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 27/10/2026: **401/401 correctas** (antes 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 27/10/2026: **403/403 correctas** (antes 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash
