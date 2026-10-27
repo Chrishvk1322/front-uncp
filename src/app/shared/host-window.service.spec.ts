@@ -1,6 +1,6 @@
 import { Store } from '@ngrx/store';
 import { cold, hot } from 'jasmine-marbles';
-import { of as observableOf } from 'rxjs';
+import { BehaviorSubject, of as observableOf } from 'rxjs';
 import { AppState } from '../app.reducer';
 
 import { HostWindowService, WidthCategory } from './host-window.service';
@@ -194,6 +194,21 @@ describe('HostWindowService', () => {
       service.isXl().subscribe((status) => {
         expect(status).toBeFalsy();
       });
+    });
+  });
+
+  describe('widthCategory when the CSS variables arrive after the width', () => {
+    it('should be recomputed once the breakpoints are known', () => {
+      const variables$ = new BehaviorSubject<any>({});
+      const variableService = Object.assign(new CSSVariableServiceStub(), { getAllVariables: () => variables$ });
+      service = new HostWindowService({} as Store<AppState>, variableService as any);
+      spyOn(service as any, 'getWidthObs').and.returnValue(observableOf(390));
+
+      const categories: WidthCategory[] = [];
+      service.widthCategory.subscribe((category) => categories.push(category));
+      variables$.next({ '--bs-sm-min': '576px', '--bs-md-min': '768px', '--bs-lg-min': '992px', '--bs-xl-min': '1200px' });
+
+      expect(categories).toEqual([WidthCategory.XL, WidthCategory.XS]);
     });
   });
 

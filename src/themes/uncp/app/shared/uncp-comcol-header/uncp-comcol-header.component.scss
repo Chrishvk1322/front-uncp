@@ -17,28 +17,9 @@ $icon-size: 44px;
   border-bottom: 1px solid $hairline;
 }
 
+// the circle itself is the global .uncp-community-icon; here only its size
 .uncp-comcol-icon {
-  width: $icon-size;
-  height: $icon-size;
-
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  // generic icon, same shape as the community icons
-  i {
-    display: block;
-    width: 100%;
-    height: 100%;
-    line-height: $icon-size;
-    text-align: center;
-    border-radius: 50%;
-    font-size: 1.15rem;
-    color: #fff;
-    background: #067a5a;
-  }
+  --uncp-icon-size: #{$icon-size};
 }
 
 .uncp-comcol-title {
@@ -105,13 +86,7 @@ $icon-size: 44px;
     padding-bottom: 1.25rem;
   }
   .uncp-comcol-icon {
-    width: 36px;
-    height: 36px;
-
-    i {
-      line-height: 36px;
-      font-size: 1rem;
-    }
+    --uncp-icon-size: 36px;
   }
   .uncp-comcol-title {
     font-size: 1.4rem;

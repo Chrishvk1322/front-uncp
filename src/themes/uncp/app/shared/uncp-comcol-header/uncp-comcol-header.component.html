@@ -1,8 +1,5 @@
 <header class="uncp-comcol-header">
-  <div class="uncp-comcol-icon" aria-hidden="true">
-    <img *ngIf="icon$ | async as icon; else genericIcon" [src]="icon" alt="">
-    <ng-template #genericIcon><i class="fas fa-folder-open"></i></ng-template>
-  </div>
+  <span class="uncp-community-icon uncp-comcol-icon" aria-hidden="true"><i class="fa-solid {{ icon$ | async }}"></i></span>
   <h1 class="uncp-comcol-title">{{ name }}</h1>
   <div class="uncp-comcol-actions">
     <ng-content select="[uncpComcolActions]"></ng-content>

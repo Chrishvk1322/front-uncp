@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import localeEsPe from '@angular/common/locales/es-PE';
 import { SharedModule } from '../../app/shared/shared.module';
@@ -16,6 +17,7 @@ import { ItemSharedModule } from '../../app/item-page/item-shared.module';
 import { DsoPageModule } from '../../app/shared/dso-page/dso-page.module';
 import { UntypedItemComponent } from './app/item-page/simple/item-types/untyped-item/untyped-item.component';
 import { UncpItemStatsModule } from './app/item-page/uncp-item-stats/uncp-item-stats.module';
+import { UncpTitleService } from './app/shared/uncp-title.service';
 import { SearchNavbarComponent } from './app/search-navbar/search-navbar.component';
 import { LangSwitchComponent } from './app/shared/lang-switch/lang-switch.component';
 import { TopLevelCommunityListComponent } from './app/home-page/top-level-community-list/top-level-community-list.component';
@@ -62,7 +64,9 @@ const DECLARATIONS = [
   ],
   declarations: DECLARATIONS,
   providers: [
-    ...ENTRY_COMPONENTS.map((component) => ({provide: component}))
+    ...ENTRY_COMPONENTS.map((component) => ({provide: component})),
+    // UNCP: browser tab title without the order numbers of community/collection names (see uncp-title.service.ts)
+    { provide: Title, useClass: UncpTitleService },
   ],
 })
 /**

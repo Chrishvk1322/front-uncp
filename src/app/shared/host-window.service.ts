@@ -48,8 +48,10 @@ export class HostWindowService {
   }
 
   get widthCategory(): Observable<WidthCategory> {
-    return this.getWidthObs().pipe(
-      map((width: number) => {
+    // UNCP: recompute also when the CSS variables (the breakpoints) change, not only the width: on pages rendered
+    // client side only they can arrive after the width, and until then every width counted as XL (desktop)
+    return observableCombineLatest([this.getWidthObs(), this.variableService.getAllVariables()]).pipe(
+      map(([width]: [number, unknown]) => {
         if (width < this.breakPoints.SM_MIN) {
           return WidthCategory.XS;
         } else if (width >= this.breakPoints.SM_MIN && width < this.breakPoints.MD_MIN) {

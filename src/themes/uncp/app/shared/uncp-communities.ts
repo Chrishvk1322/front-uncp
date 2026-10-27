@@ -4,6 +4,9 @@
  * ============================================================================================
  *
  *  Las 8 comunidades de primer nivel del repositorio, con su icono y su estilo de tarjeta.
+ *  Iconos (27/10/2026): Font Awesome 6 (`fa-solid`), en verde UNCP sobre un círculo verde claro (clase global
+ *  `.uncp-community-icon`). Reemplazan a los PNG de colores de producción (assets/icons/1-8.png), que no
+ *  seguían la paleta institucional y tenían metáforas poco claras (un átomo para Ciencias Agrarias).
  *  Las usan:
  *   - las tarjetas de la portada (home-page/top-level-community-list);
  *   - el encabezado de las páginas de comunidad y colección (shared/uncp-comcol-header), que muestra
@@ -21,21 +24,27 @@
 export interface UncpTopCommunity {
   uuid: string;
   cardClass: string;
+  /** Font Awesome 6 solid icon class, e.g. 'fa-seedling' */
   icon: string;
   title: string;
   count: number;
 }
 
 export const UNCP_TOP_COMMUNITIES: UncpTopCommunity[] = [
-  { uuid: '3ab747e7-e5e3-45f3-b947-d3ae80e507d8', cardClass: 'card-arquitectura', icon: 'assets/uncp/icons/1.png', title: 'Arquitectura e Ingeniería', count: 3525 },
-  { uuid: 'a24e4817-4cff-4c9c-b0bd-fcef79473277', cardClass: 'card-administrativas', icon: 'assets/uncp/icons/2.png', title: 'Ciencias Administrativas, Contables Económicas', count: 1598 },
-  { uuid: 'a51150e5-83e6-4f09-bb12-8f2412f768ad', cardClass: 'card-agrarias', icon: 'assets/uncp/icons/3.png', title: 'Ciencias Agrarias', count: 1714 },
-  { uuid: 'c9e7a303-9874-44b9-bf51-280646e192eb', cardClass: 'card-salud', icon: 'assets/uncp/icons/4.png', title: 'Ciencias de la Salud', count: 780 },
-  { uuid: '3222eea9-3c3c-45ff-bbed-7a444937ba8d', cardClass: 'card-sociales', icon: 'assets/uncp/icons/5.png', title: 'Ciencias Sociales y Educación', count: 3370 },
-  { uuid: 'f1b1550f-8be8-4f7d-bfe9-57686478ac3c', cardClass: 'card-tesis', icon: 'assets/uncp/icons/6.png', title: 'Tesis de pre y posgrado para Evaluación', count: 3559 },
-  { uuid: 'b352a329-fe14-4186-b024-8e882173205a', cardClass: 'card-libros', icon: 'assets/uncp/icons/7.png', title: 'Libros de Investigación', count: 57 },
-  { uuid: 'dd970c15-b58a-4c5e-b75a-d4e4e736d43c', cardClass: 'card-articulos', icon: 'assets/uncp/icons/8.png', title: 'Artículos Científicos en Revistas Indizadas', count: 23 },
+  { uuid: '3ab747e7-e5e3-45f3-b947-d3ae80e507d8', cardClass: 'card-arquitectura', icon: 'fa-gears', title: 'Arquitectura e Ingeniería', count: 3525 },
+  { uuid: 'a24e4817-4cff-4c9c-b0bd-fcef79473277', cardClass: 'card-administrativas', icon: 'fa-chart-column', title: 'Ciencias Administrativas, Contables Económicas', count: 1598 },
+  { uuid: 'a51150e5-83e6-4f09-bb12-8f2412f768ad', cardClass: 'card-agrarias', icon: 'fa-seedling', title: 'Ciencias Agrarias', count: 1714 },
+  { uuid: 'c9e7a303-9874-44b9-bf51-280646e192eb', cardClass: 'card-salud', icon: 'fa-stethoscope', title: 'Ciencias de la Salud', count: 780 },
+  { uuid: '3222eea9-3c3c-45ff-bbed-7a444937ba8d', cardClass: 'card-sociales', icon: 'fa-chalkboard-user', title: 'Ciencias Sociales y Educación', count: 3370 },
+  { uuid: 'f1b1550f-8be8-4f7d-bfe9-57686478ac3c', cardClass: 'card-tesis', icon: 'fa-graduation-cap', title: 'Tesis de pre y posgrado para Evaluación', count: 3559 },
+  { uuid: 'b352a329-fe14-4186-b024-8e882173205a', cardClass: 'card-libros', icon: 'fa-book', title: 'Libros de Investigación', count: 57 },
+  { uuid: 'dd970c15-b58a-4c5e-b75a-d4e4e736d43c', cardClass: 'card-articulos', icon: 'fa-newspaper', title: 'Artículos Científicos en Revistas Indizadas', count: 23 },
 ];
+
+/**
+ * Icon for the pages whose top-level community can't be determined
+ */
+export const UNCP_GENERIC_COMMUNITY_ICON = 'fa-folder-open';
 
 /**
  * The top-level community with this UUID, or undefined if it is not one of them

@@ -102,6 +102,14 @@ Verificación: compilado en modo SSR y comprobado con `curl` que el HTML final c
   2. `src/assets/i18n/es.json5` y `en.json5`: 3 textos de UNCP en `es`, más las etiquetas `uncp.item-type.*` y `uncp.access-right.*` en los dos idiomas (bloque al final, marcado con un comentario "UNCP"). Los i18n de un tema no se cargan automáticamente.
   3. `src/app/shared/form/builder/.../dynamic-lookup-relation-search-tab.component.html`: se quitó `data-toggle="dropdown"`, que choca con el Bootstrap JS de `index.html` (ver sección 6).
   4. `rel="nofollow"` en 5 plantillas de `src/app/shared/search/`: `search-facet-option`, `search-facet-range-option`, `search-facet-selected-option`, `search-label` y `search-filters` (ver 7.11).
+  5. **Corrección de un fallo de DSpace** (27/10/2026): en celular, las páginas que arma solo el navegador (`/search`, que el servidor no prerenderiza, y **todas** en un despliegue estático como el de producción) a veces mostraban el menú de escritorio desbordado en lugar del ☰.
+     - **Causa**: los cortes de ancho (`--bs-*-min`) están solo en el CSS del tema, que se carga después de que la app los lee una única vez. Sin cortes, cualquier ancho se calcula como XL.
+     - **Corrección**:
+       - `src/app/app.component.ts` vuelve a leer las variables cada vez que termina de cargar el CSS del tema;
+       - `src/app/shared/theme-support/theme.service.ts` expone `isThemeCSSLoading$` para eso;
+       - `src/app/shared/host-window.service.ts` recalcula la categoría de ancho también cuando cambian las variables, no solo el ancho.
+     - **Pruebas**: el mock `src/app/shared/mocks/theme-service.mock.ts` incluye ahora los observables del tema, y hay 2 pruebas unitarias nuevas (en `app.component.spec.ts` y `host-window.service.spec.ts`).
+     - Es probable que producción (7.6.0, estática) tenga el mismo fallo.
 - **Verificado tras la migración**:
   - Compilación y lint del tema limpios.
   - En el HTML aparece `data-used-theme="uncp"`.
@@ -260,7 +268,21 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
           - `browse-by-metadata-page`, con plantilla propia que usa `ds-uncp-comcol-header`. Las de fecha y título comparten esa plantilla;
           - `browse-by-taxonomy-page`, que ahora lee `?scope=`, muestra el encabezado y las pestañas, y deja su título como subtítulo.
           
-          Sin `scope` (navegación general) no hay encabezado, como antes. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
+          Sin `scope` (navegación general) no hay encabezado, como antes.
+        - **Nombre sin número de orden** (27/10/2026, pedido del usuario): el encabezado muestra "Arquitectura e Ingenierías" en lugar de "1. Arquitectura e Ingenierías". Lo hace `uncpDisplayName()` en `uncp-comcol-header.component.ts`. Afecta a las 8 comunidades de primer nivel y a 3 colecciones, incluida "6.Tesis ...", que no lleva espacio. Las migas de pan y las listas conservan el número, que fija el orden.
+        - **Título de la pestaña sin número** (27/10/2026): `shared/uncp-title.service.ts` reemplaza al servicio `Title` de Angular (registrado en `eager-theme.module.ts`). Quita el número de orden al inicio del título, después de " :: " o después de "Examinando ". Ejemplos: "Arquitectura e Ingenierías", y "… :: Examinando Arquitectura e Ingenierías por Autor". Además se agregó la traducción `browse.metadata.srsc` ("Categoría"/"Subject Category"): la pestaña de "Por categoría" mostraba la clave sin traducir.
+        - **Iconos nuevos** (27/10/2026): las tarjetas de la home y el encabezado usan iconos de Font Awesome 6 en verde `#067A5A` sobre un círculo `#e3f5ec`. Es la clase global `.uncp-community-icon`, con el tamaño en `--uncp-icon-size`. Reemplazan a los PNG de colores de producción (`assets/icons/1-8.png`, ahora sin uso), que no seguían la paleta y tenían metáforas confusas. Los iconos, por comunidad:
+          - Arquitectura e Ingenierías: `fa-gears`;
+          - Administrativas: `fa-chart-column`;
+          - Agrarias: `fa-seedling`;
+          - Salud: `fa-stethoscope`;
+          - Sociales y Educación: `fa-chalkboard-user`;
+          - Tesis: `fa-graduation-cap`;
+          - Libros: `fa-book`;
+          - Artículos: `fa-newspaper`;
+          - genérico: `fa-folder-open`.
+          
+          Están en `shared/uncp-communities.ts`. Las tarjetas dicen ahora **"Explorar comunidad"** en lugar de "Explorar colección". Siguen con sus fondos pastel por facultad. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
@@ -353,7 +375,16 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 27/10/2026: **288/288 correctas**.
+- Resultado al 27/10/2026: **351/351 correctas** (antes 327, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
+
+  ```bash
+  CHROME_BIN=~/.cache/ms-playwright/chromium-1140/chrome-linux/chrome LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu \
+  NODE_OPTIONS=--max-old-space-size=10240 npx ng test --source-map=true --watch=false --configuration test \
+    --karma-config pruebas/karma-headless.js --include src/app/app.component.spec.ts --include ...
+  ```
+
+  Al 27/10/2026: 56/56 correctas (app, header, navbar, header-nav-wrapper, theme service, host window).
 
 ### Por qué hace falta un proxy
 `config.yml` apunta a `demo.dspace.org`. Si el navegador lo consulta directamente desde `localhost`, el backend lo bloquea por CORS y la app salta a la página **500** apenas Angular arranca en el cliente (el HTML inicial del SSR se ve un instante y luego cae). Para revisar en un navegador real se usa un proxy local que sirve todo desde un mismo origen.

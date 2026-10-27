@@ -1,3 +1,4 @@
+import { BehaviorSubject } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
 import { ComponentFixture, inject, TestBed, waitForAsync } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -107,6 +108,30 @@ describe('App component', () => {
     // Perform test using fixture and service
     expect(app).toBeTruthy();
   }));
+
+  describe('when the theme CSS finishes loading', () => {
+    let themeCSSLoading$: BehaviorSubject<boolean>;
+    let cssService: CSSVariableService;
+
+    beforeEach(() => {
+      themeCSSLoading$ = new BehaviorSubject<boolean>(true);
+      const themeService = getMockThemeService();
+      Object.defineProperty(themeService, 'isThemeCSSLoading$', { get: () => themeCSSLoading$ });
+      TestBed.resetTestingModule();
+      const conf = getDefaultTestBedConf();
+      conf.providers = conf.providers.map((provider: any) => provider?.provide === ThemeService ? { provide: ThemeService, useValue: themeService } : provider);
+      TestBed.configureTestingModule(conf);
+      fixture = TestBed.createComponent(AppComponent);
+      cssService = TestBed.inject(CSSVariableService);
+      spyOn(cssService, 'addCSSVariables');
+    });
+
+    it('should read the CSS variables again', () => {
+      expect(cssService.addCSSVariables).not.toHaveBeenCalled();
+      themeCSSLoading$.next(false);
+      expect(cssService.addCSSVariables).toHaveBeenCalledTimes(1);
+    });
+  });
 
   describe('when the window is resized', () => {
     let width: number;

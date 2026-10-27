@@ -89,6 +89,13 @@ async function common(label, { page, problems, status }) {
     || [...document.querySelectorAll('a[href]')].some((a) => a.href.includes(ip)), SERVER_IP);
   check(label, 'no muestra la IP del servidor', !ip);
   check(label, 'header y pie UNCP', await page.$('ds-header img, header img') && await page.$('footer, ds-footer'));
+  const nav = await page.evaluate(() => ({ desktop: !!document.querySelector('#desktop-navbar'), toggler: !!document.querySelector('#mobile-navbar-toggler') }));
+  if (page.viewportSize().width < 768) {
+    // pages rendered client side only (e.g. /search) used to get the desktop navbar on phones (fixed 27/10/2026)
+    check(label, 'menú de celular (☰), no el de escritorio', nav.toggler && !nav.desktop, JSON.stringify(nav));
+  } else {
+    check(label, 'menú de escritorio', nav.desktop && !nav.toggler, JSON.stringify(nav));
+  }
 }
 
 /** The UNCP community/collection header (shared/uncp-comcol-header) */
@@ -98,7 +105,7 @@ async function comcolHeader(label, page, { title, icon, description }) {
     if (!el) return null;
     return {
       title: el.querySelector('h1')?.textContent.trim(),
-      icon: el.querySelector('.uncp-comcol-icon img')?.getAttribute('src') ?? 'generic',
+      icon: [...(el.querySelector('.uncp-comcol-icon i')?.classList ?? [])].find((c) => c.startsWith('fa-') && c !== 'fa-solid') ?? 'none',
       description: el.querySelector('.uncp-comcol-description')?.textContent.trim() ?? '',
       uri: el.querySelector('.uncp-comcol-uri a')?.getAttribute('href') ?? '',
       stockHeader: !!document.querySelector('ds-comcol-page-header'),
@@ -106,7 +113,9 @@ async function comcolHeader(label, page, { title, icon, description }) {
   });
   check(label, 'encabezado UNCP presente', h, 'no hay ds-uncp-comcol-header');
   if (!h) return;
-  check(label, 'título del encabezado', h.title === title, `"${h.title}"`);
+  check(label, 'título del encabezado (sin número)', h.title === title, `"${h.title}"`);
+  const tabTitle = await page.title();
+  check(label, 'título de la pestaña sin número', !/(^|:: |Examinando )\d+\./.test(tabTitle) && tabTitle.includes(title), `"${tabTitle}"`);
   check(label, 'icono de la comunidad', h.icon === icon, h.icon);
   check(label, 'URI en hdl.handle.net', /^https:\/\/hdl\.handle\.net\/20\.500\.12894\/\d+$/.test(h.uri), h.uri);
   check(label, 'sin el encabezado de serie', !h.stockHeader);
@@ -138,10 +147,16 @@ async function run() {
     await common(label, p);
     check(label, 'carrusel', await p.page.$('#carouselExampleCaptions .carousel-item.active'));
     const cards = await p.page.$$eval('.contenido-comunidades .community-card', (els) => els.map((e) => ({
-      icon: e.querySelector('img')?.getAttribute('src'), count: e.querySelector('.card-count')?.textContent.trim(),
+      icon: [...(e.querySelector('.uncp-community-icon i')?.classList ?? [])].find((c) => c.startsWith('fa-') && c !== 'fa-solid'),
+      glyph: getComputedStyle(e.querySelector('.uncp-community-icon i'), '::before').content,
+      count: e.querySelector('.card-count')?.textContent.trim(),
+      link: e.querySelector('.card-link')?.textContent.trim(),
     })));
     check(label, '8 tarjetas de comunidades', cards.length === 8, `${cards.length}`);
     check(label, 'tarjetas con icono y cifra', cards.every((c) => c.icon && /^\d[\d,]* documentos$/.test(c.count)), JSON.stringify(cards[0]));
+    check(label, 'iconos dibujados (Font Awesome)', cards.every((c) => c.glyph && c.glyph !== 'none' && c.glyph !== 'normal'), cards.map((c) => c.glyph).join(' '));
+    check(label, '8 iconos distintos', new Set(cards.map((c) => c.icon)).size === 8, cards.map((c) => c.icon).join(' '));
+    check(label, 'enlace "Explorar comunidad"', cards.every((c) => c.link === 'Explorar comunidad'), cards[0]?.link);
     check(label, 'publicaciones recientes', (await p.page.$$('ds-item-search-result-list-element')).length > 0);
     const footer = await p.page.$$eval('.stat-number', (els) => els.map((e) => e.textContent.trim()));
     check(label, 'cifras del pie', footer.length === 4 && footer.every((n) => /^\d[\d,]*$/.test(n)), footer.join(' '));
@@ -165,10 +180,10 @@ async function run() {
 
     // Community, subcommunity, collection
     for (const [name, url, expected] of [
-      ['comunidad', COMMUNITY, { title: '1. Arquitectura e Ingenierías', icon: 'assets/uncp/icons/1.png', description: '' }],
-      ['comunidad con descripción', LIBROS, { title: '7. Libros de investigación', icon: 'assets/uncp/icons/7.png', description: 'Libros publicados por docentes' }],
-      ['subcomunidad', SUBCOMMUNITY, { title: 'Ingeniería de Sistemas', icon: 'assets/uncp/icons/1.png', description: '' }],
-      ['colección', COLLECTION, { title: 'Embargo', icon: 'assets/uncp/icons/6.png', description: '' }],
+      ['comunidad', COMMUNITY, { title: 'Arquitectura e Ingenierías', icon: 'fa-gears', description: '' }],
+      ['comunidad con descripción', LIBROS, { title: 'Libros de investigación', icon: 'fa-book', description: 'Libros publicados por docentes' }],
+      ['subcomunidad', SUBCOMMUNITY, { title: 'Ingeniería de Sistemas', icon: 'fa-gears', description: '' }],
+      ['colección', COLLECTION, { title: 'Embargo', icon: 'fa-graduation-cap', description: '' }],
     ]) {
       label = `${name} (${dev})`;
       p = await open(browser, url, width);
@@ -180,6 +195,20 @@ async function run() {
         check(label, 'selector de pestañas en celular', await p.page.$('.comcol-browse select'));
       }
       await p.page.close();
+    }
+
+    // Name with an order number and no space after the dot ("6.Tesis de pre y posgrado - ...")
+    if (!mobile) {
+      const cols = await (await fetch(`${BASE}/server/api/core/collections?size=200`)).json();
+      const tesis = cols._embedded.collections.find((c) => /^6\.\S/.test(c.name));
+      label = 'colección "6.Tesis..." (escritorio)';
+      check(label, 'existe en la API', tesis, 'no se encontró');
+      if (tesis) {
+        p = await open(browser, `/collections/${tesis.uuid}`, width);
+        await common(label, p);
+        await comcolHeader(label, p.page, { title: tesis.name.replace(/^6\./, ''), icon: 'fa-graduation-cap' });
+        await p.page.close();
+      }
     }
 
     // Every "Examinar" tab of a community: the header must stay (bug reported on 27/10/2026)
@@ -194,7 +223,7 @@ async function run() {
         label = `"${tab.text}" de comunidad (${dev})`;
         p = await open(browser, tab.href, width);
         await common(label, p);
-        await comcolHeader(label, p.page, { title: '1. Arquitectura e Ingenierías', icon: 'assets/uncp/icons/1.png' });
+        await comcolHeader(label, p.page, { title: 'Arquitectura e Ingenierías', icon: 'fa-gears' });
         await activeTab(label, p.page, tab.text);
         const button = await p.page.evaluate(() => {
           const b = document.querySelector('ds-starts-with-text .btn-primary, ds-starts-with-date .btn-primary, ds-browse-by-taxonomy-page .btn-primary');
@@ -206,8 +235,8 @@ async function run() {
     }
     // Same tabs, from a subcommunity and a collection (header icon inherited from the top community)
     for (const [name, url, title, icon] of [
-      ['subcomunidad', `/browse/author?scope=${await uuidOf(SUBCOMMUNITY)}`, 'Ingeniería de Sistemas', 'assets/uncp/icons/1.png'],
-      ['colección', `/browse/dateissued?scope=${await uuidOf(COLLECTION)}`, 'Embargo', 'assets/uncp/icons/6.png'],
+      ['subcomunidad', `/browse/author?scope=${await uuidOf(SUBCOMMUNITY)}`, 'Ingeniería de Sistemas', 'fa-gears'],
+      ['colección', `/browse/dateissued?scope=${await uuidOf(COLLECTION)}`, 'Embargo', 'fa-graduation-cap'],
     ]) {
       label = `navegación de ${name} (${dev})`;
       p = await open(browser, url, width);
@@ -242,7 +271,7 @@ async function run() {
   // Server-side rendering: the header and its icon are already in the HTML (good for crawlers)
   const html = await (await fetch(`${BASE}/communities/${await uuidOf(SUBCOMMUNITY)}`)).text();
   check('SSR subcomunidad', 'encabezado UNCP en el HTML', html.includes('uncp-comcol-header'));
-  check('SSR subcomunidad', 'icono heredado en el HTML', /uncp-comcol-icon[^]*?src="assets\/uncp\/icons\/1\.png"/.test(html));
+  check('SSR subcomunidad', 'icono heredado en el HTML', /uncp-comcol-icon[^<]*<i[^>]*fa-gears/.test(html));
 
   await browser.close();
 }

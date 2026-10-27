@@ -1,4 +1,4 @@
-import { distinctUntilChanged, take, withLatestFrom, delay } from 'rxjs/operators';
+import { distinctUntilChanged, take, withLatestFrom, delay, filter } from 'rxjs/operators';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
@@ -82,6 +82,12 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     if (isPlatformBrowser(this.platformId)) {
       this.trackIdleModal();
+      // UNCP: the breakpoint variables (--bs-*-min) are only in the theme CSS. When a page is rendered client side
+      // only (e.g. /search, or a static deployment) that CSS can finish loading after the variables were read
+      // below, and then phones got the desktop navbar. Read them again each time the theme CSS has loaded.
+      this.themeService.isThemeCSSLoading$.pipe(
+        filter((loading: boolean) => !loading),
+      ).subscribe(() => this.storeCSSVariables());
     }
 
     this.isThemeLoading$ = this.themeService.isThemeLoading$;

@@ -273,3 +273,19 @@ ds-browse-by-taxonomy-page .btn-primary {
     border-color: #05634a;
   }
 }
+
+// Community icon (home cards and community/collection header): a Font Awesome icon in UNCP green on a light
+// green circle. Size with --uncp-icon-size (default 56px); the glyph is 42% of it.
+.uncp-community-icon {
+  --uncp-icon-size: 56px;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--uncp-icon-size);
+  height: var(--uncp-icon-size);
+  border-radius: 50%;
+  font-size: calc(var(--uncp-icon-size) * .42);
+  color: #067a5a;
+  background: #e3f5ec;
+}

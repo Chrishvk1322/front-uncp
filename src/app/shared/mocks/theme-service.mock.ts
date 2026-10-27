@@ -9,6 +9,9 @@ export function getMockThemeService(themeName = 'base', themes?: ThemeConfig[]):
     getThemeName$: observableOf(themeName),
     getThemeConfigFor: undefined,
     listenForRouteChanges: undefined,
+  }, {
+    isThemeLoading$: observableOf(false),
+    isThemeCSSLoading$: observableOf(false),
   });
 
   if (isNotEmpty(themes)) {

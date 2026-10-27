@@ -813,6 +813,8 @@
 
   "browse.metadata.subject": "Subject",
 
+  "browse.metadata.srsc": "Subject Category",
+
   "browse.metadata.title": "Title",
 
   "browse.metadata.author.breadcrumbs": "Browse by Author",

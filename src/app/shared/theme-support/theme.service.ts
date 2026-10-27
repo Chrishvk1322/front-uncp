@@ -103,6 +103,13 @@ export class ThemeService {
   }
 
   /**
+   * Whether the theme CSS is downloading: true from a theme change until its stylesheet has loaded
+   */
+  get isThemeCSSLoading$(): Observable<boolean> {
+    return this._isThemeCSSLoading$;
+  }
+
+  /**
    * Every time the theme is changed
    *   - if the theme name is valid, load it (CSS + <head> tags)
    *   - otherwise fall back to {@link getDefaultThemeConfig} or {@link BASE_THEME_NAME}
