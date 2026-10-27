@@ -282,7 +282,12 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
           - Artículos: `fa-newspaper`;
           - genérico: `fa-folder-open`.
           
-          Están en `shared/uncp-communities.ts`. Las tarjetas dicen ahora **"Explorar comunidad"** en lugar de "Explorar colección". Siguen con sus fondos pastel por facultad. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
+          Están en `shared/uncp-communities.ts`. Las tarjetas dicen ahora **"Explorar comunidad"** en lugar de "Explorar colección".
+        - **Tarjetas de la home con fondo uniforme** (27/10/2026, opción B elegida por el usuario frente a la A, blanco; las dos se probaron antes con `pwtool/cardopts.js`). Se quitaron los degradados pastel por facultad de producción y el campo `cardClass`.
+          - **Normal**: fondo verde muy claro `#f4faf7`, borde `#e1efe8`, sombra suave, y el círculo del icono en blanco.
+          - **Al pasar el mouse o con foco de teclado**: la tarjeta sube 4px, el borde pasa a `#067A5A`, el círculo se rellena de `#067A5A` con el icono en blanco, y "Explorar comunidad" se pone verde.
+          - **Alturas iguales por fila**: la columna es `d-flex`.
+          - **Animación de entrada**: pasó a `backwards`. Con `forwards`, la animación terminada fijaba su `transform` final y anulaba la elevación del hover. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
@@ -375,7 +380,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 27/10/2026: **351/351 correctas** (antes 327, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 27/10/2026: **357/357 correctas** (antes 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

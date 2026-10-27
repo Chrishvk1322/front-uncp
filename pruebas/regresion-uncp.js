@@ -157,6 +157,23 @@ async function run() {
     check(label, 'iconos dibujados (Font Awesome)', cards.every((c) => c.glyph && c.glyph !== 'none' && c.glyph !== 'normal'), cards.map((c) => c.glyph).join(' '));
     check(label, '8 iconos distintos', new Set(cards.map((c) => c.icon)).size === 8, cards.map((c) => c.icon).join(' '));
     check(label, 'enlace "Explorar comunidad"', cards.every((c) => c.link === 'Explorar comunidad'), cards[0]?.link);
+    // one light green background for all cards, same height per row, hover fills the icon circle in green
+    const look = await p.page.$$eval('.contenido-comunidades .community-card', (els) => els.map((e) => {
+      const r = e.getBoundingClientRect();
+      return { bg: getComputedStyle(e).backgroundColor, img: getComputedStyle(e).backgroundImage, top: Math.round(r.top), h: Math.round(r.height) };
+    }));
+    check(label, 'fondo verde claro uniforme', look.every((c) => c.bg === 'rgb(244, 250, 247)' && c.img === 'none'), [...new Set(look.map((c) => c.bg))].join(' '));
+    const rows = {};
+    look.forEach((c) => (rows[c.top] = rows[c.top] || []).push(c.h));
+    check(label, 'misma altura por fila', Object.values(rows).every((hs) => Math.max(...hs) - Math.min(...hs) <= 1), JSON.stringify(rows));
+    const card = await p.page.$('.contenido-comunidades .community-card');
+    await card.scrollIntoViewIfNeeded();
+    await card.hover();
+    await p.page.waitForTimeout(500);
+    const hover = await card.evaluate((e) => ({
+      border: getComputedStyle(e).borderTopColor, icon: getComputedStyle(e.querySelector('.uncp-community-icon')).backgroundColor,
+    }));
+    check(label, 'hover: borde e icono en verde', hover.border === 'rgb(6, 122, 90)' && hover.icon === 'rgb(6, 122, 90)', JSON.stringify(hover));
     check(label, 'publicaciones recientes', (await p.page.$$('ds-item-search-result-list-element')).length > 0);
     const footer = await p.page.$$eval('.stat-number', (els) => els.map((e) => e.textContent.trim()));
     check(label, 'cifras del pie', footer.length === 4 && footer.every((n) => /^\d[\d,]*$/.test(n)), footer.join(' '));
