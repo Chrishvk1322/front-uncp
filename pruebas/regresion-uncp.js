@@ -214,6 +214,51 @@ async function run() {
       await p.page.close();
     }
 
+    // Subcommunity and collection cards, breadcrumbs without order numbers, green RSS button
+    label = `tarjetas de subcomunidades (${dev})`;
+    p = await open(browser, COMMUNITY, width);
+    await common(label, p);
+    const subs = await p.page.evaluate(() => ({
+      title: document.querySelector('ds-community-page-sub-community-list .uncp-comcol-section-title')?.textContent.trim(),
+      cards: [...document.querySelectorAll('ds-community-page-sub-community-list .uncp-comcol-card')].map((a) => ({
+        name: a.querySelector('.uncp-comcol-card-name')?.textContent.trim(), href: a.getAttribute('href'),
+        icon: [...(a.querySelector('.uncp-community-icon i')?.classList ?? [])].find((c) => c.startsWith('fa-') && c !== 'fa-solid'),
+      })),
+      pager: !!document.querySelector('ds-community-page-sub-community-list ngb-pagination'),
+      crumbs: [...document.querySelectorAll('.breadcrumb-item')].map((li) => li.textContent.trim()),
+      rss: (() => { const b = document.querySelector('ds-uncp-comcol-header ds-rss .btn'); return b && getComputedStyle(b).color; })(),
+    }));
+    check(label, 'título "Subcomunidades"', subs.title === 'Subcomunidades', subs.title);
+    check(label, 'las 11 en una sola vista, sin paginación', subs.cards.length === 11 && !subs.pager, `${subs.cards.length} tarjetas, paginación: ${subs.pager}`);
+    check(label, 'tarjetas con nombre, enlace e icono de la facultad', subs.cards.every((c) => c.name && /^\/communities\//.test(c.href) && c.icon === 'fa-gears'), JSON.stringify(subs.cards[0]));
+    check(label, 'migas de pan sin número', subs.crumbs.join(' | ') === 'Inicio | Arquitectura e Ingenierías', subs.crumbs.join(' | '));
+    check(label, 'botón RSS verde', subs.rss === GREEN, subs.rss);
+    if (!mobile) {
+      const subCard = await p.page.$('ds-community-page-sub-community-list .uncp-comcol-card');
+      await subCard.hover();
+      await p.page.waitForTimeout(400);
+      const subHover = await subCard.evaluate((a) => getComputedStyle(a).borderTopColor);
+      check(label, 'hover: borde verde', subHover === GREEN, subHover);
+    }
+    await p.page.close();
+
+    label = `tarjetas de colecciones (${dev})`;
+    p = await open(browser, SUBCOMMUNITY, width);
+    await common(label, p);
+    const cols = await p.page.evaluate(() => ({
+      title: document.querySelector('ds-community-page-sub-collection-list .uncp-comcol-section-title')?.textContent.trim(),
+      cards: [...document.querySelectorAll('ds-community-page-sub-collection-list .uncp-comcol-card')].map((a) => ({
+        name: a.querySelector('.uncp-comcol-card-name')?.textContent.trim(), detail: a.querySelector('.uncp-comcol-card-detail')?.textContent.trim(),
+        href: a.getAttribute('href'),
+      })),
+      crumbs: [...document.querySelectorAll('.breadcrumb-item')].map((li) => li.textContent.trim()),
+    }));
+    check(label, 'título "Colecciones"', cols.title === 'Colecciones', cols.title);
+    check(label, 'orden Pregrado → Maestría → Doctorado', cols.cards.map((c) => c.name).join(',') === 'Pregrado,Maestría,Doctorado', cols.cards.map((c) => c.name).join(','));
+    check(label, 'nombre completo como detalle', cols.cards.every((c) => /^Tesis - .+ - Ingeniería de Sistemas$/.test(c.detail) && /^\/collections\//.test(c.href)), JSON.stringify(cols.cards[0]));
+    check(label, 'migas de pan sin número', cols.crumbs.join(' | ') === 'Inicio | Arquitectura e Ingenierías | Ingeniería de Sistemas', cols.crumbs.join(' | '));
+    await p.page.close();
+
     // Name with an order number and no space after the dot ("6.Tesis de pre y posgrado - ...")
     if (!mobile) {
       const cols = await (await fetch(`${BASE}/server/api/core/collections?size=200`)).json();
@@ -224,6 +269,8 @@ async function run() {
         p = await open(browser, `/collections/${tesis.uuid}`, width);
         await common(label, p);
         await comcolHeader(label, p.page, { title: tesis.name.replace(/^6\./, ''), icon: 'fa-graduation-cap' });
+        const crumbs = await p.page.$$eval('.breadcrumb-item', (lis) => lis.map((li) => li.textContent.trim()));
+        check(label, 'migas de pan sin número', crumbs.every((c) => !/^\d+\./.test(c)), crumbs.join(' | '));
         await p.page.close();
       }
     }

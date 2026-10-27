@@ -287,7 +287,20 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
           - **Normal**: fondo verde muy claro `#f4faf7`, borde `#e1efe8`, sombra suave, y el círculo del icono en blanco.
           - **Al pasar el mouse o con foco de teclado**: la tarjeta sube 4px, el borde pasa a `#067A5A`, el círculo se rellena de `#067A5A` con el icono en blanco, y "Explorar comunidad" se pone verde.
           - **Alturas iguales por fila**: la columna es `d-flex`.
-          - **Animación de entrada**: pasó a `backwards`. Con `forwards`, la animación terminada fijaba su `transform` final y anulaba la elevación del hover. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
+          - **Animación de entrada**: pasó a `backwards`. Con `forwards`, la animación terminada fijaba su `transform` final y anulaba la elevación del hover.
+      - **(2) Hecho el 27/10/2026: subcomunidades y colecciones como tarjetas** (con los puntos 3 a 5 de la propuesta; el 6, cantidades de documentos, se descartó por innecesario). Componentes temados `app/community-page/sub-community-list/` y `sub-collection-list/`.
+        - **Tarjetas**: cuadrícula de 1, 2 o 3 columnas, en el mismo lenguaje de la home pero compacta (clases globales `.uncp-comcol-card*`). Fondo `#f4faf7`, icono en círculo blanco y flecha. Al pasar el mouse, borde y círculo en verde.
+        - **Una sola vista**: 50 por página (`UNCP_COMCOL_PAGE_SIZE`; la comunidad con más subcomunidades tiene 11). Sin "Mostrando…" ni el engranaje.
+        - **Subcomunidades**: con el icono de su facultad y el nombre sin número.
+        - **Colecciones**:
+          - las de tesis muestran el nivel como título y el nombre completo debajo. Se detectan en las variantes reales de los nombres: "Tesis - Pregrado - …", "Tesis Doctorado - …", "Maestría-…" y "Maestria" sin tilde;
+          - van en orden Pregrado → Segunda Especialidad → Maestría → Doctorado;
+          - iconos: birrete, certificado, pergamino y medalla, respectivamente;
+          - las demás conservan su nombre, sin número, y van después en orden alfabético. Su icono depende del nombre: libro, periódico, candado (Embargo), birrete (tesis) o carpeta.
+        - **Títulos de sección** (pedido del usuario): "Subcomunidades" y "Colecciones" (en: "Subcommunities", "Collections").
+        - **RSS**: estaba en la barra de la lista. Ahora está en el encabezado de la comunidad. En todo el sitio, el RSS y el engranaje de opciones pasaron a botón verde con contorno (antes gris oscuro).
+        - **Migas de pan sin número** (pedido del usuario): `app/breadcrumbs/` temado; solo cambia las migas que apuntan a `/communities/` o `/collections/`, así nunca toca los títulos de ítems.
+        - `uncpDisplayName()` y el cálculo del icono de la facultad (`uncpCommunityIcon$`) pasaron a `shared/uncp-communities.ts`, compartidos por el encabezado, las tarjetas y las migas de pan. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
@@ -380,7 +393,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 27/10/2026: **357/357 correctas** (antes 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 27/10/2026: **401/401 correctas** (antes 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

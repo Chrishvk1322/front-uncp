@@ -13,6 +13,8 @@
         <ds-comcol-page-content [content]="communityPayload.sidebarText" [hasInnerHtml]="true"
           [title]="'community.page.news'">
         </ds-comcol-page-content>
+        <!-- RSS feed of the community: the subcommunity/collection cards don't show the list toolbar where it was -->
+        <ds-rss uncpComcolActions></ds-rss>
         <ds-dso-edit-menu uncpComcolActions></ds-dso-edit-menu>
       </ds-uncp-comcol-header>
       <section class="comcol-page-browse-section">

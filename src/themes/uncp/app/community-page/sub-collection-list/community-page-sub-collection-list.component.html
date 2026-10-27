@@ -1,0 +1,25 @@
+<ng-container *ngVar="(subCollectionsRDObs | async) as subCollectionsRD">
+  <section *ngIf="subCollectionsRD?.hasSucceeded && subCollectionsRD?.payload.totalElements > 0" class="uncp-comcol-section" @fadeIn>
+    <h2 class="uncp-comcol-section-title">{{'community.sub-collection-list.head' | translate}}</h2>
+    <ds-pagination [paginationOptions]="config"
+                   [sortOptions]="sortConfig"
+                   [collectionSize]="subCollectionsRD.payload.totalElements"
+                   [hideGear]="true"
+                   [hidePaginationDetail]="true">
+      <ul class="uncp-comcol-cards row list-unstyled">
+        <li *ngFor="let card of cards$ | async" class="col-md-6 col-xl-4 d-flex">
+          <a class="uncp-comcol-card" [routerLink]="['/collections', card.uuid]">
+            <span class="uncp-community-icon" aria-hidden="true"><i class="fa-solid {{ card.icon }}"></i></span>
+            <span class="uncp-comcol-card-text">
+              <span class="uncp-comcol-card-name">{{ card.title }}</span>
+              <span *ngIf="card.subtitle" class="uncp-comcol-card-detail">{{ card.subtitle }}</span>
+            </span>
+            <i class="fas fa-chevron-right uncp-comcol-card-arrow" aria-hidden="true"></i>
+          </a>
+        </li>
+      </ul>
+    </ds-pagination>
+  </section>
+  <ds-error *ngIf="subCollectionsRD?.hasFailed" message="{{'error.sub-collections' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="subCollectionsRD?.isLoading" message="{{'loading.sub-collections' | translate}}"></ds-themed-loading>
+</ng-container>

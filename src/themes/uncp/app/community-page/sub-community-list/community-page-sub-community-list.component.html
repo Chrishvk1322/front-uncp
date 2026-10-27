@@ -1,0 +1,24 @@
+<ng-container *ngVar="(subCommunitiesRDObs | async) as subCommunitiesRD">
+  <section *ngIf="subCommunitiesRD?.hasSucceeded && subCommunitiesRD?.payload.totalElements > 0" class="uncp-comcol-section" @fadeIn>
+    <h2 class="uncp-comcol-section-title">{{'community.sub-community-list.head' | translate}}</h2>
+    <ds-pagination [paginationOptions]="config"
+                   [sortOptions]="sortConfig"
+                   [collectionSize]="subCommunitiesRD.payload.totalElements"
+                   [hideGear]="true"
+                   [hidePaginationDetail]="true">
+      <ul class="uncp-comcol-cards row list-unstyled">
+        <li *ngFor="let subCommunity of subCommunitiesRD.payload.page" class="col-md-6 col-xl-4 d-flex">
+          <a class="uncp-comcol-card" [routerLink]="['/communities', subCommunity.uuid]">
+            <span class="uncp-community-icon" aria-hidden="true"><i class="fa-solid {{ icon$ | async }}"></i></span>
+            <span class="uncp-comcol-card-text">
+              <span class="uncp-comcol-card-name">{{ name(subCommunity) }}</span>
+            </span>
+            <i class="fas fa-chevron-right uncp-comcol-card-arrow" aria-hidden="true"></i>
+          </a>
+        </li>
+      </ul>
+    </ds-pagination>
+  </section>
+  <ds-error *ngIf="subCommunitiesRD?.hasFailed" message="{{'error.sub-communities' | translate}}"></ds-error>
+  <ds-themed-loading *ngIf="subCommunitiesRD?.isLoading" message="{{'loading.sub-communities' | translate}}"></ds-themed-loading>
+</ng-container>

@@ -75,6 +75,9 @@ import { BrowseByMetadataPageComponent } from './app/browse-by/browse-by-metadat
 import { BrowseByDatePageComponent } from './app/browse-by/browse-by-date-page/browse-by-date-page.component';
 import { BrowseByTitlePageComponent } from './app/browse-by/browse-by-title-page/browse-by-title-page.component';
 import { BrowseByTaxonomyPageComponent } from './app/browse-by/browse-by-taxonomy-page/browse-by-taxonomy-page.component';
+import { CommunityPageSubCommunityListComponent } from './app/community-page/sub-community-list/community-page-sub-community-list.component';
+import { CommunityPageSubCollectionListComponent } from './app/community-page/sub-collection-list/community-page-sub-collection-list.component';
+import { BreadcrumbsComponent } from './app/breadcrumbs/breadcrumbs.component';
 import { DsoPageModule } from '../../app/shared/dso-page/dso-page.module';
 
 const DECLARATIONS = [
@@ -92,6 +95,9 @@ const DECLARATIONS = [
   BrowseByDatePageComponent,
   BrowseByTitlePageComponent,
   BrowseByTaxonomyPageComponent,
+  CommunityPageSubCommunityListComponent,
+  CommunityPageSubCollectionListComponent,
+  BreadcrumbsComponent,
 ];
 
 @NgModule({

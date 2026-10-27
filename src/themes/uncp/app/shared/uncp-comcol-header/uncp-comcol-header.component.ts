@@ -19,18 +19,17 @@
  *  ("1. Arquitectura e Ingenierías" → "Arquitectura e Ingenierías"; también "6.Tesis ...", sin espacio).
  *  Solo en el encabezado: las migas de pan y las listas conservan el nombre completo, que fija el orden.
  *
- *  Comunidad de primer nivel: se toma de las migas de pan, que ya resuelven toda la cadena de comunidades
- *  padre (/communities/{uuid}); no hace consultas adicionales.
+ *  Comunidad de primer nivel: se toma de las migas de pan, sin consultas adicionales (uncpCommunityIcon$ en
+ *  shared/uncp-communities.ts, junto con uncpDisplayName).
  * ============================================================================================
  */
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { filter, map, startWith } from 'rxjs/operators';
 import { BreadcrumbsService } from '../../../../../app/breadcrumbs/breadcrumbs.service';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { Collection } from '../../../../../app/core/shared/collection.model';
 import { Community } from '../../../../../app/core/shared/community.model';
-import { getTopCommunity, UNCP_GENERIC_COMMUNITY_ICON } from '../uncp-communities';
+import { uncpCommunityIcon$, uncpDisplayName, UNCP_GENERIC_COMMUNITY_ICON } from '../uncp-communities';
 
 /**
  * The permanent URI of a handle, always on hdl.handle.net, whatever host the stored dc.identifier.uri has
@@ -38,13 +37,6 @@ import { getTopCommunity, UNCP_GENERIC_COMMUNITY_ICON } from '../uncp-communitie
 export function uncpHandleUri(uri: string): string {
   const match = /(?:\/handle\/|hdl\.handle\.net\/)(.+)$/.exec(uri ?? '');
   return match ? `https://hdl.handle.net/${match[1]}` : uri;
-}
-
-/**
- * The name without its leading order number ("1. Arquitectura e Ingenierías" → "Arquitectura e Ingenierías")
- */
-export function uncpDisplayName(name: string): string {
-  return (name ?? '').replace(/^\s*\d+\.\s*/, '');
 }
 
 @Component({
@@ -83,15 +75,6 @@ export class UncpComcolHeaderComponent implements OnInit {
   ngOnInit(): void {
     this.name = uncpDisplayName(this.dsoNameService.getName(this.dso));
     this.uri = uncpHandleUri(this.dso.handle);
-    const ownIcon = getTopCommunity(this.dso.uuid)?.icon;
-    this.icon$ = ownIcon ? of(ownIcon) : this.breadcrumbsService.breadcrumbs$.pipe(
-      // the replayed breadcrumbs of the previous page don't contain this page
-      filter((crumbs) => crumbs.some((crumb) => crumb.url?.includes(this.dso.uuid))),
-      map((crumbs) => crumbs
-        .map((crumb) => /\/communities\/([0-9a-f-]{36})/.exec(crumb.url ?? '')?.[1])
-        .map((uuid) => getTopCommunity(uuid)?.icon)
-        .find((icon) => !!icon) ?? UNCP_GENERIC_COMMUNITY_ICON),
-      startWith(UNCP_GENERIC_COMMUNITY_ICON),
-    );
+    this.icon$ = uncpCommunityIcon$(this.dso.uuid, this.breadcrumbsService.breadcrumbs$);
   }
 }
