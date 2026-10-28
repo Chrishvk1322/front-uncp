@@ -6,7 +6,9 @@
  *  Reemplaza el encabezado de serie (título negro + "URI permanente") por un encabezado sobrio, sin caja
  *  ni fondo (rediseño del 27/10/2026 con la skill Impeccable, modo lectura/navegación), con:
  *   - el icono de la comunidad de primer nivel a la que pertenece la página (el de las tarjetas de la
- *     portada, ver shared/uncp-communities.ts), o un icono genérico (carpeta) si no se puede determinar;
+ *     portada, ver shared/uncp-communities.ts), o un icono genérico (carpeta) si no se puede determinar; si la
+ *     página es de una carrera con color oficial (o de una colección de ella), el círculo sólido de la carrera:
+ *     su color y su icono (UNCP_CAREERS);
  *   - el nombre, la descripción corta (dc.description.abstract) si existe, y la URI permanente;
  *   - el contenido que agregue la página (logo, texto introductorio, noticias) y el menú de edición.
  *  Sin etiqueta "Comunidad"/"Colección" ni cantidad de documentos (pedido del usuario, 27/10/2026).
@@ -24,12 +26,13 @@
  * ============================================================================================
  */
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { combineLatest, Observable, of } from 'rxjs';
 import { BreadcrumbsService } from '../../../../../app/breadcrumbs/breadcrumbs.service';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { Collection } from '../../../../../app/core/shared/collection.model';
 import { Community } from '../../../../../app/core/shared/community.model';
-import { uncpCommunityIcon$, uncpDisplayName, UNCP_GENERIC_COMMUNITY_ICON } from '../uncp-communities';
+import { map } from 'rxjs/operators';
+import { uncpCareer$, uncpCareerStyle, uncpCommunityIcon$, uncpDisplayName, UNCP_GENERIC_COMMUNITY_ICON } from '../uncp-communities';
 
 /**
  * The permanent URI of a handle, always on hdl.handle.net, whatever host the stored dc.identifier.uri has
@@ -66,6 +69,11 @@ export class UncpComcolHeaderComponent implements OnInit {
    */
   icon$: Observable<string> = of(UNCP_GENERIC_COMMUNITY_ICON);
 
+  /**
+   * Circle in the color of the career when the page belongs to one with an official color, otherwise null
+   */
+  careerStyle$: Observable<Record<string, string> | null> = of(null);
+
   constructor(
     private breadcrumbsService: BreadcrumbsService,
     private dsoNameService: DSONameService,
@@ -75,6 +83,10 @@ export class UncpComcolHeaderComponent implements OnInit {
   ngOnInit(): void {
     this.name = uncpDisplayName(this.dsoNameService.getName(this.dso));
     this.uri = uncpHandleUri(this.dso.handle);
-    this.icon$ = uncpCommunityIcon$(this.dso.uuid, this.breadcrumbsService.breadcrumbs$);
+    const career$ = uncpCareer$(this.dso.uuid, this.breadcrumbsService.breadcrumbs$);
+    this.icon$ = combineLatest([uncpCommunityIcon$(this.dso.uuid, this.breadcrumbsService.breadcrumbs$), career$]).pipe(
+      map(([facultyIcon, career]) => career?.icon ?? facultyIcon),
+    );
+    this.careerStyle$ = career$.pipe(map(uncpCareerStyle));
   }
 }

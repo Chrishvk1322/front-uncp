@@ -1,15 +1,15 @@
 .contenido-comunidades {
   padding: 2rem 1rem;
 }
-// One background for every community (27/10/2026, option B): very light green, so the green icons are the
-// only color; the per-faculty pastel gradients of production (card-arquitectura, ...) are no longer used
+// White cards with a solid green icon circle and a green border on hover (28/10/2026, example 1): the same look
+// as the subcommunity and collection cards of the community pages. Same size as before (padding, min-height)
 .contenido-comunidades .community-card {
   width: 100%;
-  background: #f4faf7;
+  background: #fff;
   border-radius: 16px;
   padding: 1.2rem 1.1rem;
   text-align: center;
-  border: 1px solid #e1efe8;
+  border: 1px solid #e4e7e6;
   box-shadow: 0 1px 2px rgba(31, 45, 40, .04), 0 6px 16px rgba(31, 45, 40, .05);
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
   min-height: 220px;
@@ -19,26 +19,19 @@
   position: relative;
   overflow: hidden;
 }
-// hover (and keyboard focus): gold border and warm shadow around, icon circle filled with UNCP green; the
-// gold-around-green of the university seal. The gold is a bit deeper than the seal's #CDB370, which is hardly
-// visible on the light green card
+// hover (and keyboard focus): UNCP green border and shadow
 .contenido-comunidades .community-card:hover,
 .contenido-comunidades .community-card:focus-visible {
   transform: translateY(-4px);
-  border-color: #c9a24f;
-  box-shadow: 0 2px 4px rgba(31, 45, 40, .05), 0 12px 28px rgba(201, 162, 79, .22);
+  border-color: #067a5a;
+  box-shadow: 0 2px 4px rgba(31, 45, 40, .05), 0 12px 28px rgba(6, 122, 90, .14);
   outline: none;
 }
 .contenido-comunidades .community-card .uncp-community-icon {
-  background: #fff;
-  transition: background-color .25s ease, color .25s ease;
-}
-.contenido-comunidades .community-card:hover .uncp-community-icon,
-.contenido-comunidades .community-card:focus-visible .uncp-community-icon {
   color: #fff;
   background: #067a5a;
 }
-// the circle is the global .uncp-community-icon (Font Awesome icon in UNCP green)
+// the circle is the global .uncp-community-icon (size, shape); here solid green with a white icon
 .contenido-comunidades .community-card .card-icon {
   display: flex;
   justify-content: center;
@@ -58,7 +51,7 @@
 .contenido-comunidades .community-card .card-count {
   display: inline-block;
   padding: 0 1.8rem;
-  background: #fff;
+  background: #f1f4f3;
   border-radius: 10px;
   font-size: .95rem;
   margin-bottom: 1.5rem;

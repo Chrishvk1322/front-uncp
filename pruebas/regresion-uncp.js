@@ -35,6 +35,16 @@ const BASE = process.env.BASE || 'http://localhost:8080';
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.31 Safari/537.36';
 const SERVER_IP = '38.43.155.155';
 const GREEN = 'rgb(6, 122, 90)';
+const BLUE = 'rgb(31, 78, 121)';
+// Careers (UNCP_CAREERS): solid circle in the official color, own icon, white or charcoal glyph
+const WHITE = 'rgb(255, 255, 255)';
+const CHARCOAL = 'rgb(39, 38, 37)';
+const CAREER = {
+  'Ingeniería Civil': { tint: 'rgb(181, 31, 32)', ink: WHITE, icon: 'fa-bridge' },                 // #B51F20
+  'Ingeniería de Minas': { tint: 'rgb(249, 193, 20)', ink: CHARCOAL, icon: 'fa-helmet-safety' },   // #F9C114
+  'Ingeniería de Sistemas': { tint: 'rgb(100, 150, 210)', ink: WHITE, icon: 'fa-laptop-code' },    // #6496D2
+  'Ingeniería Química': { tint: 'rgb(252, 221, 24)', ink: CHARCOAL, icon: 'fa-flask' },            // #FCDD18
+};
 
 // Production data used by the checks
 const COMMUNITY = '/handle/20.500.12894/37';             // 1. Arquitectura e Ingenierías (top level)
@@ -108,6 +118,7 @@ async function comcolHeader(label, page, { title, icon, description }) {
       icon: [...(el.querySelector('.uncp-comcol-icon i')?.classList ?? [])].find((c) => c.startsWith('fa-') && c !== 'fa-solid') ?? 'none',
       description: el.querySelector('.uncp-comcol-description')?.textContent.trim() ?? '',
       uri: el.querySelector('.uncp-comcol-uri a')?.getAttribute('href') ?? '',
+      uriColor: el.querySelector('.uncp-comcol-uri a') && getComputedStyle(el.querySelector('.uncp-comcol-uri a')).color,
       stockHeader: !!document.querySelector('ds-comcol-page-header'),
     };
   });
@@ -118,6 +129,14 @@ async function comcolHeader(label, page, { title, icon, description }) {
   check(label, 'título de la pestaña sin número', !/(^|:: |Examinando )\d+\./.test(tabTitle) && tabTitle.includes(title), `"${tabTitle}"`);
   check(label, 'icono de la comunidad', h.icon === icon, h.icon);
   check(label, 'URI en hdl.handle.net', /^https:\/\/hdl\.handle\.net\/20\.500\.12894\/\d+$/.test(h.uri), h.uri);
+  check(label, 'URI en azul', h.uriColor === BLUE, h.uriColor);
+  const uriLink = await page.$('ds-uncp-comcol-header .uncp-comcol-uri a');
+  if (uriLink && page.viewportSize().width >= 768) {
+    await uriLink.hover();
+    await page.waitForTimeout(200);
+    const hoverColor = await uriLink.evaluate((a) => getComputedStyle(a).color);
+    check(label, 'URI azul también en hover', hoverColor === BLUE, hoverColor);
+  }
   check(label, 'sin el encabezado de serie', !h.stockHeader);
   if (description !== undefined) {
     check(label, 'descripción corta', description ? h.description.startsWith(description) : h.description === '', h.description.slice(0, 40));
@@ -132,6 +151,15 @@ async function activeTab(label, page, expected) {
   });
   check(label, `pestaña activa "${expected}"`, tab && tab.text === expected, tab ? tab.text : 'ninguna');
   check(label, 'pestaña activa en verde', tab && tab.bg === GREEN, tab?.bg);
+  const other = await page.$('.comcol-browse .list-group-item:not(.active)');
+  if (other) {
+    const before = await other.evaluate((a) => getComputedStyle(a).color);
+    await other.hover();
+    await page.waitForTimeout(300);
+    const after = await other.evaluate((a) => { const c = getComputedStyle(a); return { color: c.color, bg: c.backgroundColor, line: c.textDecorationLine }; });
+    check(label, 'pestañas no seleccionadas en azul', before === BLUE, before);
+    check(label, 'hover en pestaña: subrayado y fondo gris tenue', after.color === BLUE && after.line === 'underline' && after.bg === 'rgb(241, 243, 244)', JSON.stringify(after));
+  }
 }
 
 async function run() {
@@ -162,7 +190,11 @@ async function run() {
       const r = e.getBoundingClientRect();
       return { bg: getComputedStyle(e).backgroundColor, img: getComputedStyle(e).backgroundImage, top: Math.round(r.top), h: Math.round(r.height) };
     }));
-    check(label, 'fondo verde claro uniforme', look.every((c) => c.bg === 'rgb(244, 250, 247)' && c.img === 'none'), [...new Set(look.map((c) => c.bg))].join(' '));
+    check(label, 'tarjetas blancas', look.every((c) => c.bg === 'rgb(255, 255, 255)' && c.img === 'none'), [...new Set(look.map((c) => c.bg))].join(' '));
+    const sizes = look.map((c) => c.h);
+    check(label, 'tamaño de tarjeta sin cambios (alto mínimo 220px)', sizes.every((h) => h >= 220), sizes.join(','));
+    const circle = await p.page.$eval('.contenido-comunidades .uncp-community-icon', (e) => ({ bg: getComputedStyle(e).backgroundColor, fg: getComputedStyle(e).color }));
+    check(label, 'círculo verde sólido con icono blanco', circle.bg === GREEN && circle.fg === 'rgb(255, 255, 255)', JSON.stringify(circle));
     const rows = {};
     look.forEach((c) => (rows[c.top] = rows[c.top] || []).push(c.h));
     check(label, 'misma altura por fila', Object.values(rows).every((hs) => Math.max(...hs) - Math.min(...hs) <= 1), JSON.stringify(rows));
@@ -173,7 +205,7 @@ async function run() {
     const hover = await card.evaluate((e) => ({
       border: getComputedStyle(e).borderTopColor, icon: getComputedStyle(e.querySelector('.uncp-community-icon')).backgroundColor,
     }));
-    check(label, 'hover: borde dorado e icono en verde', hover.border === 'rgb(201, 162, 79)' && hover.icon === GREEN, JSON.stringify(hover));
+    check(label, 'hover: borde verde e icono en verde', hover.border === GREEN && hover.icon === GREEN, JSON.stringify(hover));
     const link = await card.$('.card-link');
     await link.hover();
     await p.page.waitForTimeout(400);
@@ -204,7 +236,7 @@ async function run() {
     for (const [name, url, expected] of [
       ['comunidad', COMMUNITY, { title: 'Arquitectura e Ingenierías', icon: 'fa-gears', description: '' }],
       ['comunidad con descripción', LIBROS, { title: 'Libros de investigación', icon: 'fa-book', description: 'Libros publicados por docentes' }],
-      ['subcomunidad', SUBCOMMUNITY, { title: 'Ingeniería de Sistemas', icon: 'fa-gears', description: '' }],
+      ['subcomunidad', SUBCOMMUNITY, { title: 'Ingeniería de Sistemas', icon: 'fa-laptop-code', description: '' }],
       ['colección', COLLECTION, { title: 'Embargo', icon: 'fa-graduation-cap', description: '' }],
     ]) {
       label = `${name} (${dev})`;
@@ -228,6 +260,8 @@ async function run() {
       cards: [...document.querySelectorAll('ds-community-page-sub-community-list .uncp-comcol-card')].map((a) => ({
         name: a.querySelector('.uncp-comcol-card-name')?.textContent.trim(), href: a.getAttribute('href'),
         icon: [...(a.querySelector('.uncp-community-icon i')?.classList ?? [])].find((c) => c.startsWith('fa-') && c !== 'fa-solid'),
+        tint: getComputedStyle(a.querySelector('.uncp-community-icon')).backgroundColor,
+        ink: getComputedStyle(a.querySelector('.uncp-community-icon')).color,
       })),
       pager: !!document.querySelector('ds-community-page-sub-community-list ngb-pagination'),
       crumbs: [...document.querySelectorAll('.breadcrumb-item')].map((li) => li.textContent.trim()),
@@ -235,17 +269,47 @@ async function run() {
     }));
     check(label, 'título "Subcomunidades"', subs.title === 'Subcomunidades', subs.title);
     check(label, 'las 11 en una sola vista, sin paginación', subs.cards.length === 11 && !subs.pager, `${subs.cards.length} tarjetas, paginación: ${subs.pager}`);
-    check(label, 'tarjetas con nombre, enlace e icono de la facultad', subs.cards.every((c) => c.name && /^\/communities\//.test(c.href) && c.icon === 'fa-gears'), JSON.stringify(subs.cards[0]));
+    check(label, 'tarjetas con nombre, enlace e icono propio', subs.cards.every((c) => c.name && /^\/communities\//.test(c.href) && c.icon && c.icon !== 'fa-gears'), JSON.stringify(subs.cards[0]));
+    check(label, 'tarjetas blancas', await p.page.$$eval('ds-community-page-sub-community-list .uncp-comcol-card', (els) => els.every((a) => getComputedStyle(a).backgroundColor === 'rgb(255, 255, 255)')));
     check(label, 'migas de pan sin número', subs.crumbs.join(' | ') === 'Inicio | Arquitectura e Ingenierías', subs.crumbs.join(' | '));
     check(label, 'botón RSS verde', subs.rss === GREEN, subs.rss);
+    for (const [career, colors] of Object.entries(CAREER)) {
+      const card = subs.cards.find((c) => c.name === career);
+      check(label, `color e icono de carrera: ${career}`, card && card.tint === colors.tint && card.ink === colors.ink && card.icon === colors.icon, JSON.stringify(card));
+    }
     if (!mobile) {
       const subCard = await p.page.$('ds-community-page-sub-community-list .uncp-comcol-card');
       await subCard.hover();
       await p.page.waitForTimeout(400);
-      const subHover = await subCard.evaluate((a) => getComputedStyle(a).borderTopColor);
-      check(label, 'hover: borde verde', subHover === GREEN, subHover);
+      const subHover = await subCard.evaluate((a) => ({ border: getComputedStyle(a).borderTopColor, icon: getComputedStyle(a.querySelector('.uncp-community-icon')).backgroundColor }));
+      check(label, 'hover: borde verde, el círculo conserva el color de la carrera', subHover.border === GREEN && subHover.icon === 'rgb(34, 138, 203)', JSON.stringify(subHover));
     }
     await p.page.close();
+
+    // faculties 2 to 5: every career card has its official color (colors given on 28/10/2026)
+    if (!mobile) {
+      for (const [faculty, uuid, careers, sample] of [
+        ['Administrativas', 'a24e4817-4cff-4c9c-b0bd-fcef79473277', 5, ['Economía', 'rgb(216, 33, 32)', WHITE, 'fa-chart-line']],
+        ['Agrarias', 'a51150e5-83e6-4f09-bb12-8f2412f768ad', 11, ['Zootecnia', 'rgb(179, 34, 34)', WHITE, 'fa-cow']],
+        ['Salud', 'c9e7a303-9874-44b9-bf51-280646e192eb', 2, ['Enfermería', 'rgb(95, 195, 238)', CHARCOAL, 'fa-user-nurse']],
+        ['Sociales y Educación', '3222eea9-3c3c-45ff-bbed-7a444937ba8d', 17, ['Trabajo Social', 'rgb(25, 48, 116)', WHITE, 'fa-hands-holding-child']],
+      ]) {
+        label = `carreras de ${faculty} (${dev})`;
+        p = await open(browser, `/communities/${uuid}`, width);
+        await common(label, p);
+        const found = await p.page.$$eval('ds-community-page-sub-community-list .uncp-comcol-card', (els) => els.map((a) => {
+          const circle = a.querySelector('.uncp-community-icon');
+          return { name: a.querySelector('.uncp-comcol-card-name').textContent.trim(), career: circle.classList.contains('uncp-career-icon'),
+            bg: getComputedStyle(circle).backgroundColor, fg: getComputedStyle(circle).color,
+            icon: [...circle.querySelector('i').classList].find((c) => c.startsWith('fa-') && c !== 'fa-solid') };
+        }));
+        check(label, `las ${careers} carreras con su color`, found.length === careers && found.every((c) => c.career), found.filter((c) => !c.career).map((c) => c.name).join(', ') || `${found.length} tarjetas`);
+        const [name, bg, fg, icon] = sample;
+        const card = found.find((c) => c.name === name);
+        check(label, `${name}: color, icono y contraste`, card && card.bg === bg && card.fg === fg && card.icon === icon, JSON.stringify(card));
+        await p.page.close();
+      }
+    }
 
     label = `tarjetas de colecciones (${dev})`;
     p = await open(browser, SUBCOMMUNITY, width);
@@ -258,10 +322,25 @@ async function run() {
       })),
       crumbs: [...document.querySelectorAll('.breadcrumb-item')].map((li) => li.textContent.trim()),
     }));
+    const headerCircle = await p.page.$eval('ds-uncp-comcol-header .uncp-community-icon', (e) => ({ tint: getComputedStyle(e).backgroundColor, ink: getComputedStyle(e).color,
+      icon: [...e.querySelector('i').classList].find((c) => c.startsWith('fa-') && c !== 'fa-solid') }));
+    const sis = CAREER['Ingeniería de Sistemas'];
+    check(label, 'encabezado con el color y el icono de la carrera (Sistemas)', headerCircle.tint === sis.tint && headerCircle.ink === sis.ink && headerCircle.icon === sis.icon, JSON.stringify(headerCircle));
+    const colCircles = await p.page.$$eval('ds-community-page-sub-collection-list .uncp-community-icon', (els) => els.map((e) => ({ bg: getComputedStyle(e).backgroundColor, fg: getComputedStyle(e).color })));
+    check(label, 'colecciones con el color de la carrera', colCircles.length === 3 && colCircles.every((c) => c.bg === sis.tint && c.fg === sis.ink), JSON.stringify(colCircles[0]));
     check(label, 'título "Colecciones"', cols.title === 'Colecciones', cols.title);
     check(label, 'orden Pregrado → Maestría → Doctorado', cols.cards.map((c) => c.name).join(',') === 'Pregrado,Maestría,Doctorado', cols.cards.map((c) => c.name).join(','));
     check(label, 'nombre completo como detalle', cols.cards.every((c) => /^Tesis - .+ - Ingeniería de Sistemas$/.test(c.detail) && /^\/collections\//.test(c.href)), JSON.stringify(cols.cards[0]));
     check(label, 'migas de pan sin número', cols.crumbs.join(' | ') === 'Inicio | Arquitectura e Ingenierías | Ingeniería de Sistemas', cols.crumbs.join(' | '));
+    await p.page.close();
+
+    // a collection of a career inherits the career color in its header; a top-level community stays neutral
+    label = `colección de una carrera (${dev})`;
+    const pregrado = cols.cards.find((c) => c.name === 'Pregrado');
+    p = await open(browser, pregrado.href, width);
+    await common(label, p);
+    const colCircle = await p.page.$eval('ds-uncp-comcol-header .uncp-community-icon', (e) => getComputedStyle(e).backgroundColor);
+    check(label, 'encabezado en el color de la carrera', colCircle === CAREER['Ingeniería de Sistemas'].tint, colCircle);
     await p.page.close();
 
     // Name with an order number and no space after the dot ("6.Tesis de pre y posgrado - ...")
@@ -304,7 +383,7 @@ async function run() {
     }
     // Same tabs, from a subcommunity and a collection (header icon inherited from the top community)
     for (const [name, url, title, icon] of [
-      ['subcomunidad', `/browse/author?scope=${await uuidOf(SUBCOMMUNITY)}`, 'Ingeniería de Sistemas', 'fa-gears'],
+      ['subcomunidad', `/browse/author?scope=${await uuidOf(SUBCOMMUNITY)}`, 'Ingeniería de Sistemas', 'fa-laptop-code'],
       ['colección', `/browse/dateissued?scope=${await uuidOf(COLLECTION)}`, 'Embargo', 'fa-graduation-cap'],
     ]) {
       label = `navegación de ${name} (${dev})`;
@@ -340,7 +419,7 @@ async function run() {
   // Server-side rendering: the header and its icon are already in the HTML (good for crawlers)
   const html = await (await fetch(`${BASE}/communities/${await uuidOf(SUBCOMMUNITY)}`)).text();
   check('SSR subcomunidad', 'encabezado UNCP en el HTML', html.includes('uncp-comcol-header'));
-  check('SSR subcomunidad', 'icono heredado en el HTML', /uncp-comcol-icon[^<]*<i[^>]*fa-gears/.test(html));
+  check('SSR subcomunidad', 'icono de la carrera en el HTML', /uncp-comcol-icon[^<]*<i[^>]*fa-laptop-code/.test(html));
 
   await browser.close();
 }

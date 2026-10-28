@@ -258,6 +258,20 @@ ds-untyped-item .uncp-subjects .simple-view-element-body {
   color: #6c757d;
 }
 
+// "Examinar" tabs not selected (27/10/2026, user request): deep blue #1F4E79, the color of links; on hover or
+// keyboard focus, underlined on a faint gray background. The selected tab keeps green with white text (above)
+.comcol-browse .list-group-item:not(.active) {
+  color: #1f4e79;
+
+  &:hover, &:focus {
+    color: #1f4e79;
+    text-decoration: underline;
+    text-underline-offset: .2em;
+    background-color: #f1f3f4;
+    border-color: rgba(0, 0, 0, .125);
+  }
+}
+
 // "Examinar" button of the browse pages (by date, author, title, subject...) and "Buscar" of the browse by
 // category page: same green as the selected tab
 ds-starts-with-text .btn-primary,
@@ -290,8 +304,9 @@ ds-browse-by-taxonomy-page .btn-primary {
   background: #e3f5ec;
 }
 
-// Subcommunity and collection cards of a community page (community-page/sub-*-list): same language as the home
-// community cards (light green, white icon circle, green on hover) but compact, in a 1/2/3 column grid
+// Subcommunity and collection cards of a community page (community-page/sub-*-list): white (28/10/2026, design A,
+// so the career colors stand out), icon circle, green border on hover; compact, in a
+// 1/2/3 column grid
 .uncp-comcol-section {
   margin-bottom: 2rem;
 }
@@ -313,17 +328,17 @@ ds-browse-by-taxonomy-page .btn-primary {
   width: 100%;
   padding: .85rem 1rem;
   color: #1f2d28;
-  background: #f4faf7;
-  border: 1px solid #e1efe8;
+  background: #fff;
+  border: 1px solid #e4e7e6;
   border-radius: 12px;
   box-shadow: 0 1px 2px rgba(31, 45, 40, .04);
   transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 
   .uncp-community-icon {
-    background: #fff;
     transition: background-color .2s ease, color .2s ease;
   }
 
+  // hover: UNCP green border and shadow (28/10/2026: the gold felt out of place on these white cards)
   &:hover, &:focus-visible {
     color: #1f2d28;
     text-decoration: none;
@@ -377,4 +392,13 @@ ds-pagination #paginationControls {
     background-color: #067a5a;
     border-color: #067a5a;
   }
+}
+
+// Icon circle of a career (UNCP_CAREERS): solid official color, icon in white or in charcoal on the yellows,
+// set as CSS variables by the template. It keeps the career color on hover too (the card shows the hover)
+.uncp-community-icon.uncp-career-icon,
+.uncp-comcol-card:hover .uncp-community-icon.uncp-career-icon,
+.uncp-comcol-card:focus-visible .uncp-community-icon.uncp-career-icon {
+  color: var(--uncp-career-fg);
+  background: var(--uncp-career-bg);
 }

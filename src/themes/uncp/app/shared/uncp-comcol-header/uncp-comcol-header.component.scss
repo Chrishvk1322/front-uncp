@@ -3,7 +3,7 @@
 $ink: #1f2d28;
 $muted: #52615b;
 $hairline: #dfe7e3;
-$link: #158264;
+$link: #1f4e79;
 $icon-size: 44px;
 
 .uncp-comcol-header {
@@ -63,6 +63,7 @@ $icon-size: 44px;
   font-size: .875rem;
   color: $muted;
 
+  // deep blue, the color of links, also on hover (27/10/2026, user request); hover only adds the underline
   a {
     color: $link;
     overflow-wrap: anywhere;
@@ -74,7 +75,7 @@ $icon-size: 44px;
     }
 
     &:hover, &:focus {
-      color: #067a5a;
+      color: $link;
     }
   }
 }

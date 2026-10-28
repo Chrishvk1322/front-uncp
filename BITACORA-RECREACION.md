@@ -255,12 +255,12 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
 12. ~~**Locale `es-PE`**~~ **Hecho el 25/10/2026**: `registerLocaleData(localeEsPe)` en `src/themes/uncp/eager-theme.module.ts`. Las cifras usan `number:'1.0-0':'es-PE'` y quedan como "14,626". En producción se mezclaban "11,568" y "1896".
 13. **Estilo UNCP en todas las páginas posibles** (pedido del usuario, 25/10/2026; para más adelante). Hoy tienen estilo UNCP la portada, los resultados de búsqueda (tarjetas), la ficha simple y completa del ítem (parcial), el header y el pie. El resto son páginas de serie de DSpace. Lista inicial, a revisar en este orden:
     - **páginas de comunidad y colección** y **búsqueda** (incluye 7.1). Propuestas del 27/10/2026: (1) encabezado de comunidad/colección, (2) subcomunidades y colecciones como tarjetas, (3) pestañas y paginación en verde, (4) filtros y resultados de colección en la búsqueda, (5) aviso de cookies.
-      - **(3) Hecho el 27/10/2026** (`styles/_global-styles.scss`, al final): pestañas "Examinar" (`.comcol-browse .list-group-item`) y todas las barras de paginación (`.pagination`, también en búsqueda y navegación). Texto `#067A5A`, hover con fondo `#f2fdf7` y borde `#d1f9e4`, activo con fondo `#067A5A` y texto blanco. Se usa `#067A5A` y no `#26B269` para el estado activo por contraste (5,6:1 contra 2,8:1). Verificado con colores computados y recortes (`pwtool/tabspag.js`). También el botón "Examinar" de las páginas de navegación (`ds-starts-with-text`/`ds-starts-with-date .btn-primary`): fondo `#067A5A`, hover `#05634A`, texto blanco (verificado con `pwtool/browsebtn.js` en `/browse/author` y `/browse/dateissued`);
+      - **(3) Hecho el 27/10/2026** (`styles/_global-styles.scss`, al final): pestañas "Examinar" (`.comcol-browse .list-group-item`) y todas las barras de paginación (`.pagination`, también en búsqueda y navegación). Texto `#067A5A`, hover con fondo `#f2fdf7` y borde `#d1f9e4`, activo con fondo `#067A5A` y texto blanco. Se usa `#067A5A` y no `#26B269` para el estado activo por contraste (5,6:1 contra 2,8:1). **Ajuste del 27/10/2026** (pedido del usuario): las pestañas no seleccionadas pasaron a **azul `#1F4E79`**, y al pasar el mouse quedan subrayadas sobre un fondo gris tenue `#f1f3f4`. La seleccionada sigue verde con texto blanco. La paginación no cambió. Verificado con colores computados y recortes (`pwtool/tabspag.js`). También el botón "Examinar" de las páginas de navegación (`ds-starts-with-text`/`ds-starts-with-date .btn-primary`): fondo `#067A5A`, hover `#05634A`, texto blanco (verificado con `pwtool/browsebtn.js` en `/browse/author` y `/browse/dateissued`);
       - **(1) Hecho el 27/10/2026**: encabezado de comunidad y colección (`shared/uncp-comcol-header/`). **Rediseñado el mismo día con la skill Impeccable** (instalada solo en el proyecto, en `.claude/`, sin hook), porque la primera versión, una franja verde con caja, no convenció. Ahora es sobrio: sin caja ni fondo, título 1,75rem/600 en tinta verdosa `#1f2d28`, textos secundarios `#52615b`, icono de 44px y una línea fina `#dfe7e3` debajo. Lleva:
         - el icono de la comunidad de primer nivel (el de la tarjeta de la home). Se obtiene de las migas de pan, sin consultas extra; si no se puede determinar, un icono genérico verde;
         - el título;
         - la descripción corta (`dc.description.abstract`), si existe;
-        - la URI como `https://hdl.handle.net/{handle}` (ver 8.15);
+        - la URI como `https://hdl.handle.net/{handle}` (ver 8.15), en **azul `#1F4E79`**, también al pasar el mouse, donde solo se agrega el subrayado (27/10/2026). Aplica a comunidades, subcomunidades, colecciones y sus páginas de "Examinar";
         - el logo, el texto introductorio y las noticias, si existen, y el menú de edición.
         
         Por pedido del usuario no lleva etiqueta "Comunidad"/"Colección" ni cantidad de documentos. Páginas temadas `app/community-page/` y `app/collection-page/` (plantilla de serie con el encabezado reemplazado). La tabla de las 8 comunidades pasó a `shared/uncp-communities.ts`, que comparten la home y el encabezado. Verificado (`pwtool/comcolhead.js`) en comunidad, subcomunidad, colección, "7. Libros" (con descripción) y una colección de Salud; el icono también sale en SSR; en móvil (390px) la URI va en su propia línea.
@@ -294,6 +294,14 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
             - Facebook oficial (`recuperado/logo-uncp.jpg`): verde `#00760D`, dorado `#E4B565`, negro.
           - **Alturas iguales por fila**: la columna es `d-flex`.
           - **Animación de entrada**: pasó a `backwards`. Con `forwards`, la animación terminada fijaba su `transform` final y anulaba la elevación del hover.
+          - **Rediseño del 28/10/2026 (ejemplo 1 de 3 vistas previas, `pwtool/homecards.js`)**: las tarjetas adoptan el estilo de las de subcomunidades, con el **mismo tamaño** (247×243 px a 1366px de ancho):
+            - tarjeta **blanca** con borde `#e4e7e6`;
+            - **círculo verde sólido** `#067A5A` con el icono en blanco;
+            - etiqueta de documentos en gris suave `#f1f4f3`;
+            - al pasar el mouse, **borde y sombra verdes**; el borde dorado se descartó porque se sentía fuera de lugar;
+            - "Explorar comunidad" sigue pasando a azul al pasar el mouse sobre el texto.
+            
+            Así la portada y las páginas internas usan el mismo lenguaje.
       - **(2) Hecho el 27/10/2026: subcomunidades y colecciones como tarjetas** (con los puntos 3 a 5 de la propuesta; el 6, cantidades de documentos, se descartó por innecesario). Componentes temados `app/community-page/sub-community-list/` y `sub-collection-list/`.
         - **Tarjetas**: cuadrícula de 1, 2 o 3 columnas, en el mismo lenguaje de la home pero compacta (clases globales `.uncp-comcol-card*`). Fondo `#f4faf7`, icono en círculo blanco y flecha. Al pasar el mouse, borde y círculo en verde.
         - **Una sola vista**: 50 por página (`UNCP_COMCOL_PAGE_SIZE`; la comunidad con más subcomunidades tiene 11). Sin "Mostrando…" ni el engranaje.
@@ -306,7 +314,79 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
         - **Títulos de sección** (pedido del usuario): "Subcomunidades" y "Colecciones" (en: "Subcommunities", "Collections").
         - **RSS**: estaba en la barra de la lista. Ahora está en el encabezado de la comunidad. En todo el sitio, el RSS y el engranaje de opciones pasaron a botón verde con contorno (antes gris oscuro).
         - **Migas de pan sin número** (pedido del usuario): `app/breadcrumbs/` temado; solo cambia las migas que apuntan a `/communities/` o `/collections/`, así nunca toca los títulos de ítems.
-        - `uncpDisplayName()` y el cálculo del icono de la facultad (`uncpCommunityIcon$`) pasaron a `shared/uncp-communities.ts`, compartidos por el encabezado, las tarjetas y las migas de pan. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
+        - `uncpDisplayName()` y el cálculo del icono de la facultad (`uncpCommunityIcon$`) pasaron a `shared/uncp-communities.ts`, compartidos por el encabezado, las tarjetas y las migas de pan.
+        - **Al pasar el mouse** (27/10/2026): borde dorado `#C9A24F` y círculo verde, igual que en las tarjetas de la home.
+      - **Colores oficiales por carrera** (27/10/2026; colores dados por el usuario; por ahora solo las 11 carreras de Arquitectura e Ingenierías):
+
+        | Carrera | Color |
+        |---|---|
+        | Arquitectura | `#228ACB` |
+        | Civil | `#B51F20` |
+        | Minas | `#F9C114` |
+        | Sistemas | `#6496D2` |
+        | Eléctrica y Electrónica | `#103D66` |
+        | Mecánica | `#811E4C` |
+        | Metalúrgica y de Materiales | `#E37909` |
+        | las 4 Químicas | `#FCDD18` |
+
+        - **Rediseño del 28/10/2026 (diseño A, elegido por el usuario entre 3 vistas previas, `pwtool/careercards.js`)**. La primera versión, con círculos pastel derivados del color y el mismo engranaje en las 11 tarjetas, "no quedaba muy bien": el icono no distinguía nada y los colores oficiales se veían desvaídos. Ahora:
+          - **Círculo sólido en el color oficial puro**, con un **icono propio por carrera**. El icono va en blanco, o en carbón `#272625` cuando el blanco no llega a 3:1, como en los amarillos (`uncpIconColorOn`).
+          - **Iconos (Font Awesome 6)**:
+            - Arquitectura: `fa-compass-drafting`;
+            - Civil: `fa-bridge`;
+            - Minas: `fa-helmet-safety`;
+            - Sistemas: `fa-laptop-code`;
+            - Eléctrica: `fa-bolt`;
+            - Mecánica: `fa-gear`;
+            - Metalúrgica: `fa-industry`;
+            - Química: `fa-flask`;
+            - Química Ambiental: `fa-leaf`;
+            - Química del Gas Natural y Energía: `fa-fire-flame-simple`;
+            - Química Industrial: `fa-oil-well`.
+          - **Tarjetas de subcomunidades y colecciones en blanco** (borde `#e4e7e6`) para bajar el verde. Al pasar el mouse, el borde es **verde `#067A5A`** (antes dorado; el usuario lo sintió fuera de lugar, 28/10/2026) y el círculo de la carrera **conserva su color**. Las tarjetas sin carrera pasan su círculo a verde. Las tarjetas de la home también pasaron a verde (ver abajo).
+          - **Encabezado de la carrera y de sus colecciones y páginas de "Examinar"**: el mismo círculo sólido con el icono de la carrera.
+          - **Tarjetas de colecciones dentro de una carrera** (28/10/2026, pedido del usuario): los círculos de Pregrado, Maestría y Doctorado **heredan el color de la carrera** (`careerStyle$` en `sub-collection-list`, con `uncpCareer$`: la carrera de la página o la de sus migas de pan). Cada uno conserva su icono de nivel. Fuera de una carrera con color, siguen en el círculo verde claro.
+        - **Tabla**: `UNCP_CAREERS` (UUID → `{ color, icon }`) en `shared/uncp-communities.ts`. **Para agregar otra facultad, sumar sus líneas.** Las carreras que no están en la tabla usan el icono de su facultad en el círculo neutro.
+        - **Facultades 2 a 5 agregadas el 28/10/2026** (colores dados por el usuario; 35 carreras, 46 en total). Iconos:
+          - **Administrativas**:
+            - Administración: `fa-briefcase`;
+            - Contabilidad: `fa-calculator`;
+            - Economía: `fa-chart-line`;
+            - Negocios Tarma: `fa-handshake`;
+            - Hotelería y Turismo Tarma: `fa-hotel`.
+          - **Agrarias**:
+            - Agronomía: `fa-wheat-awn`;
+            - Satipo: `fa-tractor`;
+            - Agronomía Tropical: `fa-seedling`;
+            - Forestal Tropical: `fa-leaf`;
+            - Industrias Alimentarias Tropical: `fa-jar-wheat`;
+            - Zootecnia y Zootecnia Tropical: `fa-cow`;
+            - Forestales y del Ambiente: `fa-tree`;
+            - Agroindustrial (Junín y Tarma): `fa-boxes-stacked`;
+            - Industrias Alimentarias: `fa-bowl-food`.
+          - **Salud**:
+            - Enfermería: `fa-user-nurse`;
+            - Medicina Humana: `fa-staff-snake`.
+          - **Sociales y Educación**:
+            - Antropología: `fa-people-group`;
+            - Ciencias Aplicadas Tarma: `fa-microscope`;
+            - Comunicación: `fa-bullhorn`;
+            - Educación: `fa-chalkboard-user`;
+            - Ciencias Biológicas: `fa-dna`;
+            - Matemáticas e Informática: `fa-square-root-variable`;
+            - Naturales y Ambientales: `fa-earth-americas`;
+            - Educación Física: `fa-person-running`;
+            - Filosofía y Ciencias Sociales: `fa-landmark`;
+            - Inicial: `fa-shapes`;
+            - Lenguas y Literatura: `fa-book-open`;
+            - Primaria: `fa-pencil`;
+            - Sede Junín: `fa-school`;
+            - Secundaria: `fa-user-graduate`;
+            - Matemática y Física: `fa-atom`;
+            - Sociología: `fa-users`;
+            - Trabajo Social: `fa-hands-holding-child`.
+        - **Icono en carbón** (el blanco no llega a 3:1): `#FCDD18`, `#F9C114`, `#E37909`, `#F07F06`, `#63B23F`, `#55A5A6`, `#5FC3EE`, `#53C9E3`. Todos los demás llevan el icono en blanco.
+        - **Pendientes de color**: las facultades 6, 7 y 8 no tienen carreras, solo colecciones, y quedan con el aspecto neutro. Las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
@@ -399,7 +479,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 27/10/2026: **403/403 correctas** (antes 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 28/10/2026: **515/515 correctas** (antes 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

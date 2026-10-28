@@ -6,10 +6,11 @@
                    [collectionSize]="subCollectionsRD.payload.totalElements"
                    [hideGear]="true"
                    [hidePaginationDetail]="true">
-      <ul class="uncp-comcol-cards row list-unstyled">
+      <ul *ngVar="(careerStyle$ | async) as careerStyle" class="uncp-comcol-cards row list-unstyled">
         <li *ngFor="let card of cards$ | async" class="col-md-6 col-xl-4 d-flex">
           <a class="uncp-comcol-card" [routerLink]="['/collections', card.uuid]">
-            <span class="uncp-community-icon" aria-hidden="true"><i class="fa-solid {{ card.icon }}"></i></span>
+            <span class="uncp-community-icon" [class.uncp-career-icon]="careerStyle" [ngStyle]="careerStyle"
+                  aria-hidden="true"><i class="fa-solid {{ card.icon }}"></i></span>
             <span class="uncp-comcol-card-text">
               <span class="uncp-comcol-card-name">{{ card.title }}</span>
               <span *ngIf="card.subtitle" class="uncp-comcol-card-detail">{{ card.subtitle }}</span>

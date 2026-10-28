@@ -1,5 +1,6 @@
 <header class="uncp-comcol-header">
-  <span class="uncp-community-icon uncp-comcol-icon" aria-hidden="true"><i class="fa-solid {{ icon$ | async }}"></i></span>
+  <span *ngVar="(careerStyle$ | async) as careerStyle" class="uncp-community-icon uncp-comcol-icon" [class.uncp-career-icon]="careerStyle"
+        [ngStyle]="careerStyle" aria-hidden="true"><i class="fa-solid {{ icon$ | async }}"></i></span>
   <h1 class="uncp-comcol-title">{{ name }}</h1>
   <div class="uncp-comcol-actions">
     <ng-content select="[uncpComcolActions]"></ng-content>

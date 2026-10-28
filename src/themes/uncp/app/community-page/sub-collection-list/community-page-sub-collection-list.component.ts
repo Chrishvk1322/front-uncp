@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CommunityPageSubCollectionListComponent as BaseComponent } from '../../../../../app/community-page/sub-collection-list/community-page-sub-collection-list.component';
 import { fadeIn } from '../../../../../app/shared/animations/fade';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { Collection } from '../../../../../app/core/shared/collection.model';
-import { uncpDisplayName } from '../../shared/uncp-communities';
+import { BreadcrumbsService } from '../../../../../app/breadcrumbs/breadcrumbs.service';
+import { uncpCareer$, uncpCareerStyle, uncpDisplayName } from '../../shared/uncp-communities';
 import { UNCP_COMCOL_PAGE_SIZE } from '../sub-community-list/community-page-sub-community-list.component';
 
 /**
@@ -68,7 +69,8 @@ export function uncpCollectionCard(uuid: string, name: string): UncpCollectionCa
 }
 
 /**
- * UNCP collections of a community: a grid of cards instead of the stock list of links, all on one page
+ * UNCP collections of a community: a grid of cards instead of the stock list of links, all on one page. In a
+ * career with an official color, the icon circles (Pregrado, Maestría, Doctorado...) take that color.
  */
 @Component({
   selector: 'ds-community-page-sub-collection-list',
@@ -79,6 +81,14 @@ export function uncpCollectionCard(uuid: string, name: string): UncpCollectionCa
 export class CommunityPageSubCollectionListComponent extends BaseComponent implements OnInit {
 
   private dsoNameService = inject(DSONameService);
+
+  private breadcrumbsService = inject(BreadcrumbsService);
+
+  /**
+   * Icon circles in the color of the career the collections belong to (the community of the page, or the
+   * career in its breadcrumbs), or null for the neutral look
+   */
+  careerStyle$: Observable<Record<string, string> | null> = of(null);
 
   /**
    * The cards of the current page, sorted
@@ -92,5 +102,6 @@ export class CommunityPageSubCollectionListComponent extends BaseComponent imple
   ngOnInit(): void {
     this.pageSize = this.pageSize ?? UNCP_COMCOL_PAGE_SIZE;
     super.ngOnInit();
+    this.careerStyle$ = uncpCareer$(this.community.uuid, this.breadcrumbsService.breadcrumbs$).pipe(map(uncpCareerStyle));
   }
 }

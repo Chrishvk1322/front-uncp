@@ -9,7 +9,8 @@
       <ul class="uncp-comcol-cards row list-unstyled">
         <li *ngFor="let subCommunity of subCommunitiesRD.payload.page" class="col-md-6 col-xl-4 d-flex">
           <a class="uncp-comcol-card" [routerLink]="['/communities', subCommunity.uuid]">
-            <span class="uncp-community-icon" aria-hidden="true"><i class="fa-solid {{ icon$ | async }}"></i></span>
+            <span class="uncp-community-icon" [class.uncp-career-icon]="careerStyle(subCommunity)" [ngStyle]="careerStyle(subCommunity)"
+                  aria-hidden="true"><i class="fa-solid {{ careerIcon(subCommunity) ?? (icon$ | async) }}"></i></span>
             <span class="uncp-comcol-card-text">
               <span class="uncp-comcol-card-name">{{ name(subCommunity) }}</span>
             </span>
