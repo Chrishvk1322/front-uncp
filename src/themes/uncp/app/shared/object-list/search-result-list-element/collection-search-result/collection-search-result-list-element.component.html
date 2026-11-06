@@ -1,0 +1,9 @@
+<ds-uncp-comcol-result *ngVar="(parent$ | async) as parent"
+                       [link]="linkType != linkTypes.None ? ['/collections', dso.id] : null"
+                       [title]="title"
+                       typeKey="collection.listelement.badge"
+                       [parentName]="parentName(parent)"
+                       [icon]="icon"
+                       [careerStyle]="careerStyle$ | async"
+                       [description]="dso.shortDescription">
+</ds-uncp-comcol-result>

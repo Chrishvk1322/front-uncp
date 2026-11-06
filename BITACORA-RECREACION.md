@@ -159,7 +159,7 @@ Verificación: compilado en modo SSR y comprobado con `curl` que el HTML final c
   - **Miniatura**: de 125px a **250px**, sin pasar nunca del ancho de su columna (a 800px de pantalla queda en 210px). Está en `_global-styles.scss` del tema (`ds-untyped-item .thumbnail.limit-width`). **Ojo**: las miniaturas que genera el backend miden 135×175px, así que a 250px se ven algo menos nítidas. Para que se vean mejor hay que cambiarlo en el backend: subir `thumbnail.maxwidth`/`maxheight` y regenerarlas con `dspace filter-media -f`. Es un proceso largo y no se ha hecho.
   - **Etiquetas** en `src/assets/i18n/es.json5`, cambiando el valor de las claves de serie, así que aplica en todas las páginas que las usan: `item.page.citation` "Citación" → **"Cita"**; `item.page.uri` "URI" → **"Identificador único - URI"**; `item.page.collections` "Colecciones" → **"Colección a la que pertenece"** (también en la ficha completa); `item.page.publisher` "Editor" → **"Editorial"**. Las de inglés no cambiaron.
 - **Ficha del ítem: columnas, etiquetas, resumen y palabras clave** (25/10/2026), en `src/themes/uncp/app/item-page/simple/item-types/untyped-item/` y `_global-styles.scss`:
-  - **Columnas**: la derecha pasa de `col-md-6` a `col-md-8` y ocupa el espacio que quedaba libre. Desde 992px, la columna izquierda (`.uncp-item-left`) mide **lo que su línea más larga**, para que no se parta ningún nombre de archivo ni valor (pedido del usuario). Tiene un mínimo de 310px (la columna derecha arrancaría en x=423 a 1366px) y un máximo del 38%; pasado ese tope, en pantallas chicas, sí se parte. La derecha (`.uncp-item-right`) toma el resto.
+  - **Columnas**: la derecha pasa de `col-md-6` a `col-md-8` y ocupa el espacio que quedaba libre. Desde 992px, la columna izquierda (`.uncp-item-left`) mide **lo que su línea más larga**, para que no se parta ningún nombre de archivo ni valor (pedido del usuario). Tiene un mínimo de 310px (la columna derecha arrancaría en x=423 a 1366px) y un máximo del 38%; pasado ese tope, en pantallas chicas, sí se parte. La derecha (`.uncp-item-right`) toma el resto. **Cambiado el 05/11/2026** (pedido del usuario): el ancho variaba entre registros, porque los libros y artículos con nombres de archivo largos tenían la columna más ancha que las tesis (343 a 505px a 1920px). Ahora mide **lo mismo en todos los registros: 454px**, el ancho de una tesis típica (`/items/5583420e-…`), con un máximo del 38% (433px a 1366px). Las líneas más largas se parten (`overflow-wrap: anywhere`). La suite verifica que sea igual en una tesis, dos libros y un artículo, y que no haya desbordes.
     - **x=423 exacto no es posible sin partir líneas**: "Universidad Nacional del Centro del Perú" (Editorial, en todos los ítems) mide 297px y los nombres de archivo llegan a 348–373px.
     - **Separación extra** de 1rem (16px) entre columnas, a pedido del usuario ("se sigue viendo muy junto"): `padding-right: calc(15px + 1rem)` en `.uncp-item-left`, así que el espacio total entre el texto de las dos columnas pasa de 30 a 46px.
     - **Medido a 1366px**: la columna derecha empieza en x=456 (ítem 13558), x=507 (10160) y x=532 (11198), sin renglones partidos.
@@ -387,6 +387,34 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
             - Trabajo Social: `fa-hands-holding-child`.
         - **Icono en carbón** (el blanco no llega a 3:1): `#FCDD18`, `#F9C114`, `#E37909`, `#F07F06`, `#63B23F`, `#55A5A6`, `#5FC3EE`, `#53C9E3`. Todos los demás llevan el icono en blanco.
         - **Pendientes de color**: las facultades 6, 7 y 8 no tienen carreras, solo colecciones, y quedan con el aspecto neutro. Las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
+    - **búsqueda, filtros laterales** (05/11/2026). Se mostraron dos opciones: tarjetas (A) y panel único (B), con vistas previas en `pwtool/filtersopts.js`. El usuario no eligió ninguna; se mantuvo el diseño de serie con 3 ajustes, en `styles/_global-styles.scss`:
+      - **foco**: al abrir un filtro con el "+" (o con el teclado), la tarjeta muestra un **contorno verde suave** `rgba(6,122,90,.35)` en lugar del gris de serie. Primero se había quitado el contorno; el usuario aclaró que lo que quería era cambiarlo a verde;
+      - **"Mostrar más/menos"**: azul `#1F4E79` y sin subrayado, que solo aparece al pasar el mouse. Lleva `!important`, porque los componentes de filtro lo imponen con selectores encapsulados más específicos;
+      - **valores** (autores, materias…) a 0,9rem: más nombres entran en una línea en la barra angosta.
+      
+      El "borde interior" visto en la vista previa B lo causaba el propio CSS de prueba; en el diseño real no existe. "Restablecer filtros" se mantiene gris (pedido del usuario).
+    - **búsqueda, resultados que son colecciones o comunidades** (05/11/2026). En lugar del enlace con la etiqueta "Colección"/"Comunidad", una tarjeta con el lenguaje de las de subcomunidades (`shared/uncp-comcol-result/`, usada por `shared/object-list/search-result-list-element/collection-search-result/` y `community-search-result/`, temados con `Context.Any`, en el módulo eager). Lleva:
+      - el nombre sin número;
+      - debajo, "Colección · Comunidad a la que pertenece", y la descripción corta si existe (2 líneas como máximo);
+      - **icono**: en colecciones, el del nivel o del tipo (`shared/uncp-collection-cards.ts`, que ahora comparten la búsqueda y las páginas de comunidad); en carreras, el suyo; en facultades, el de la home;
+      - **color de la carrera**: el de la propia comunidad si es una carrera, o el de su comunidad padre en las colecciones;
+      - la comunidad padre se obtiene con el enlace `parentCommunity` (`shared/uncp-parent.ts`): una consulta por resultado, en caché. `/search` no se prerenderiza, así que esto no se ejecuta para los bots.
+    - **aviso de cookies (Klaro)** (05/11/2026, opción B entre clara y oscura, con vistas previas en `pwtool/cookieopts.js`):
+      - fondo oscuro del pie `#0f2a24` y texto claro;
+      - enlaces ("política de privacidad", "Personalizar") en el dorado del escudo `#E4C27A`;
+      - "Aceptar" en el verde del botón de sesión `#26B269`; "Rechazar" con contorno blanco;
+      - esquinas de 12px y la tipografía del sitio.
+      
+      Usa `!important`, porque Klaro inyecta su propio CSS.
+      - **Ventana "Personalizar"** (06/11/2026, pedido del usuario: el mismo estilo de la tarjeta):
+        - mismo fondo, borde, sombra y esquinas; título 1,4rem semi-negrita; descripciones en `#a9bab3`; enlaces y "↓ 4 servicios" en dorado;
+        - **"Aceptar todo"** en verde `#26B269`; "Rechazar" y "Aceptar seleccionado" con contorno blanco;
+        - **interruptores**: translúcidos si están apagados, verde `#26B269` si están encendidos, y un verde más oscuro `#1f7a4d` para los obligatorios y para el grupo con solo los obligatorios activos (clases de Klaro `required`, `only-required`, `half-checked`). La clase `.active` de Klaro **no** indica el estado: un primer intento con ella pintaba de verde un interruptor apagado.
+        - **Pendiente para 7.4**: el servicio "Accessibility Settings" y su descripción siguen en inglés (vienen de la configuración de Klaro de DSpace).
+    - **Destello oscuro al cargar** (06/11/2026, reportado por el usuario: "como si algo atravesara la pantalla con el tono del aviso de cookies").
+      - **Causa**: no era el aviso. Una grabación cuadro a cuadro (`pwtool/screencast.js`) mostró que, durante unos 80ms, Angular reemplaza la página del servidor por la del navegador, el área central queda vacía y **el pie oscuro sube hasta ocupar la pantalla**. En el despliegue estático de producción pasa algo equivalente, antes de que llegue el contenido.
+      - **Corrección**: `#main-content { min-height: calc(100vh - 150px) }` (header y migas de pan). En páginas cortas, el pie queda justo debajo del borde de la pantalla.
+      - **Verificación**: la suite graba la carga de 4 páginas (home, búsqueda, comunidad, ítem) y cuenta los cuadros con la mitad superior oscura (`darkFlashFrames`). Con la corrección hay 0; sin ella, 6 a 8 por carga.
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
@@ -479,7 +507,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 28/10/2026: **515/515 correctas** (antes 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 06/11/2026: **553/553 correctas** (antes 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

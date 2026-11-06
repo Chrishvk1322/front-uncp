@@ -6,67 +6,9 @@ import { fadeIn } from '../../../../../app/shared/animations/fade';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { Collection } from '../../../../../app/core/shared/collection.model';
 import { BreadcrumbsService } from '../../../../../app/breadcrumbs/breadcrumbs.service';
-import { uncpCareer$, uncpCareerStyle, uncpDisplayName } from '../../shared/uncp-communities';
+import { uncpCareer$, uncpCareerStyle } from '../../shared/uncp-communities';
+import { UncpCollectionCard, uncpCollectionCard } from '../../shared/uncp-collection-cards';
 import { UNCP_COMCOL_PAGE_SIZE } from '../sub-community-list/community-page-sub-community-list.component';
-
-/**
- * A collection as shown on its card
- */
-export interface UncpCollectionCard {
-  uuid: string;
-  /** "Pregrado", "Maestría"... for thesis collections, otherwise the name */
-  title: string;
-  /** The full name, when the title is only the level */
-  subtitle?: string;
-  icon: string;
-  order: number;
-}
-
-/**
- * Thesis levels, in the order the cards are shown, with their icon
- */
-const LEVELS = [
-  { pattern: /pregrado/i, label: 'Pregrado', icon: 'fa-graduation-cap' },
-  { pattern: /segunda especialidad/i, label: 'Segunda Especialidad', icon: 'fa-certificate' },
-  { pattern: /maestr[ií]a/i, label: 'Maestría', icon: 'fa-scroll' },
-  { pattern: /doctorado/i, label: 'Doctorado', icon: 'fa-award' },
-];
-
-/**
- * Names that are only "[Tesis] <level> - <program>" ("Tesis - Pregrado - Ingeniería de Sistemas",
- * "Tesis Doctorado - ...", "Maestría-Ingeniería Química Ambiental")
- */
-const LEVEL_NAME = /^(tesis\s*-?\s*)?(pregrado|segunda especialidad|maestr[ií]a|doctorado)\s*-\s*\S/i;
-
-/**
- * Icon of the collections that are not of a thesis level
- */
-const OTHER_ICONS = [
-  { pattern: /libro/i, icon: 'fa-book' },
-  { pattern: /art[ií]culo/i, icon: 'fa-newspaper' },
-  { pattern: /embargo/i, icon: 'fa-lock' },
-  { pattern: /tesis/i, icon: 'fa-graduation-cap' },
-];
-
-/**
- * The card of a collection: thesis collections show their level as title (in the community of the program
- * the rest of the name is redundant) and are sorted Pregrado → Segunda Especialidad → Maestría → Doctorado;
- * the others keep their name (without order number) and go after them, alphabetically
- */
-export function uncpCollectionCard(uuid: string, name: string): UncpCollectionCard {
-  const fullName = uncpDisplayName(name);
-  const levelIndex = LEVELS.findIndex((level) => level.pattern.test(fullName));
-  const level = LEVELS[levelIndex];
-  if (level && LEVEL_NAME.test(fullName)) {
-    return { uuid, title: level.label, subtitle: fullName, icon: level.icon, order: levelIndex };
-  }
-  return {
-    uuid,
-    title: fullName,
-    icon: level?.icon ?? OTHER_ICONS.find((other) => other.pattern.test(fullName))?.icon ?? 'fa-folder-open',
-    order: LEVELS.length,
-  };
-}
 
 /**
  * UNCP collections of a community: a grid of cards instead of the stock list of links, all on one page. In a

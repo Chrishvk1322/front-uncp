@@ -18,6 +18,13 @@ import { DsoPageModule } from '../../app/shared/dso-page/dso-page.module';
 import { UntypedItemComponent } from './app/item-page/simple/item-types/untyped-item/untyped-item.component';
 import { UncpItemStatsModule } from './app/item-page/uncp-item-stats/uncp-item-stats.module';
 import { UncpTitleService } from './app/shared/uncp-title.service';
+import { UncpComcolResultComponent } from './app/shared/uncp-comcol-result/uncp-comcol-result.component';
+import {
+  CollectionSearchResultListElementComponent
+} from './app/shared/object-list/search-result-list-element/collection-search-result/collection-search-result-list-element.component';
+import {
+  CommunitySearchResultListElementComponent
+} from './app/shared/object-list/search-result-list-element/community-search-result/community-search-result-list-element.component';
 import { SearchNavbarComponent } from './app/search-navbar/search-navbar.component';
 import { LangSwitchComponent } from './app/shared/lang-switch/lang-switch.component';
 import { TopLevelCommunityListComponent } from './app/home-page/top-level-community-list/top-level-community-list.component';
@@ -35,6 +42,8 @@ registerLocaleData(localeEsPe);
 const ENTRY_COMPONENTS = [
   UntypedItemComponent,
   ItemSearchResultListElementComponent,
+  CollectionSearchResultListElementComponent,
+  CommunitySearchResultListElementComponent,
   TopLevelCommunityListComponent,
 ];
 
@@ -47,6 +56,7 @@ const DECLARATIONS = [
   SearchNavbarComponent,
   FooterComponent,
   LangSwitchComponent,
+  UncpComcolResultComponent,
 ];
 
 @NgModule({

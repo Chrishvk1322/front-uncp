@@ -1,0 +1,19 @@
+<ng-template #content>
+  <span class="uncp-community-icon" [class.uncp-career-icon]="careerStyle" [ngStyle]="careerStyle"
+        aria-hidden="true"><i class="fa-solid {{ icon }}"></i></span>
+  <span class="uncp-comcol-card-text">
+    <span class="uncp-comcol-card-name" [innerHTML]="title"></span>
+    <span class="uncp-comcol-card-detail">{{ typeKey | translate }}<ng-container *ngIf="parentName"> · {{ parentName }}</ng-container></span>
+    <span *ngIf="description" class="uncp-comcol-card-detail uncp-comcol-result-description">{{ description }}</span>
+  </span>
+</ng-template>
+
+<a *ngIf="link; else noLink" class="uncp-comcol-card uncp-comcol-result" [routerLink]="link">
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+  <i class="fas fa-chevron-right uncp-comcol-card-arrow" aria-hidden="true"></i>
+</a>
+<ng-template #noLink>
+  <div class="uncp-comcol-card uncp-comcol-result">
+    <ng-container *ngTemplateOutlet="content"></ng-container>
+  </div>
+</ng-template>

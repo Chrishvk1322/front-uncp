@@ -63,7 +63,90 @@ function check(page, name, ok, detail = '') {
   results.push({ page, name, ok: !!ok, detail });
 }
 
-async function open(browser, url, width) {
+/** The cookie notice (Klaro), option B: dark background, gold links, UNCP green "Aceptar" (05/11/2026) */
+async function cookieNotice(label, page) {
+  const n = await page.evaluate(() => {
+    const box = document.querySelector('.klaro .cookie-notice:not(.cookie-modal-notice)');
+    if (!box) return null;
+    const accept = box.querySelector('.cm-btn-success');
+    const link = box.querySelector('.cn-learn-more');
+    return { bg: getComputedStyle(box).backgroundColor, accept: accept && getComputedStyle(accept).backgroundColor, link: link && getComputedStyle(link).color,
+      overflow: box.getBoundingClientRect().right > window.innerWidth + 1 };
+  });
+  check(label, 'aviso de cookies con el estilo UNCP', n && n.bg === 'rgb(15, 42, 36)' && n.accept === 'rgb(38, 178, 105)' && n.link === 'rgb(228, 194, 122)', JSON.stringify(n));
+  check(label, 'aviso de cookies dentro de la pantalla', n && !n.overflow, JSON.stringify(n));
+  // the "Personalizar" window: same style, switches colored by their real state
+  const more = await page.$('.klaro .cookie-notice .cn-learn-more');
+  if (!more) {
+    return;
+  }
+  await more.click();
+  await page.waitForTimeout(1000);
+  const m = await page.evaluate(() => {
+    const modal = document.querySelector('.klaro .cookie-modal .cm-modal');
+    if (!modal) return null;
+    const css = (sel, prop) => { const e = modal.querySelector(sel); return e && getComputedStyle(e)[prop]; };
+    const switches = [...modal.querySelectorAll('.cm-list-input')].map((i) => ({
+      on: i.checked || i.classList.contains('only-required') || i.classList.contains('half-checked'),
+      bg: getComputedStyle(i.parentElement.querySelector('.slider')).backgroundColor,
+    }));
+    return { bg: getComputedStyle(modal).backgroundColor, link: css('.cm-header a', 'color'), all: css('.cm-btn-accept-all', 'backgroundColor'), switches };
+  });
+  check(label, 'ventana "Personalizar" con el estilo UNCP', m && m.bg === 'rgb(15, 42, 36)' && m.link === 'rgb(228, 194, 122)' && m.all === 'rgb(38, 178, 105)', JSON.stringify(m && { bg: m.bg, link: m.link, all: m.all }));
+  check(label, 'interruptores en verde solo si están encendidos', m && m.switches.length > 0 && m.switches.every((sw) => sw.on === (sw.bg !== 'rgba(255, 255, 255, 0.25)')), JSON.stringify(m?.switches));
+  await page.keyboard.press('Escape');
+}
+
+/**
+ * Records the load of a page (Chrome screencast) and counts the frames whose upper half is mostly the dark footer
+ * color: the "dark flash" of the footer jumping up while the content is replaced (fixed 06/11/2026)
+ */
+async function darkFlashFrames(browser, url) {
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 }, locale: 'es-PE', userAgent: UA });
+  const cdp = await page.context().newCDPSession(page);
+  const frames = [];
+  cdp.on('Page.screencastFrame', async (f) => {
+    frames.push(f.data);
+    await cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => {});
+  });
+  await cdp.send('Page.startScreencast', { format: 'png', maxWidth: 341, maxHeight: 192, everyNthFrame: 1 });
+  try {
+    await page.goto(BASE + url, { waitUntil: 'commit', timeout: 90000 });
+  } catch (e) {
+    await page.close();
+    return { frames: 0, dark: 0, error: e.message.split('\n')[0] };
+  }
+  await page.waitForTimeout(6000);
+  await cdp.send('Page.stopScreencast');
+  const dark = await page.evaluate(async (list) => {
+    let count = 0;
+    for (const data of list) {
+      const img = new Image();
+      img.src = 'data:image/png;base64,' + data;
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = img.width;
+      c.height = img.height;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const d = ctx.getImageData(0, Math.round(img.height * 0.2), img.width, Math.round(img.height * 0.3)).data;
+      let n = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i] < 40 && d[i + 1] < 60 && d[i + 2] < 60) {
+          n++;
+        }
+      }
+      if (n / (d.length / 4) > 0.6) {
+        count++;
+      }
+    }
+    return count;
+  }, frames);
+  await page.close();
+  return { frames: frames.length, dark };
+}
+
+async function open(browser, url, width, keepCookieNotice = false) {
   const page = await browser.newPage({ viewport: { width, height: 900 }, locale: 'es-PE', userAgent: UA });
   const problems = [];
   page.on('pageerror', (e) => problems.push(`JS: ${e.message}`));
@@ -79,7 +162,9 @@ async function open(browser, url, width) {
   });
   const response = await page.goto(BASE + url, { waitUntil: 'load', timeout: 60000 });
   await page.waitForTimeout(6000);
-  await page.evaluate(() => document.querySelectorAll('.klaro').forEach((e) => e.remove()));
+  if (!keepCookieNotice) {
+    await page.evaluate(() => document.querySelectorAll('.klaro').forEach((e) => e.remove()));
+  }
   return { page, problems, status: response.status() };
 }
 
@@ -171,7 +256,9 @@ async function run() {
 
     // Home
     let label = `home (${dev})`;
-    let p = await open(browser, '/home', width);
+    let p = await open(browser, '/home', width, true);
+    await cookieNotice(label, p.page);
+    await p.page.evaluate(() => document.querySelectorAll('.klaro').forEach((e) => e.remove()));
     await common(label, p);
     check(label, 'carrusel', await p.page.$('#carouselExampleCaptions .carousel-item.active'));
     const cards = await p.page.$$eval('.contenido-comunidades .community-card', (els) => els.map((e) => ({
@@ -193,8 +280,11 @@ async function run() {
     check(label, 'tarjetas blancas', look.every((c) => c.bg === 'rgb(255, 255, 255)' && c.img === 'none'), [...new Set(look.map((c) => c.bg))].join(' '));
     const sizes = look.map((c) => c.h);
     check(label, 'tamaño de tarjeta sin cambios (alto mínimo 220px)', sizes.every((h) => h >= 220), sizes.join(','));
-    const circle = await p.page.$eval('.contenido-comunidades .uncp-community-icon', (e) => ({ bg: getComputedStyle(e).backgroundColor, fg: getComputedStyle(e).color }));
-    check(label, 'círculo verde sólido con icono blanco', circle.bg === GREEN && circle.fg === 'rgb(255, 255, 255)', JSON.stringify(circle));
+    const circle = await p.page.evaluate(() => {
+      const e = document.querySelector('.contenido-comunidades .uncp-community-icon');
+      return e && { bg: getComputedStyle(e).backgroundColor, fg: getComputedStyle(e).color };
+    });
+    check(label, 'círculo verde sólido con icono blanco', circle && circle.bg === GREEN && circle.fg === 'rgb(255, 255, 255)', JSON.stringify(circle));
     const rows = {};
     look.forEach((c) => (rows[c.top] = rows[c.top] || []).push(c.h));
     check(label, 'misma altura por fila', Object.values(rows).every((hs) => Math.max(...hs) - Math.min(...hs) <= 1), JSON.stringify(rows));
@@ -230,7 +320,51 @@ async function run() {
       return a && getComputedStyle(a).backgroundColor;
     });
     check(label, 'paginación activa en verde', pag === GREEN, pag);
+    // filters (05/11/2026): no gray focus ring after a click, "Mostrar más" blue and not underlined, smaller values
+    const toggle = await p.page.$('ds-search-filter .filter-name');
+    if (toggle && !mobile) {
+      await toggle.click();
+      await p.page.waitForTimeout(2500);
+      const f = await p.page.evaluate(() => {
+        const box = document.querySelector('ds-search-filter .facet-filter');
+        const more = document.querySelector('ds-search-filter .toggle-more-filters a');
+        const value = document.querySelector('ds-search-facet-option .break-facet');
+        return {
+          ring: getComputedStyle(box).boxShadow,
+          more: more && { color: getComputedStyle(more).color, line: getComputedStyle(more).textDecorationLine },
+          size: value && getComputedStyle(value).fontSize,
+        };
+      });
+      check(label, 'filtro abierto con contorno de foco verde suave', f.ring === 'rgba(6, 122, 90, 0.35) 0px 0px 0px 2px', f.ring);
+      check(label, '"Mostrar más" en azul y sin subrayado', f.more && f.more.color === BLUE && f.more.line === 'none', JSON.stringify(f.more));
+      check(label, 'valores de filtro en letra más pequeña (14.4px)', f.size === '14.4px', f.size);
+    }
     await p.page.close();
+
+    // Search results that are collections (page 1 of /search) and communities (page 4): UNCP cards
+    if (!mobile) {
+      for (const [pg, type, sample, bg] of [
+        [1, 'Colección', 'Doctorado - Ingeniería Química Ambiental', 'rgb(252, 221, 24)'],
+        [4, 'Comunidad', 'Agronomia', 'rgb(62, 154, 92)'],
+      ]) {
+        label = `búsqueda: resultados de tipo ${type} (${dev})`;
+        p = await open(browser, `/search?spc.page=${pg}`, width);
+        await common(label, p);
+        const res = await p.page.$$eval('.uncp-comcol-result', (els) => els.map((a) => ({
+          name: a.querySelector('.uncp-comcol-card-name').textContent.trim(),
+          detail: a.querySelector('.uncp-comcol-card-detail').textContent.trim(),
+          bg: getComputedStyle(a.querySelector('.uncp-community-icon')).backgroundColor,
+          href: a.getAttribute('href'),
+        })));
+        const stockBadges = await p.page.$$eval('ds-collection-search-result-list-element ds-themed-badges, ds-community-search-result-list-element ds-themed-badges', (els) => els.length);
+        check(label, 'tarjetas UNCP en lugar del enlace de serie', res.length >= 7 && stockBadges === 0, `${res.length} tarjetas, ${stockBadges} etiquetas de serie`);
+        check(label, 'nombres sin número de orden', res.every((r) => !/^\d+\./.test(r.name)), res.map((r) => r.name).filter((n) => /^\d/.test(n)).join(', '));
+        check(label, `tipo "${type}" y comunidad debajo`, res.some((r) => r.detail.startsWith(`${type} · `)), res[0]?.detail);
+        const card = res.find((r) => r.name === sample);
+        check(label, `${sample}: color de su carrera`, card && card.bg === bg && /^\/(collections|communities)\//.test(card.href), JSON.stringify(card));
+        await p.page.close();
+      }
+    }
 
     // Community, subcommunity, collection
     for (const [name, url, expected] of [
@@ -409,11 +543,33 @@ async function run() {
     check(label, 'miniatura', await p.page.$('ds-themed-thumbnail img, ds-thumbnail img'));
     await p.page.close();
 
+    // same left column width on every item (thesis, book, article), 454px or 38% of the row (05/11/2026)
+    if (!mobile) {
+      const widths = [];
+      for (const uuid of ['5583420e-5bec-41a4-a5db-3c40192258c1', '47382c68-1aa0-4833-956b-959cd8054eb3', 'b5a034cd-ea7e-46c5-bb0c-bb9ae4fd0a93', '8ff08aa4-d5d2-413a-b9d6-1919d0fd42bd']) {
+        const q = await open(browser, `/items/${uuid}`, width);
+        widths.push(await q.page.evaluate(() => {
+          const left = document.querySelector('.uncp-item-left');
+          return left ? { w: Math.round(left.getBoundingClientRect().width), overflow: left.scrollWidth > left.clientWidth + 1 } : null;
+        }));
+        await q.page.close();
+      }
+      check(`ficha (${dev})`, 'columna izquierda igual en tesis, libros y artículos', widths.every((x) => x && x.w === widths[0].w), widths.map((x) => x?.w).join(', '));
+      check(`ficha (${dev})`, 'columna izquierda de 433px a 1366px (38%)', widths[0]?.w === 433, `${widths[0]?.w}px`);
+      check(`ficha (${dev})`, 'sin desbordes en la columna izquierda', widths.every((x) => x && !x.overflow), JSON.stringify(widths));
+    }
+
     label = `ficha completa (${dev})`;
     p = await open(browser, `/items/${await uuidOf(ITEM)}/full`, width);
     await common(label, p);
     check(label, 'bloque de estadísticas', (await p.page.$$('.uncp-stat-card')).length === 2);
     await p.page.close();
+  }
+
+  // No dark flash of the footer while the page loads
+  for (const url of ['/home', '/search', COMMUNITY, ITEM]) {
+    const r = await darkFlashFrames(browser, url);
+    check(`carga de ${url}`, 'sin destello oscuro del pie al cargar', r.frames > 5 && r.dark === 0, r.error ?? `${r.dark} de ${r.frames} cuadros`);
   }
 
   // Server-side rendering: the header and its icon are already in the HTML (good for crawlers)
