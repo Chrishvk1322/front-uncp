@@ -1365,8 +1365,7 @@
   "browse.startsWith.input": "Filtrar",
 
   // "browse.taxonomy_srsc.title": "Browsing by Subject Category",
-  // TODO New key - Add a translation
-  "browse.taxonomy_srsc.title": "Browsing by Subject Category",
+  "browse.taxonomy_srsc.title": "Examinando por categoría temática",
 
   // "browse.taxonomy.button": "Browse",
   "browse.taxonomy.button": "Examinar",
@@ -2153,12 +2152,10 @@
   "cookies.consent.content-modal.service": "servicio",
 
   // "cookies.consent.app.title.accessibility": "Accessibility Settings",
-  // TODO New key - Add a translation
-  "cookies.consent.app.title.accessibility": "Accessibility Settings",
+  "cookies.consent.app.title.accessibility": "Ajustes de accesibilidad",
 
   // "cookies.consent.app.description.accessibility": "Required for saving your accessibility settings locally",
-  // TODO New key - Add a translation
-  "cookies.consent.app.description.accessibility": "Required for saving your accessibility settings locally",
+  "cookies.consent.app.description.accessibility": "Necesaria para guardar sus ajustes de accesibilidad en este navegador",
 
   // "cookies.consent.app.title.authentication": "Authentication",
   "cookies.consent.app.title.authentication": "Autenticación",
@@ -2586,8 +2583,7 @@
   "footer.copyright": "copyright © 2002-{{ year }}",
 
   // "footer.link.accessibility": "Accessibility settings",
-  // TODO New key - Add a translation
-  "footer.link.accessibility": "Accessibility settings",
+  "footer.link.accessibility": "Ajustes de accesibilidad",
 
   // "footer.link.dspace": "DSpace software",
   "footer.link.dspace": "Software DSpace",
@@ -2608,7 +2604,7 @@
   "footer.link.feedback": "Enviar Sugerencias",
 
   // "forgot-email.form.header": "Forgot Password",
-  "forgot-email.form.header": "Olvido de contraseña",
+  "forgot-email.form.header": "Recuperar contraseña",
 
   // "forgot-email.form.info": "Enter the email address associated with the account.",
   "forgot-email.form.info": "Introduzca la dirección de correo electrónico que proporcionó cuando se registró.",
@@ -2629,7 +2625,7 @@
   "forgot-email.form.submit": "Restablecer contraseña",
 
   // "forgot-email.form.success.head": "Password reset email sent",
-  "forgot-email.form.success.head": "Se ha enviado el mensaje de restablecemieto de contraseña",
+  "forgot-email.form.success.head": "Se ha enviado el mensaje de restablecimiento de contraseña",
 
   // "forgot-email.form.success.content": "An email has been sent to {{ email }} containing a special URL and further instructions.",
   "forgot-email.form.success.content": "Se ha enviado un correo a {{ email }} que contiene una URL especial e instrucciones adicionales.",
@@ -2638,8 +2634,7 @@
   "forgot-email.form.error.head": "Error al intentar restablecer la contraseña",
 
   // "forgot-email.form.error.content": "An error occurred when attempting to reset the password for the account associated with the following email address: {{ email }}",
-  // TODO New key - Add a translation
-  "forgot-email.form.error.content": "An error occurred when attempting to reset the password for the account associated with the following email address: {{ email }}",
+  "forgot-email.form.error.content": "Se produjo un error al intentar restablecer la contraseña de la cuenta asociada al correo: {{ email }}",
 
   // "forgot-password.title": "Forgot Password",
   "forgot-password.title": "Olvido de contraseña",
@@ -2945,80 +2940,61 @@
   "home.top-level-communities.help": "Seleccione una comunidad para explorar sus colecciones.",
 
   // "info.accessibility-settings.breadcrumbs": "Accessibility settings",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.breadcrumbs": "Accessibility settings",
+  "info.accessibility-settings.breadcrumbs": "Ajustes de accesibilidad",
 
   // "info.accessibility-settings.cookie-warning": "Saving the accessibility settings is currently not possible. Either log in to save the settings in user data, or accept the 'Accessibility Settings' cookie using the 'Cookie Settings' menu at the bottom of the page. Once the cookie has been accepted, you can reload the page to remove this message.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.cookie-warning": "Saving the accessibility settings is currently not possible. Either log in to save the settings in user data, or accept the 'Accessibility Settings' cookie using the 'Cookie Settings' menu at the bottom of the page. Once the cookie has been accepted, you can reload the page to remove this message.",
+  "info.accessibility-settings.cookie-warning": "Por ahora no es posible guardar los ajustes de accesibilidad. Inicie sesión para guardarlos en su perfil, o acepte la cookie \"Ajustes de accesibilidad\" desde \"Configuración de cookies\" al pie de la página. Una vez aceptada, recargue la página para quitar este mensaje.",
 
   // "info.accessibility-settings.disableNotificationTimeOut.label": "Automatically close notifications after time out",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.disableNotificationTimeOut.label": "Automatically close notifications after time out",
+  "info.accessibility-settings.disableNotificationTimeOut.label": "Cerrar las notificaciones automáticamente",
 
   // "info.accessibility-settings.disableNotificationTimeOut.hint": "When this toggle is activated, notifications will close automatically after the time out passes. When deactivated, notifications will remain open untill manually closed.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.disableNotificationTimeOut.hint": "When this toggle is activated, notifications will close automatically after the time out passes. When deactivated, notifications will remain open untill manually closed.",
+  "info.accessibility-settings.disableNotificationTimeOut.hint": "Si está activado, las notificaciones se cierran solas al cumplirse el tiempo de espera. Si está desactivado, permanecen abiertas hasta que las cierre.",
 
   // "info.accessibility-settings.failed-notification": "Failed to save accessibility settings",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.failed-notification": "Failed to save accessibility settings",
+  "info.accessibility-settings.failed-notification": "No se pudieron guardar los ajustes de accesibilidad",
 
   // "info.accessibility-settings.invalid-form-notification": "Did not save. The form contains invalid values.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.invalid-form-notification": "Did not save. The form contains invalid values.",
+  "info.accessibility-settings.invalid-form-notification": "No se guardó. El formulario contiene valores no válidos.",
 
   // "info.accessibility-settings.liveRegionTimeOut.label": "ARIA Live region time out (in seconds)",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.liveRegionTimeOut.label": "ARIA Live region time out (in seconds)",
+  "info.accessibility-settings.liveRegionTimeOut.label": "Tiempo de espera de la región ARIA live (en segundos)",
 
   // "info.accessibility-settings.liveRegionTimeOut.hint": "The duration after which a message in the ARIA live region disappears. ARIA live regions are not visible on the page, but provide announcements of notifications (or other actions) to screen readers.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.liveRegionTimeOut.hint": "The duration after which a message in the ARIA live region disappears. ARIA live regions are not visible on the page, but provide announcements of notifications (or other actions) to screen readers.",
+  "info.accessibility-settings.liveRegionTimeOut.hint": "Tiempo tras el cual desaparece un mensaje de la región ARIA live. Estas regiones no se ven en la página, pero anuncian las notificaciones (y otras acciones) a los lectores de pantalla.",
 
   // "info.accessibility-settings.liveRegionTimeOut.invalid": "Live region time out must be greater than 0",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.liveRegionTimeOut.invalid": "Live region time out must be greater than 0",
+  "info.accessibility-settings.liveRegionTimeOut.invalid": "El tiempo de espera de la región live debe ser mayor que 0",
 
   // "info.accessibility-settings.notificationTimeOut.label": "Notification time out (in seconds)",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.notificationTimeOut.label": "Notification time out (in seconds)",
+  "info.accessibility-settings.notificationTimeOut.label": "Tiempo de espera de las notificaciones (en segundos)",
 
   // "info.accessibility-settings.notificationTimeOut.hint": "The duration after which a notification disappears.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.notificationTimeOut.hint": "The duration after which a notification disappears.",
+  "info.accessibility-settings.notificationTimeOut.hint": "Tiempo tras el cual desaparece una notificación.",
 
   // "info.accessibility-settings.notificationTimeOut.invalid": "Notification time out must be greater than 0",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.notificationTimeOut.invalid": "Notification time out must be greater than 0",
+  "info.accessibility-settings.notificationTimeOut.invalid": "El tiempo de espera de las notificaciones debe ser mayor que 0",
 
   // "info.accessibility-settings.save-notification.cookie": "Successfully saved settings locally.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.save-notification.cookie": "Successfully saved settings locally.",
+  "info.accessibility-settings.save-notification.cookie": "Ajustes guardados en este navegador.",
 
   // "info.accessibility-settings.save-notification.metadata": "Successfully saved settings on the user profile.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.save-notification.metadata": "Successfully saved settings on the user profile.",
+  "info.accessibility-settings.save-notification.metadata": "Ajustes guardados en su perfil.",
 
   // "info.accessibility-settings.reset-failed": "Failed to reset. Either log in or accept the 'Accessibility Settings' cookie.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.reset-failed": "Failed to reset. Either log in or accept the 'Accessibility Settings' cookie.",
+  "info.accessibility-settings.reset-failed": "No se pudo restablecer. Inicie sesión o acepte la cookie \"Ajustes de accesibilidad\".",
 
   // "info.accessibility-settings.reset-notification": "Successfully reset settings.",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.reset-notification": "Successfully reset settings.",
+  "info.accessibility-settings.reset-notification": "Ajustes restablecidos.",
 
   // "info.accessibility-settings.reset": "Reset accessibility settings",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.reset": "Reset accessibility settings",
+  "info.accessibility-settings.reset": "Restablecer ajustes de accesibilidad",
 
   // "info.accessibility-settings.submit": "Save accessibility settings",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.submit": "Save accessibility settings",
+  "info.accessibility-settings.submit": "Guardar ajustes de accesibilidad",
 
   // "info.accessibility-settings.title": "Accessibility settings",
-  // TODO New key - Add a translation
-  "info.accessibility-settings.title": "Accessibility settings",
+  "info.accessibility-settings.title": "Ajustes de accesibilidad",
 
   // "info.end-user-agreement.accept": "I have read and I agree to the End User Agreement",
   "info.end-user-agreement.accept": "He leído y acepto el Acuerdo de usuario final.",
@@ -4504,7 +4480,7 @@
   "login.form.forgot-password": "¿Has olvidado tu contraseña?",
 
   // "login.form.header": "Please log in to DSpace",
-  "login.form.header": "Inicie sesión en DSpace",
+  "login.form.header": "Iniciar sesión",
 
   // "login.form.new-user": "New user? Click here to register.",
   "login.form.new-user": "¿Nuevo Usuario? Pulse aquí para registrarse",
@@ -5284,16 +5260,13 @@
   "profile.breadcrumbs": "Actualización del perfil",
 
   // "profile.card.accessibility.content": "Accessibility settings can be configured on the accessibility settings page.",
-  // TODO New key - Add a translation
-  "profile.card.accessibility.content": "Accessibility settings can be configured on the accessibility settings page.",
+  "profile.card.accessibility.content": "Los ajustes de accesibilidad se pueden configurar en la página de ajustes de accesibilidad.",
 
   // "profile.card.accessibility.header": "Accessibility",
-  // TODO New key - Add a translation
-  "profile.card.accessibility.header": "Accessibility",
+  "profile.card.accessibility.header": "Accesibilidad",
 
   // "profile.card.accessibility.link": "Go to Accessibility Settings Page",
-  // TODO New key - Add a translation
-  "profile.card.accessibility.link": "Go to Accessibility Settings Page",
+  "profile.card.accessibility.link": "Ir a la página de ajustes de accesibilidad",
 
   // "profile.card.identify": "Identify",
   "profile.card.identify": "Identidad",
@@ -5557,8 +5530,7 @@
   "register-page.registration.error.head": "Error al intentar registrar el correo electrónico",
 
   // "register-page.registration.error.content": "An error occurred when registering the following email address: {{ email }}",
-  // TODO New key - Add a translation
-  "register-page.registration.error.content": "An error occurred when registering the following email address: {{ email }}",
+  "register-page.registration.error.content": "Se produjo un error al registrar el siguiente correo electrónico: {{ email }}",
 
   // "register-page.registration.error.recaptcha": "Error when trying to authenticate with recaptcha",
   "register-page.registration.error.recaptcha": "Error al intentar autenticar con recaptcha",
@@ -7626,11 +7598,10 @@
   "vocabulary-treeview.search.form.search": "Buscar",
 
   // "vocabulary-treeview.search.form.search-placeholder": "Filter results by typing the first few letters",
-  // TODO New key - Add a translation
-  "vocabulary-treeview.search.form.search-placeholder": "Filter results by typing the first few letters",
+  "vocabulary-treeview.search.form.search-placeholder": "Filtre los resultados escribiendo las primeras letras",
 
   // "vocabulary-treeview.search.no-result": "There were no items to show",
-  "vocabulary-treeview.search.no-result": "No había ítems para mostrar",
+  "vocabulary-treeview.search.no-result": "No hay elementos para mostrar",
 
   // "vocabulary-treeview.tree.description.nsi": "The Norwegian Science Index",
   "vocabulary-treeview.tree.description.nsi": "El Norwegian Science Index",
@@ -8386,8 +8357,7 @@
   "access-control-option-end-date-note": "Escoja la fecha hasta la cuál se aplicarán las condiciones de acceso especificadas",
 
   // "vocabulary-treeview.search.form.add": "Add",
-  // TODO New key - Add a translation
-  "vocabulary-treeview.search.form.add": "Add",
+  "vocabulary-treeview.search.form.add": "Agregar",
 
   // "process.overview.unknown.user": "Unknown",
   // TODO New key - Add a translation
@@ -8404,6 +8374,21 @@
 
   // "forgot-email.form.aria.label": "Enter your e-mail address",
   "forgot-email.form.aria.label": "Introduzca su dirección de correo electrónico",
+
+  // UNCP: link back to the login page, under the registration and password recovery forms
+  "uncp.auth.back-to-login": "Volver a iniciar sesión",
+
+  // UNCP: error pages 404, 403 and 500 (option C)
+  "uncp.error.404.title": "No encontramos la página que buscas",
+  "uncp.error.404.text": "Es posible que el enlace esté mal escrito o que el documento haya cambiado de dirección. Prueba buscándolo en el repositorio.",
+  "uncp.error.403.title": "No tienes permiso para ver esta página",
+  "uncp.error.403.text": "Tu cuenta no tiene acceso a este contenido. Si crees que se trata de un error, comunícate con el equipo del repositorio.",
+  "uncp.error.500.title": "El servicio no está disponible en este momento",
+  "uncp.error.500.text": "El repositorio está en mantenimiento o tiene un problema técnico. Inténtalo de nuevo en unos minutos.",
+  "uncp.error.search-placeholder": "Buscar tesis, artículos, autores…",
+  "uncp.error.home": "Volver al inicio",
+  "uncp.error.communities": "Explorar comunidades",
+  "uncp.error.guide": "Guía de usuario",
 
   // "search-facet-option.update.announcement": "The page will be reloaded. Filter {{ filter }} is selected.",
   "search-facet-option.update.announcement": "La página será recargada. Filtro {{ filter }} seleccionado.",

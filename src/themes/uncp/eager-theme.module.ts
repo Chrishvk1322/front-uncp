@@ -31,6 +31,7 @@ import { TopLevelCommunityListComponent } from './app/home-page/top-level-commun
 import {
   ItemSearchResultListElementComponent
 } from './app/shared/object-list/search-result-list-element/item-search-result/item-types/item/item-search-result-list-element.component';
+import { LogInPasswordComponent } from './app/shared/log-in/methods/password/log-in-password.component';
 
 // UNCP: Peruvian number format ('es-PE') for the figures of the footer and the community cards
 registerLocaleData(localeEsPe);
@@ -45,6 +46,7 @@ const ENTRY_COMPONENTS = [
   CollectionSearchResultListElementComponent,
   CommunitySearchResultListElementComponent,
   TopLevelCommunityListComponent,
+  LogInPasswordComponent,
 ];
 
 const DECLARATIONS = [

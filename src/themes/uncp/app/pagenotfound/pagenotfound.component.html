@@ -1,0 +1,13 @@
+<div class="container uncp-error">
+  <h1 class="uncp-error-title">{{ 'uncp.error.404.title' | translate }}</h1>
+  <hr class="uncp-error-rule">
+  <p class="uncp-error-text">{{ 'uncp.error.404.text' | translate }}</p>
+  <div class="uncp-error-search">
+    <ds-themed-search-form [inPlaceSearch]="false" [searchPlaceholder]="'uncp.error.search-placeholder' | translate"></ds-themed-search-form>
+  </div>
+  <nav class="uncp-error-links">
+    <a routerLink="/home">← {{ 'uncp.error.home' | translate }}</a>
+    <a routerLink="/community-list">{{ 'uncp.error.communities' | translate }}</a>
+    <a href="https://uncpedu-my.sharepoint.com/:b:/g/personal/edgarrojas_uncp_edu_pe/ESM2VDKhNzFJjFO0Y8ke5HMBBSlgXrzJ19x01shuiz31EQ?e=utbq3f" target="_blank" rel="noopener">{{ 'uncp.error.guide' | translate }}</a>
+  </nav>
+</div>

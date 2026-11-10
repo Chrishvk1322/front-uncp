@@ -587,3 +587,237 @@ ds-search-facet-selected-option .break-facet {
     color: #a9bab3 !important;
   }
 }
+
+// UNCP: login, registration and password recovery (09/11/2026). Option A card (same border and soft shadow as the
+// community cards) with labels above the fields, a soft green focus, UNCP green button and blue links. The form
+// classes are also used by the login form of the navbar menu.
+.uncp-auth-card {
+  max-width: 420px;
+  margin: 3rem auto;
+  padding: 2rem 2.25rem 1.5rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e4e7e6;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(31, 45, 40, .05), 0 12px 32px rgba(31, 45, 40, .08);
+
+  ds-log-in .login-container {
+    width: 100% !important;
+    padding: 0 !important;
+  }
+
+  @media (max-width: 575.98px) {
+    margin: 1.5rem auto;
+    padding: 1.5rem 1.25rem 1rem;
+  }
+}
+
+.uncp-auth-logo {
+  height: 64px;
+  width: auto;
+  margin-bottom: 1rem;
+}
+
+.uncp-auth-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2d28;
+}
+
+.uncp-auth-subtitle {
+  margin: .35rem 0 1.25rem;
+  font-size: .92rem;
+  color: #5b6b65;
+}
+
+.uncp-auth-form {
+  text-align: left;
+
+  .uncp-auth-label {
+    display: block;
+    margin-bottom: .3rem;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #1f2d28;
+  }
+
+  .form-control {
+    height: auto;
+    margin-bottom: .75rem;
+    padding: .6rem .85rem;
+    font-size: 1rem;
+    border: 1px solid #cfd8d4;
+    border-radius: 8px;
+
+    &:focus {
+      border-color: #067a5a;
+      box-shadow: 0 0 0 3px rgba(6, 122, 90, .18);
+    }
+
+    &.is-invalid {
+      border-color: #dc3545;
+    }
+  }
+
+  .uncp-auth-hint {
+    margin: -.35rem 0 .75rem;
+    font-size: .82rem;
+    color: #5b6b65;
+  }
+
+  .invalid-feedback {
+    margin: -.5rem 0 .75rem;
+  }
+}
+
+.uncp-auth-submit {
+  margin-top: 1rem;
+  padding: .65rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #067a5a;
+  border-color: #067a5a;
+  border-radius: 8px;
+
+  &:hover:not(.disabled),
+  &:focus {
+    color: #fff;
+    background-color: #05664b;
+    border-color: #05664b;
+  }
+
+  // dimmed green while the form is incomplete (it does not respond yet), full green once it can be sent
+  &.disabled,
+  &:disabled {
+    background-color: #067a5a;
+    border-color: #067a5a;
+    opacity: .45;
+    cursor: not-allowed;
+  }
+}
+
+.uncp-auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  margin-top: .9rem;
+  font-size: .92rem;
+  text-align: center;
+
+  a {
+    color: #1f4e79;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      color: #1f4e79;
+      text-decoration: underline;
+    }
+  }
+}
+
+// UNCP: error pages 404, 403 and 500 (10/11/2026). Option C, minimal and without a card: big title with a short green
+// rule, text, the repository search (not on the 500 page) and text links in blue. Without the code label.
+.container.uncp-error,
+#main-content .container.uncp-error {
+  max-width: 680px;
+  margin: 4rem auto;
+
+  .uncp-error-title {
+    margin: 0 0 .75rem;
+    font-size: 2.1rem;
+    font-weight: 600;
+    color: #1f2d28;
+  }
+
+  .uncp-error-rule {
+    width: 56px;
+    margin: 0 0 1rem;
+    border: 0;
+    border-top: 3px solid #067a5a;
+    opacity: 1;
+  }
+
+  .uncp-error-text {
+    margin: 0;
+    font-size: .98rem;
+    color: #5b6b65;
+  }
+
+  // the search form of the theme without its home box: plain field and UNCP green button
+  .uncp-error-search {
+    margin: 1.25rem 0 1rem;
+
+    ds-search-form > div {
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .input-group {
+      flex-wrap: nowrap;
+      gap: .5rem;
+    }
+
+    .form-control {
+      height: auto;
+      padding: .8rem 1rem;
+      font-size: 1rem;
+      background-color: #fff !important;
+      border: 1px solid #cfd8d4;
+      border-radius: 8px !important;
+
+      &:focus {
+        border-color: #067a5a;
+        box-shadow: 0 0 0 3px rgba(6, 122, 90, .18);
+      }
+    }
+
+    .search-button {
+      height: 100%;
+      padding: 0 1rem;
+      font-weight: 600;
+      background-color: #067a5a !important;
+      border-color: #067a5a !important;
+      border-radius: 8px !important;
+
+      &:hover,
+      &:focus {
+        background-color: #05664b !important;
+        border-color: #05664b !important;
+      }
+    }
+  }
+
+  .uncp-error-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    margin-top: .5rem;
+    font-size: .95rem;
+
+    a {
+      color: #1f4e79;
+      text-decoration: none;
+
+      &:hover,
+      &:focus {
+        color: #1f4e79;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // the 500 page has no search: a little more air before the links
+  .uncp-error-text + .uncp-error-links {
+    margin-top: 1.25rem;
+  }
+
+  @media (max-width: 575.98px) {
+    margin: 2.5rem auto;
+
+    .uncp-error-title {
+      font-size: 1.6rem;
+    }
+  }
+}

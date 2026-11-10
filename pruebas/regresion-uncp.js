@@ -90,11 +90,29 @@ async function cookieNotice(label, page) {
       on: i.checked || i.classList.contains('only-required') || i.classList.contains('half-checked'),
       bg: getComputedStyle(i.parentElement.querySelector('.slider')).backgroundColor,
     }));
-    return { bg: getComputedStyle(modal).backgroundColor, link: css('.cm-header a', 'color'), all: css('.cm-btn-accept-all', 'backgroundColor'), switches };
+    return { bg: getComputedStyle(modal).backgroundColor, link: css('.cm-header a', 'color'), all: css('.cm-btn-accept-all', 'backgroundColor'), switches, text: modal.textContent };
   });
   check(label, 'ventana "Personalizar" con el estilo UNCP', m && m.bg === 'rgb(15, 42, 36)' && m.link === 'rgb(228, 194, 122)' && m.all === 'rgb(38, 178, 105)', JSON.stringify(m && { bg: m.bg, link: m.link, all: m.all }));
+  check(label, 'ventana "Personalizar" en español', m && m.text && !/Accessibility|Required for/.test(m.text) && m.text.includes('Ajustes de accesibilidad'), m && m.text?.slice(0, 200));
   check(label, 'interruptores en verde solo si están encendidos', m && m.switches.length > 0 && m.switches.every((sw) => sw.on === (sw.bg !== 'rgba(255, 255, 255, 0.25)')), JSON.stringify(m?.switches));
   await page.keyboard.press('Escape');
+}
+
+/**
+ * The submit button of a login/registration card: dimmed while the form is incomplete, full green once it can be
+ * sent (10/11/2026). Only fills the fields, never clicks.
+ */
+async function submitDimmedUntilFilled(page, fields) {
+  const state = () => page.$eval('.uncp-auth-card .uncp-auth-submit', (e) => ({
+    disabled: e.getAttribute('aria-disabled') === 'true', opacity: getComputedStyle(e).opacity, bg: getComputedStyle(e).backgroundColor,
+  }));
+  const empty = await state();
+  for (const [selector, value] of Object.entries(fields)) {
+    await page.fill(selector, value);
+  }
+  await page.waitForTimeout(400);
+  const filled = await state();
+  return empty.disabled && empty.opacity === '0.45' && !filled.disabled && filled.opacity === '1' && filled.bg === GREEN;
 }
 
 /**
@@ -169,8 +187,8 @@ async function open(browser, url, width, keepCookieNotice = false) {
 }
 
 /** Checks every page shares */
-async function common(label, { page, problems, status }) {
-  check(label, 'carga (HTTP 200)', status === 200, `HTTP ${status}`);
+async function common(label, { page, problems, status }, expectedStatus = 200) {
+  check(label, `carga (HTTP ${expectedStatus})`, status === expectedStatus, `HTTP ${status}`);
   check(label, 'sin errores JS ni HTTP', problems.length === 0, problems.slice(0, 5).join(' | '));
   const measure = () => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   let overflow = await measure();
@@ -512,6 +530,16 @@ async function run() {
           return b && getComputedStyle(b).backgroundColor;
         });
         check(label, 'botón en verde', button === GREEN, button);
+        if (/srsc/.test(tab.href)) {
+          // texts in Spanish (7.4, 09/11/2026)
+          const t = await p.page.evaluate(() => ({
+            title: [...document.querySelectorAll('ds-browse-by-taxonomy-page h1')].pop()?.textContent.trim(),
+            placeholder: document.querySelector('ds-vocabulary-treeview input')?.getAttribute('placeholder'),
+            buttons: [...document.querySelectorAll('ds-vocabulary-treeview button')].map((x) => x.textContent.trim()),
+          }));
+          check(label, 'textos de Categoría en español', t.title === 'Examinando por categoría temática'
+            && t.placeholder === 'Filtre los resultados escribiendo las primeras letras' && t.buttons.includes('Agregar'), JSON.stringify(t));
+        }
         await p.page.close();
       }
     }
@@ -524,6 +552,113 @@ async function run() {
       p = await open(browser, url, width);
       await common(label, p);
       await comcolHeader(label, p.page, { title, icon });
+      await p.page.close();
+    }
+    // Accessibility page (footer link "Accesibilidad"): in Spanish (7.4, 09/11/2026)
+    label = `accesibilidad (${dev})`;
+    p = await open(browser, '/info/accessibility', width);
+    await common(label, p);
+    const acc = await p.page.evaluate(() => document.querySelector('main, #main-content')?.innerText || '');
+    check(label, 'página en español', acc.includes('Ajustes de accesibilidad') && !/Accessibility settings|time out|Save accessibility/i.test(acc), acc.slice(0, 200));
+    await p.page.close();
+    // Login page: option A card with the labels of option C (09/11/2026). Nothing is submitted.
+    label = `inicio de sesión (${dev})`;
+    p = await open(browser, '/login', width);
+    await common(label, p);
+    const login = await p.page.evaluate(() => {
+      const card = document.querySelector('.uncp-auth-card');
+      const css = (sel, prop) => { const e = document.querySelector(sel); return e && getComputedStyle(e)[prop]; };
+      return card && {
+        logo: card.querySelector('.uncp-auth-logo')?.getAttribute('src'),
+        title: card.querySelector('h1')?.textContent.trim(),
+        labels: [...card.querySelectorAll('.uncp-auth-label')].map((l) => `${l.textContent.trim()}>${l.getAttribute('for')}`),
+        button: css('.uncp-auth-card .uncp-auth-submit', 'backgroundColor'),
+        links: [...card.querySelectorAll('.uncp-auth-links a')].map((a) => getComputedStyle(a).color),
+        overflow: card.getBoundingClientRect().right > window.innerWidth + 1,
+      };
+    });
+    check(label, 'tarjeta con logo UNCP y título "Iniciar sesión"', login && /uncp/.test(login.logo) && login.title === 'Iniciar sesión', JSON.stringify(login));
+    check(label, 'etiquetas "Correo electrónico" y "Contraseña" ligadas a sus campos', login
+      && login.labels.join() === 'Correo electrónico>uncp-login-email,Contraseña>uncp-login-password', JSON.stringify(login?.labels));
+    check(label, 'botón verde y enlaces azules', login && login.button === GREEN && login.links.length > 0 && login.links.every((c) => c === BLUE), JSON.stringify(login));
+    check(label, 'tarjeta dentro de la pantalla', login && !login.overflow);
+    await p.page.focus('#uncp-login-email');
+    await p.page.waitForTimeout(400);
+    const focus = await p.page.$eval('#uncp-login-email', (e) => ({ border: getComputedStyle(e).borderTopColor, shadow: getComputedStyle(e).boxShadow }));
+    check(label, 'foco verde suave en el campo', focus.border === GREEN && /rgba\(6, 122, 90, 0\.18\)/.test(focus.shadow), JSON.stringify(focus));
+    check(label, 'botón atenuado con el formulario vacío y verde intenso al llenarlo', await submitDimmedUntilFilled(p.page, { '#uncp-login-email': 'prueba@uncp.edu.pe', '#uncp-login-password': 'x' }));
+    await p.page.close();
+    // Registration and password recovery: the same card (09/11/2026). Nothing is submitted.
+    for (const [path, title, button] of [['/register', 'Registro de nuevo usuario', 'Registrarse'], ['/forgot', 'Recuperar contraseña', 'Restablecer contraseña']]) {
+      label = `${path} (${dev})`;
+      p = await open(browser, path, width);
+      await common(label, p);
+      const reg = await p.page.evaluate(() => {
+        const card = document.querySelector('.uncp-auth-card');
+        return card && {
+          logo: card.querySelector('.uncp-auth-logo')?.getAttribute('src'),
+          title: card.querySelector('h1')?.textContent.trim(),
+          label: card.querySelector('.uncp-auth-label')?.getAttribute('for'),
+          button: card.querySelector('.uncp-auth-submit')?.textContent.trim(),
+          buttonBg: (() => { const e = card.querySelector('.uncp-auth-submit'); return e && getComputedStyle(e).backgroundColor; })(),
+          back: (() => { const a = card.querySelector('.uncp-auth-links a'); return a && [a.getAttribute('href'), getComputedStyle(a).color]; })(),
+          overflow: card.getBoundingClientRect().right > window.innerWidth + 1,
+        };
+      });
+      check(label, `tarjeta UNCP "${title}"`, reg && /uncp/.test(reg.logo) && reg.title === title && reg.label === 'email' && !reg.overflow, JSON.stringify(reg));
+      check(label, `botón "${button}" verde y enlace azul a iniciar sesión`, reg && reg.button === button && reg.buttonBg === GREEN
+        && reg.back && reg.back[0] === '/login' && reg.back[1] === BLUE, JSON.stringify(reg));
+      check(label, 'botón atenuado con el formulario vacío y verde intenso al llenarlo', await submitDimmedUntilFilled(p.page, { '.uncp-auth-card #email': 'prueba@uncp.edu.pe' }));
+      await p.page.close();
+    }
+    if (!mobile) {
+      label = `menú "Iniciar sesión" (${dev})`;
+      p = await open(browser, '/home', width);
+      await p.page.click('button.dropdownLogin');
+      await p.page.waitForTimeout(1200);
+      const menu = await p.page.evaluate(() => ({
+        labels: [...document.querySelectorAll('#loginDropdownMenu .uncp-auth-label')].map((l) => l.textContent.trim()),
+        button: (() => { const e = document.querySelector('#loginDropdownMenu .uncp-auth-submit'); return e && getComputedStyle(e).backgroundColor; })(),
+      }));
+      check(label, 'mismo formulario en el menú', menu.labels.length === 2 && menu.button === GREEN, JSON.stringify(menu));
+      await p.page.close();
+    }
+    // Error pages 404, 403 and 500: option C without the code label (10/11/2026). They answer with their own status.
+    for (const [path, status, title, search] of [
+      ['/pagina-que-no-existe', 404, 'No encontramos la página que buscas', true],
+      ['/items/00000000-0000-0000-0000-000000000000', 404, 'No encontramos la página que buscas', true],
+      ['/403', 403, 'No tienes permiso para ver esta página', true],
+      ['/500', 500, 'El servicio no está disponible en este momento', false],
+    ]) {
+      label = `error ${path} (${dev})`;
+      p = await open(browser, path, width);
+      // the page itself (or the item lookup) answers with the error status on purpose
+      p.problems = p.problems.filter((x) => !/^HTTP (403|404|500) GET \/(pagina-que-no-existe|403|500|404|items\/0{8}|server\/api\/core\/items\/0{8})/.test(x)
+        && !/^console: Failed to load resource: the server responded with a status of 500/.test(x));
+      await common(label, p, status);
+      const err = await p.page.evaluate(() => {
+        const box = document.querySelector('.uncp-error');
+        const css = (e, prop) => e && getComputedStyle(e)[prop];
+        return box && {
+          title: box.querySelector('h1')?.textContent.trim(),
+          rule: css(box.querySelector('.uncp-error-rule'), 'borderTopColor'),
+          code: /\b(404|403|500)\b/.test(box.innerText),
+          search: !!box.querySelector('ds-search-form input'),
+          searchButton: css(box.querySelector('.search-button'), 'backgroundColor'),
+          links: [...box.querySelectorAll('.uncp-error-links a')].map((a) => [a.textContent.trim(), getComputedStyle(a).color]),
+          width: box.getBoundingClientRect().width,
+        };
+      });
+      check(label, `título "${title}" con línea verde y sin etiqueta del código`, err && err.title === title && err.rule === GREEN && !err.code, JSON.stringify(err));
+      check(label, search ? 'buscador del repositorio con botón verde' : 'sin buscador', err && (search ? err.search && err.searchButton === GREEN : !err.search), JSON.stringify(err));
+      check(label, 'enlaces azules, el primero "Volver al inicio"', err && err.links.length >= 2 && /Volver al inicio/.test(err.links[0][0]) && err.links.every(([, c]) => c === BLUE), JSON.stringify(err?.links));
+      check(label, 'ancho de lectura (máx. 680px)', err && err.width <= 680, err && `${err.width}px`);
+      if (path === '/pagina-que-no-existe' && !mobile) {
+        await p.page.fill('.uncp-error-search input', 'agua potable');
+        await p.page.click('.uncp-error-search .search-button');
+        await p.page.waitForTimeout(6000);
+        check(label, 'el buscador lleva a los resultados', /\/search\?.*query=agua%20potable/.test(p.page.url()), p.page.url());
+      }
       await p.page.close();
     }
     // Browse without scope: no header

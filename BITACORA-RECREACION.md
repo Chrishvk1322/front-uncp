@@ -198,6 +198,11 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
      - el menú móvil tiene el estilo de serie, sin separación, con "Repositorio" en azul y los demás en gris;
      - "Iniciar sesión" en móvil es un enlace azul y no el botón verde.
 4. **Textos fijos en español** que no cambian con el idioma: navbar, carrusel, tarjetas de comunidades, sub-footer, footer y "Ver todos los metadatos". Es igual que en producción; pasarlos a i18n solo si se quiere el sitio en inglés.
+   - **Textos de serie que quedaban en inglés en `es.json5`** (traducidos el 09/11/2026; se quitó su marca `TODO New key`):
+     - "Por categoría": título `browse.taxonomy_srsc.title` ("Examinando por categoría temática"), buscador `vocabulary-treeview.search.form.search-placeholder`, botón `vocabulary-treeview.search.form.add` ("Agregar"); además `vocabulary-treeview.search.no-result` ("No hay elementos para mostrar", antes "No había ítems…").
+     - Ventana de cookies: `cookies.consent.app.title.accessibility` ("Ajustes de accesibilidad") y su descripción.
+     - Página `/info/accessibility` (enlace "Accesibilidad" del pie): las 20 claves `info.accessibility-settings.*`, más `footer.link.accessibility` y `profile.card.accessibility.*`.
+     - Pruebas: "textos de Categoría en español", "ventana "Personalizar" en español" y "accesibilidad › página en español".
 5. ~~**Conteos de las 8 tarjetas de comunidades**~~ **Hecho el 25/10/2026** (frontend). Antes estaban fijos, igual que en producción, y al 24/10/2026 había 7 de 8 desactualizados. Ahora:
    - `TopLevelCommunityListComponent` del tema (`counts$`) toma cada conteo de `comunidades_inicio` en `/assets/custom/uncp-totales.json`, por UUID, mediante `UncpTotalesService`;
    - `count` de `communityCards` quedó solo como respaldo, con los valores del 24/10/2026;
@@ -386,7 +391,7 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
             - Sociología: `fa-users`;
             - Trabajo Social: `fa-hands-holding-child`.
         - **Icono en carbón** (el blanco no llega a 3:1): `#FCDD18`, `#F9C114`, `#E37909`, `#F07F06`, `#63B23F`, `#55A5A6`, `#5FC3EE`, `#53C9E3`. Todos los demás llevan el icono en blanco.
-        - **Pendientes de color**: las facultades 6, 7 y 8 no tienen carreras, solo colecciones, y quedan con el aspecto neutro. Las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. **Pendiente para 7.4**: en "Por categoría" quedan textos en inglés de serie ("Browsing by Subject Category", "Filter results by typing the first few letters", "Add").
+        - **Pendientes de color**: las facultades 6, 7 y 8 no tienen carreras, solo colecciones, y quedan con el aspecto neutro. Las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. Los textos en inglés de serie de "Por categoría" se tradujeron el 09/11/2026 (ver 7.4).
     - **búsqueda, filtros laterales** (05/11/2026). Se mostraron dos opciones: tarjetas (A) y panel único (B), con vistas previas en `pwtool/filtersopts.js`. El usuario no eligió ninguna; se mantuvo el diseño de serie con 3 ajustes, en `styles/_global-styles.scss`:
       - **foco**: al abrir un filtro con el "+" (o con el teclado), la tarjeta muestra un **contorno verde suave** `rgba(6,122,90,.35)` en lugar del gris de serie. Primero se había quitado el contorno; el usuario aclaró que lo que quería era cambiarlo a verde;
       - **"Mostrar más/menos"**: azul `#1F4E79` y sin subrayado, que solo aparece al pasar el mouse. Lleva `!important`, porque los componentes de filtro lo imponen con selectores encapsulados más específicos;
@@ -410,7 +415,7 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
         - mismo fondo, borde, sombra y esquinas; título 1,4rem semi-negrita; descripciones en `#a9bab3`; enlaces y "↓ 4 servicios" en dorado;
         - **"Aceptar todo"** en verde `#26B269`; "Rechazar" y "Aceptar seleccionado" con contorno blanco;
         - **interruptores**: translúcidos si están apagados, verde `#26B269` si están encendidos, y un verde más oscuro `#1f7a4d` para los obligatorios y para el grupo con solo los obligatorios activos (clases de Klaro `required`, `only-required`, `half-checked`). La clase `.active` de Klaro **no** indica el estado: un primer intento con ella pintaba de verde un interruptor apagado.
-        - **Pendiente para 7.4**: el servicio "Accessibility Settings" y su descripción siguen en inglés (vienen de la configuración de Klaro de DSpace).
+        - El servicio "Accessibility Settings" y su descripción se tradujeron el 09/11/2026 (ver 7.4).
     - **Destello oscuro al cargar** (06/11/2026, reportado por el usuario: "como si algo atravesara la pantalla con el tono del aviso de cookies").
       - **Causa**: no era el aviso. Una grabación cuadro a cuadro (`pwtool/screencast.js`) mostró que, durante unos 80ms, Angular reemplaza la página del servidor por la del navegador, el área central queda vacía y **el pie oscuro sube hasta ocupar la pantalla**. En el despliegue estático de producción pasa algo equivalente, antes de que llegue el contenido.
       - **Corrección**: `#main-content { min-height: calc(100vh - 150px) }` (header y migas de pan). En páginas cortas, el pie queda justo debajo del borde de la pantalla.
@@ -419,8 +424,29 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
     - **lista de comunidades** (`/community-list`);
     - **páginas informativas** (`/info/privacy`, `/info/end-user-agreement`, `/info/feedback`; ver 7.10);
-    - **inicio de sesión**, registro y recuperación de clave;
-    - **páginas de error** (404, 500);
+    - **inicio de sesión, registro y recuperación de clave** (hechos el 09/11/2026):
+      - Elegida la opción A (tarjeta centrada) con las etiquetas de la opción C y el foco verde suave de la vista "A-foco"; vistas previas en `pwtool/loginopts.js`.
+      - **Estilos compartidos** `.uncp-auth-*` en `_global-styles.scss` (tarjeta, logo, título, subtítulo, formulario, etiqueta, ayuda, botón y enlaces). El botón deshabilitado necesita su propio color de fondo, porque `.btn-primary.disabled` de serie lo pintaba gris oscuro.
+      - **Botón atenuado mientras el formulario está incompleto** (10/11/2026, reportado por el usuario: "los botones no funcionan"). Al principio se veía en verde intenso también deshabilitado, como en la vista aprobada. Por eso, al pulsarlo con los campos vacíos, parecía roto. Ahora se ve con opacidad 0,45 y cursor `not-allowed`, y pasa a verde intenso al llenar los datos.
+      - **En local, registro y recuperación no se envían**: el proxy en `READ_ONLY=1` bloquea `POST /server/api/eperson/registrations` (403), así no se crean cuentas ni se mandan correos reales desde las pruebas. El inicio de sesión sí pasa (`/api/authn/login` está permitido).
+      - `app/login-page/` (declarado en `lazy-theme.module.ts`): tarjeta blanca de 420px con el borde `#e4e7e6` y la sombra de las tarjetas de comunidades, logo `assets/uncp/images/logo.png`, título `login.form.header` (cambiado a "Iniciar sesión" / "Log in") y el subtítulo fijo "Repositorio Institucional de la UNCP".
+      - `app/shared/log-in/methods/password/` (en `ENTRY_COMPONENTS` de `eager-theme.module.ts`): reemplaza al formulario de serie con `@renderAuthMethodFor(AuthMethodType.Password)`. Gana el del tema porque su archivo importa la clase base, así que se registra después. Por eso cambia también el menú "Iniciar sesión" de la barra.
+        - etiquetas `<label for>` "Correo electrónico" y "Contraseña" sobre los campos (sin placeholder);
+        - campos redondeados (8px), borde `#cfd8d4`, foco con borde verde `#067A5A` y halo `rgba(6,122,90,.18)`; se mantiene el contorno global de foco;
+        - botón "Iniciar sesión" en verde UNCP (atenuado mientras faltan datos); enlaces de registro y contraseña en azul `#1f4e79`, subrayados al pasar el mouse.
+      - `app/register-email-form/` (declarado en `lazy-theme.module.ts`): es el formulario de `/register` y de `/forgot`. Lleva la misma tarjeta con el logo; el título y el texto vienen de las claves de cada página. Debajo, la etiqueta del correo, la ayuda bajo el campo, el botón verde a todo el ancho y el enlace azul "Volver a iniciar sesión" (clave nueva `uncp.auth.back-to-login`). Se conservan la validación, los errores y el reCaptcha de serie.
+      - Textos: `forgot-email.form.header` pasó de "Olvido de contraseña" a "Recuperar contraseña"; se corrigió la errata "restablecemieto" y se tradujeron `forgot-email.form.error.content` y `register-page.registration.error.content`, que estaban en inglés.
+      - No cambian las páginas a las que se llega con el enlace del correo (`/register/:token` y `/forgot/:token`): necesitan un token válido para verlas.
+      - Pruebas: "inicio de sesión" (escritorio y celular), "menú "Iniciar sesión"", "/register" y "/forgot". No se envía ningún formulario, porque el backend es el de producción.
+    - **páginas de error 404, 403 y 500** (hechas el 10/11/2026):
+      - Propuestas A (tarjeta), B (dividida con facultades) y C (minimalista) en `pwtool/erroropts.js`. Elegida la C sin la etiqueta verde del código ("ERROR 404", "ACCESO RESTRINGIDO").
+      - `app/pagenotfound/`, `app/forbidden/` y `app/page-internal-server-error/` (declarados en `lazy-theme.module.ts`). Extienden las clases de serie, así que conservan el código HTTP de respuesta (404, 403 y 500).
+      - Diseño (`.uncp-error*` en `_global-styles.scss`): ancho de lectura de 680px, título de 2,1rem con una línea verde corta, texto en gris, buscador real del repositorio (`ds-themed-search-form` sin la caja de la portada, botón verde) y enlaces de texto azules: "← Volver al inicio", "Explorar comunidades" (`/community-list`) y "Guía de usuario" (la misma guía del menú Tutoriales).
+      - Selector `.container.uncp-error, #main-content .container.uncp-error`: la regla del 80% de ancho (`#main-content .container`) le ganaba a la clase sola.
+      - 500: sin buscador (depende del mismo servidor) y con enlaces de carga completa (`href`), como en la plantilla de serie.
+      - Textos nuevos `uncp.error.*` en `es.json5`/`en.json5`, en el tono de las vistas aprobadas.
+      - **Cuándo sale el 403**: a un visitante sin sesión, DSpace lo manda al inicio de sesión (`/admin/...`, `/mydspace`). El 403 lo ve quien ya inició sesión y no tiene permiso, por ejemplo con el panel de administración o con un archivo restringido.
+      - Pruebas: "error /pagina-que-no-existe", "/items/000…" (ítem inexistente), "/403" y "/500", en escritorio y celular. Revisan el código HTTP, el título y la línea verde, que no aparezca el código, el buscador (y que lleve a `/search?query=`), los enlaces y el ancho. `common()` acepta ahora el código HTTP esperado.
     - **opcional**: el área de usuario y administración (MyDSpace, envío, edición), que usa solo personal interno.
     
     **Criterio**: reutilizar los colores, tipografía y componentes ya hechos (tarjetas, pastillas, botones verdes) y sobrescribir en el tema solo lo necesario. Revisar antes en la réplica y en los chunks si producción ya tenía algo propio en cada página.
@@ -507,7 +533,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 06/11/2026: **553/553 correctas** (antes 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 10/11/2026: **712/712 correctas** (antes 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

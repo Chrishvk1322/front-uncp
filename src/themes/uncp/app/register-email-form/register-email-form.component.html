@@ -1,0 +1,59 @@
+<div class="container">
+  <div class="uncp-auth-card">
+    <img class="uncp-auth-logo" src="assets/uncp/images/logo.png" [alt]="'repository.image.logo' | translate">
+    <h1 class="uncp-auth-title">{{ MESSAGE_PREFIX + '.header' | translate }}</h1>
+    <p class="uncp-auth-subtitle">{{ MESSAGE_PREFIX + '.info' | translate }}</p>
+
+    <p *ngIf="validMailDomains.length != 0 && typeRequest === TYPE_REQUEST_REGISTER" class="uncp-auth-subtitle">
+      {{ MESSAGE_PREFIX + '.info.maildomain' | translate }} {{ validMailDomains.join(', ') }}
+    </p>
+
+    <form [class]="'uncp-auth-form ng-invalid'" [formGroup]="form">
+      <label class="uncp-auth-label" for="email">{{ MESSAGE_PREFIX + '.email' | translate }}</label>
+      <input [className]="(email.invalid) && (email.dirty || email.touched) ? 'form-control is-invalid' : 'form-control'"
+             type="text" id="email" formControlName="email" autocomplete="email"
+             [attr.aria-label]="MESSAGE_PREFIX + '.aria.label' | translate"
+             [attr.aria-describedby]="(!email.errors) ? 'email-hint' : (email.errors.required ? 'email-errors-required' : 'email-error-not-valid')"
+             [attr.aria-invalid]="email.invalid"/>
+      <div *ngIf="email.invalid && (email.dirty || email.touched)" class="invalid-feedback show-feedback">
+        <span *ngIf="email.errors && email.errors.required" id="email-errors-required">
+          {{ MESSAGE_PREFIX + '.email.error.required' | translate }}
+        </span>
+        <span *ngIf="email.errors && ((email.errors.pattern && this.typeRequest === TYPE_REQUEST_REGISTER) || email.errors.email)" id="email-error-not-valid">
+          {{ MESSAGE_PREFIX + '.email.error.not-email-form' | translate }}
+          <ng-container *ngIf="validMailDomains.length > 0">
+            {{ MESSAGE_PREFIX + '.email.error.not-valid-domain' | translate: { domains: validMailDomains.join(', ') } }}
+          </ng-container>
+        </span>
+      </div>
+      <p class="uncp-auth-hint" id="email-hint">{{ MESSAGE_PREFIX + '.email.hint' | translate }}</p>
+
+      <ds-alert [type]="AlertTypeEnum.Warning" *ngIf="registrationVerification && !isRecaptchaCookieAccepted()">
+        <p class="m-0" [innerHTML]="MESSAGE_PREFIX + '.google-recaptcha.must-accept-cookies' | translate"></p>
+        <p class="m-0"><a href="javascript:void(0);" (click)="this.klaroService.showSettings()">{{ MESSAGE_PREFIX + '.google-recaptcha.open-cookie-settings' | translate }}</a></p>
+      </ds-alert>
+
+      <div class="my-3" *ngIf="isRecaptchaCookieAccepted() && (captchaVersion$ | async) === 'v2'">
+        <ds-google-recaptcha [captchaMode]="(captchaMode$ | async)"
+                             (executeRecaptcha)="register($event)" (checkboxChecked)="onCheckboxChecked($event)"
+                             (showNotification)="showNotification($event)"></ds-google-recaptcha>
+      </div>
+
+      <ng-container *ngIf="!((captchaVersion$ | async) === 'v2' && (captchaMode$ | async) === 'invisible'); else v2Invisible">
+        <button class="btn btn-primary btn-block uncp-auth-submit" [dsBtnDisabled]="form.invalid || registrationVerification && !isRecaptchaCookieAccepted() || disableUntilChecked" (click)="register()">
+          {{ MESSAGE_PREFIX + '.submit' | translate }}
+        </button>
+      </ng-container>
+
+      <ng-template #v2Invisible>
+        <button class="btn btn-primary btn-block uncp-auth-submit" [dsBtnDisabled]="form.invalid" (click)="executeRecaptcha()">
+          {{ MESSAGE_PREFIX + '.submit' | translate }}
+        </button>
+      </ng-template>
+    </form>
+
+    <div class="uncp-auth-links">
+      <a routerLink="/login">{{ 'uncp.auth.back-to-login' | translate }}</a>
+    </div>
+  </div>
+</div>

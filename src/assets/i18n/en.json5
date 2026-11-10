@@ -2925,7 +2925,7 @@
 
   "login.form.forgot-password": "Have you forgotten your password?",
 
-  "login.form.header": "Please log in to DSpace",
+  "login.form.header": "Log in",
 
   "login.form.new-user": "New user? Click here to register.",
 
@@ -5486,6 +5486,21 @@
   "register-page.registration.aria.label": "Enter your e-mail address",
 
   "forgot-email.form.aria.label": "Enter your e-mail address",
+
+  // UNCP: link back to the login page, under the registration and password recovery forms
+  "uncp.auth.back-to-login": "Back to log in",
+
+  // UNCP: error pages 404, 403 and 500 (option C)
+  "uncp.error.404.title": "We couldn't find the page you are looking for",
+  "uncp.error.404.text": "The link may be mistyped, or the document may have moved. Try searching for it in the repository.",
+  "uncp.error.403.title": "You don't have permission to see this page",
+  "uncp.error.403.text": "Your account has no access to this content. If you think this is a mistake, please contact the repository team.",
+  "uncp.error.500.title": "The service is not available right now",
+  "uncp.error.500.text": "The repository is under maintenance or has a technical problem. Please try again in a few minutes.",
+  "uncp.error.search-placeholder": "Search theses, articles, authors…",
+  "uncp.error.home": "Back to home",
+  "uncp.error.communities": "Explore communities",
+  "uncp.error.guide": "User guide",
 
   "search-facet-option.update.announcement": "The page will be reloaded. Filter {{ filter }} is selected.",
 

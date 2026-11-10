@@ -79,6 +79,11 @@ import { CommunityPageSubCommunityListComponent } from './app/community-page/sub
 import { CommunityPageSubCollectionListComponent } from './app/community-page/sub-collection-list/community-page-sub-collection-list.component';
 import { BreadcrumbsComponent } from './app/breadcrumbs/breadcrumbs.component';
 import { DsoPageModule } from '../../app/shared/dso-page/dso-page.module';
+import { LoginPageComponent } from './app/login-page/login-page.component';
+import { RegisterEmailFormComponent } from './app/register-email-form/register-email-form.component';
+import { PageNotFoundComponent } from './app/pagenotfound/pagenotfound.component';
+import { ForbiddenComponent } from './app/forbidden/forbidden.component';
+import { PageInternalServerErrorComponent } from './app/page-internal-server-error/page-internal-server-error.component';
 
 const DECLARATIONS = [
   HomePageComponent,
@@ -98,6 +103,11 @@ const DECLARATIONS = [
   CommunityPageSubCommunityListComponent,
   CommunityPageSubCollectionListComponent,
   BreadcrumbsComponent,
+  LoginPageComponent,
+  RegisterEmailFormComponent,
+  PageNotFoundComponent,
+  ForbiddenComponent,
+  PageInternalServerErrorComponent,
 ];
 
 @NgModule({
