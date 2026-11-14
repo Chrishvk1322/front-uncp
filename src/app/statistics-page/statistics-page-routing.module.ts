@@ -10,6 +10,7 @@ import { ThemedCommunityStatisticsPageComponent } from './community-statistics-p
 import { ThemedItemStatisticsPageComponent } from './item-statistics-page/themed-item-statistics-page.component';
 import { ThemedSiteStatisticsPageComponent } from './site-statistics-page/themed-site-statistics-page.component';
 import { ItemResolver } from '../item-page/item.resolver';
+import { StatisticsBreadcrumbResolver } from './statistics-breadcrumb.resolver';
 import { StatisticsAdministratorGuard } from '../core/data/feature-authorization/feature-authorization-guard/statistics-administrator.guard';
 
 @NgModule({
@@ -37,7 +38,7 @@ import { StatisticsAdministratorGuard } from '../core/data/feature-authorization
         path: `items/:id`,
         resolve: {
           scope: ItemResolver,
-          breadcrumb: I18nBreadcrumbResolver
+          breadcrumb: StatisticsBreadcrumbResolver
         },
         data: {
           title: 'statistics.title',
@@ -50,7 +51,7 @@ import { StatisticsAdministratorGuard } from '../core/data/feature-authorization
         path: `collections/:id`,
         resolve: {
           scope: CollectionPageResolver,
-          breadcrumb: I18nBreadcrumbResolver
+          breadcrumb: StatisticsBreadcrumbResolver
         },
         data: {
           title: 'statistics.title',
@@ -63,7 +64,7 @@ import { StatisticsAdministratorGuard } from '../core/data/feature-authorization
         path: `communities/:id`,
         resolve: {
           scope: CommunityPageResolver,
-          breadcrumb: I18nBreadcrumbResolver
+          breadcrumb: StatisticsBreadcrumbResolver
         },
         data: {
           title: 'statistics.title',

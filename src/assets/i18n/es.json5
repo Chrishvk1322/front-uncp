@@ -6325,13 +6325,13 @@
   "statistics.table.title.TotalVisitsPerMonth": "Visitas totales por mes",
 
   // "statistics.table.title.TotalDownloads": "File Visits",
-  "statistics.table.title.TotalDownloads": "Visitas de archivo",
+  "statistics.table.title.TotalDownloads": "Descargas por archivo",
 
   // "statistics.table.title.TopCountries": "Top country views",
-  "statistics.table.title.TopCountries": "Vistas principales por país",
+  "statistics.table.title.TopCountries": "Visitas por país",
 
   // "statistics.table.title.TopCities": "Top city views",
-  "statistics.table.title.TopCities": "Visitas principales por ciudad",
+  "statistics.table.title.TopCities": "Visitas por ciudad",
 
   // "statistics.table.header.views": "Views",
   "statistics.table.header.views": "Visitas",
@@ -8396,6 +8396,31 @@
   "uncp.browse.startsWith.subject.hint": "Por ejemplo: «Agua» para Agua potable",
   "uncp.browse.startsWith.default.placeholder": "Primeras letras",
   "uncp.browse.startsWith.default.hint": "Escriba las primeras letras y pulse Examinar",
+
+  // UNCP: statistics pages (14/11/2026)
+  "uncp.statistics.eyebrow.item": "Estadísticas del ítem",
+  "uncp.statistics.eyebrow.community": "Estadísticas de la comunidad",
+  "uncp.statistics.eyebrow.collection": "Estadísticas de la colección",
+  "uncp.statistics.eyebrow.site": "Estadísticas",
+  "uncp.statistics.back.item": "Ver ítem",
+  "uncp.statistics.comcol-tab": "Ver estadísticas",
+  "uncp.statistics.back.community": "Ver la comunidad",
+  "uncp.statistics.back.collection": "Ver la colección",
+  "uncp.statistics.total-visits": "Visitas totales",
+  "uncp.statistics.downloads": "Descargas",
+  "uncp.statistics.file": "{{ count }} archivo",
+  "uncp.statistics.files": "{{ count }} archivos",
+  "uncp.statistics.peak-month": "Mes con más visitas",
+  "uncp.statistics.this-month": "Este mes",
+  "uncp.statistics.so-far": "{{ month }}, hasta hoy",
+  "uncp.statistics.per-month": "Visitas por mes",
+  "uncp.statistics.visits-tip": "{{ month }}: {{ count }} visitas",
+  "uncp.statistics.show-table": "Ver como tabla",
+  "uncp.statistics.hide-table": "Ocultar tabla",
+  "uncp.statistics.table.month": "Mes",
+  "uncp.statistics.table.visits": "Visitas",
+  "uncp.statistics.site.title": "Documentos más visitados",
+  "uncp.statistics.site.subtitle": "Los 10 documentos con más visitas en el repositorio.",
 
   // "search-facet-option.update.announcement": "The page will be reloaded. Filter {{ filter }} is selected.",
   "search-facet-option.update.announcement": "La página será recargada. Filtro {{ filter }} seleccionado.",

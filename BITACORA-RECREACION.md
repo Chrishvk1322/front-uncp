@@ -420,7 +420,28 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
       - **Causa**: no era el aviso. Una grabación cuadro a cuadro (`pwtool/screencast.js`) mostró que, durante unos 80ms, Angular reemplaza la página del servidor por la del navegador, el área central queda vacía y **el pie oscuro sube hasta ocupar la pantalla**. En el despliegue estático de producción pasa algo equivalente, antes de que llegue el contenido.
       - **Corrección**: `#main-content { min-height: calc(100vh - 150px) }` (header y migas de pan). En páginas cortas, el pie queda justo debajo del borde de la pantalla.
       - **Verificación**: la suite graba la carga de 4 páginas (home, búsqueda, comunidad, ítem) y cuenta los cuadros con la mitad superior oscura (`darkFlashFrames`). Con la corrección hay 0; sin ella, 6 a 8 por carga.
-    - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
+    - **estadísticas** (hechas el 14/11/2026; vistas previas en `pwtool/statsopts.js`): del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics` (enlace "Estadísticas" del menú):
+      - **Ítem, comunidad y colección:** `app/statistics-page/{item,community,collection}-statistics-page/`, con una plantilla compartida, `uncp-statistics-page.component.html`, y la lógica en `uncp-statistics.ts`. Están declarados en `lazy-theme.module.ts` y reemplazan a los de serie mediante sus componentes "themed".
+        - **Encabezado:** un texto pequeño en verde ("Estadísticas del ítem / de la comunidad / de la colección"), el nombre con la línea verde corta (comunidades y colecciones sin número) y el botón "Ver ítem" / "Ver la comunidad" / "Ver la colección", con el mismo estilo `btn-outline-primary` que "Vista sencilla de ítem" (pedido del usuario).
+        - **Tres tarjetas:**
+          - "Visitas totales";
+          - "Descargas", con la cantidad de archivos (en el ítem) o "Mes con más visitas" (en comunidad y colección);
+          - "Este mes" ("noviembre de 2026, hasta hoy").
+        - **"Visitas por mes":**
+          - barras de un solo tono (verde UNCP), con el número solo en el mes más alto y el resto en un tooltip al pasar el mouse;
+          - meses en el idioma de la interfaz: DSpace los envía en inglés ("May 2026") y se traducen con `toLocaleDateString`;
+          - "Ver como tabla" muestra una tabla con los mismos datos, que los lectores de pantalla siempre leen (`sr-only` mientras está oculta).
+        - **Listas con barra proporcional:** "Descargas por archivo" y, si el servidor algún día tiene geolocalización, "Visitas por país/ciudad". Se corrigieron sus títulos en `es.json5`.
+      - **General:** `app/statistics-page/site-statistics-page/`. DSpace solo informa aquí los 10 ítems más visitados, así que la página se presenta como "Documentos más visitados": un ranking con la posición (los 3 primeros en círculo verde), el título enlazado al ítem, una barra proporcional y las visitas.
+      - **Migas de pan (cambio en el núcleo):** `statistics-page/statistics-breadcrumb.resolver.ts` y `statistics-breadcrumbs.service.ts` (con su spec), usados en `statistics-page-routing.module.ts` para ítems, comunidades y colecciones. Muestran la ruta del objeto y luego "Estadísticas", por ejemplo "Inicio • Arquitectura e Ingenierías • … • título • Estadísticas". La página general sigue con "Inicio • Estadísticas".
+      - **Ancho** (pedido del usuario, 14/11/2026): las páginas de estadísticas usan el ancho del contenedor del tema (80% de la pantalla), como las demás páginas. Al principio tenían un máximo de 960px.
+      - **"Ver estadísticas" en la barra "Examinar"** de comunidades, subcomunidades y colecciones (pedido del usuario, 14/11/2026):
+        - Es la última opción, con el icono de gráfico, y lleva a `/statistics/communities/:id` o `/statistics/collections/:id`.
+        - En celular aparece como última opción del desplegable.
+        - Está en `app/shared/comcol-page-browse-by/` (declarado en `lazy-theme.module.ts`), que extiende el de serie. `onSelectChange` maneja la opción nueva (`uncp-statistics`) y deja el resto a la clase base.
+        - La prueba de pestañas de la comunidad espera ahora 7 opciones.
+      - **Tipo de `Point.values`:** el modelo de DSpace lo declara como arreglo, pero la API envía un objeto (`{ views: 138 }`), así que `uncp-statistics.ts` lo lee como objeto.
+      - **Pruebas** "estadísticas de ítem", "de comunidad" y "generales" (escritorio y celular): encabezado, botón, tarjetas, gráfico verde con un solo número y su tabla, sin textos en inglés, migas de pan con el objeto, "Ver como tabla" y el ranking de 10 con los 3 primeros en verde.
     - **navegación** (`/browse/...`: por autor, materia, fecha, título), hecha el 14/11/2026:
       - **Decisión del usuario:** no se agregan enlaces a la navegación general (ni en el pie ni en el menú). La búsqueda (`/search`) ya filtra por autor, fecha y materia, y cada comunidad o colección tiene su propio "Examinar por…". Las páginas `/browse/*` siguen existiendo para quien llegue desde Google o un enlace antiguo. Se descartaron el encabezado "Explorar el repositorio" y las pestañas generales (vistas previas en `pwtool/browseopts.js`).
       - **Lista de valores** (por autor y por materia; general y dentro de comunidades y colecciones, que usan el mismo componente). Estilos en `_global-styles.scss`, vista previa en `pwtool/browsescope.js`:
@@ -562,7 +583,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - **Requiere el servidor con `DSPACE_UI_RATELIMITER_MAX=10000`** (ver "Compilar y levantar"); si no, aparecen 429.
   - Verificada con cuatro corridas seguidas: 744/744 en todas.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 14/11/2026: **778/778 correctas** (antes 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 14/11/2026: **861/861 correctas** (antes 850, 778, 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

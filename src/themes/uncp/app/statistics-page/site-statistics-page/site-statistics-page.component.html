@@ -1,0 +1,23 @@
+<div class="container uncp-stats">
+  <p class="uncp-stats-eyebrow">{{ 'uncp.statistics.eyebrow.site' | translate }}</p>
+  <h1 class="uncp-stats-title">{{ 'uncp.statistics.site.title' | translate }}</h1>
+  <hr class="uncp-stats-rule">
+  <p class="uncp-stats-sub">{{ 'uncp.statistics.site.subtitle' | translate }}</p>
+
+  <ng-container *ngVar="(rows$ | async) as rows">
+    <ds-themed-loading *ngIf="!rows"></ds-themed-loading>
+    <section *ngIf="rows?.length > 0" class="uncp-stats-card">
+      <ol class="uncp-stats-list uncp-stats-rank">
+        <li *ngFor="let row of rows; let i = index">
+          <span class="uncp-stats-pos" aria-hidden="true">{{ i + 1 }}</span>
+          <div class="uncp-stats-grow">
+            <a class="uncp-stats-name" [routerLink]="['/items', row.id]">{{ row.label }}</a>
+            <div class="uncp-stats-meter" aria-hidden="true"><div [style.width.%]="row.width"></div></div>
+          </div>
+          <span class="uncp-stats-count">{{ row.views | number:'1.0-0':'es-PE' }}</span>
+        </li>
+      </ol>
+    </section>
+    <p *ngIf="rows?.length === 0">{{ 'statistics.page.no-data' | translate }}</p>
+  </ng-container>
+</div>

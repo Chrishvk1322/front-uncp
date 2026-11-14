@@ -259,6 +259,19 @@ ds-untyped-item .uncp-subjects .simple-view-element-body {
   color: #6c757d;
 }
 
+// "Examinar" bar with 7 options since "Ver estadísticas" (14/11/2026): labels on one line and a bit less side padding,
+// so the whole bar fits on one row on a 1366px screen; on narrower screens it wraps to a second row instead of
+// overflowing (on the phone it is a select)
+.comcol-browse .list-group-horizontal {
+  flex-wrap: wrap;
+
+  .list-group-item {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    white-space: nowrap;
+  }
+}
+
 // "Examinar" tabs not selected (27/10/2026, user request): deep blue #1F4E79, the color of links; on hover or
 // keyboard focus, underlined on a faint gray background. The selected tab keeps green with white text (above)
 .comcol-browse .list-group-item:not(.active) {
@@ -1045,5 +1058,263 @@ ds-browse-entry-list-element > div {
     font-weight: 500;
     color: #3d4a45;
     background: #f1f4f3;
+  }
+}
+
+// UNCP statistics pages (14/11/2026): item, community, collection (uncp-statistics-page.component.html) and the site
+// page (most visited items). Green eyebrow, title with the short green rule, a button back to the object like
+// "Vista sencilla de ítem", cards with the totals, a single-hue bar chart (one series: no legend; number only on the
+// highest month, the rest on hover and in the table) and ranked lists with a bar relative to the first row.
+.container.uncp-stats,
+#main-content .container.uncp-stats {
+  // the width of the theme's container (80% of the screen), like the other pages (user request, 14/11/2026)
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+.uncp-stats {
+  .uncp-stats-eyebrow {
+    margin: 0 0 .4rem;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #067a5a;
+  }
+  .uncp-stats-title {
+    margin: 0 0 .75rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #1f2d28;
+  }
+  .uncp-stats-rule {
+    width: 56px;
+    margin: 0 0 1rem;
+    border: 0;
+    border-top: 3px solid #067a5a;
+    opacity: 1;
+  }
+  .uncp-stats-sub {
+    margin: 0 0 1.25rem;
+    color: #5b6b65;
+  }
+  .uncp-stats-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin: 1.75rem 0 2rem;
+  }
+  .uncp-stats-kpi {
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 1.25rem;
+    background: #fff;
+    border: 1px solid #e4e7e6;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(31, 45, 40, .04), 0 6px 16px rgba(31, 45, 40, .05);
+  }
+  .uncp-stats-kpi-label {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .9rem;
+    color: #5b6b65;
+
+    i {
+      color: #067a5a;
+    }
+  }
+  .uncp-stats-kpi-value {
+    margin-top: .25rem;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1f2d28;
+  }
+  .uncp-stats-kpi-note {
+    font-size: .8rem;
+    color: #5b6b65;
+  }
+  .uncp-stats-card {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem 1.5rem 1rem;
+    background: #fff;
+    border: 1px solid #e4e7e6;
+    border-radius: 14px;
+
+    h2 {
+      margin: 0 0 1rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #1f2d28;
+    }
+  }
+  .uncp-stats-chart,
+  .uncp-stats-axis {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 10px;
+  }
+  .uncp-stats-chart {
+    align-items: end;
+    height: 200px;
+    margin-top: 1.75rem;
+    border-bottom: 1px solid #cfd8d4;
+  }
+  .uncp-stats-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 100%;
+  }
+  .uncp-stats-bar {
+    position: relative;
+    width: min(40px, 70%);
+    min-height: 2px;
+    background: #067a5a;
+    border-radius: 4px 4px 0 0;
+  }
+  .uncp-stats-col:hover .uncp-stats-bar {
+    background: #04573f;
+  }
+  .uncp-stats-value {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: #3d4a45;
+  }
+  .uncp-stats-tip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    z-index: 2;
+    padding: .3rem .55rem;
+    font-size: .8rem;
+    white-space: nowrap;
+    color: #fff;
+    background: #1f2d28;
+    border-radius: 6px;
+  }
+  .uncp-stats-col:hover .uncp-stats-tip {
+    display: block;
+  }
+  .uncp-stats-axis {
+    margin-top: .4rem;
+
+    span {
+      font-size: .8rem;
+      text-align: center;
+      color: #5b6b65;
+    }
+  }
+  .uncp-stats-table-toggle {
+    margin-top: .5rem;
+    padding: 0;
+    font-size: .85rem;
+    color: #1f4e79;
+  }
+  .uncp-stats-table {
+    margin: .75rem 0 0;
+  }
+  .uncp-stats-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      padding: .6rem 0;
+      border-bottom: 1px solid #edf1ef;
+    }
+    li:last-child {
+      border-bottom: 0;
+    }
+  }
+  .uncp-stats-file {
+    color: #5b6b65;
+  }
+  .uncp-stats-grow {
+    flex: 1;
+    min-width: 0;
+  }
+  .uncp-stats-name {
+    overflow-wrap: anywhere;
+    color: #1f2d28;
+  }
+  a.uncp-stats-name {
+    color: #1f4e79;
+  }
+  .uncp-stats-meter {
+    height: 6px;
+    margin-top: .4rem;
+    background: #edf1ef;
+    border-radius: 3px;
+
+    > div {
+      height: 100%;
+      background: #067a5a;
+      border-radius: 3px;
+    }
+  }
+  .uncp-stats-count {
+    font-weight: 600;
+    white-space: nowrap;
+    color: #1f2d28;
+  }
+  .uncp-stats-pos {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-size: .9rem;
+    font-weight: 600;
+    color: #3d4a45;
+    background: #f1f4f3;
+    border-radius: 50%;
+  }
+  .uncp-stats-rank li:nth-child(-n+3) .uncp-stats-pos {
+    color: #fff;
+    background: #067a5a;
+  }
+
+  @media (max-width: 575px) {
+    .uncp-stats-title {
+      font-size: 1.3rem;
+    }
+    .uncp-stats-kpis {
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: .5rem;
+    }
+    .uncp-stats-kpi {
+      padding: .7rem .6rem;
+    }
+    .uncp-stats-kpi-label {
+      gap: .3rem;
+      font-size: .75rem;
+    }
+    .uncp-stats-kpi-value {
+      font-size: 1.35rem;
+    }
+    .uncp-stats-kpi-note {
+      font-size: .7rem;
+    }
+    .uncp-stats-card {
+      padding: 1rem;
+    }
+    .uncp-stats-chart,
+    .uncp-stats-axis {
+      gap: 4px;
+    }
   }
 }

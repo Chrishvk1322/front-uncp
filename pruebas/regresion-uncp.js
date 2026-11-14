@@ -593,8 +593,12 @@ async function run() {
         text: a.textContent.trim(), href: a.getAttribute('href'),
       })));
       await p.page.close();
-      check('pestañas de comunidad', 'hay 6 pestañas', tabs.length === 6, tabs.map((t) => t.text).join(', '));
-      for (const tab of tabs.slice(1)) {
+      check('pestañas de comunidad', 'hay 7 pestañas', tabs.length === 7, tabs.map((t) => t.text).join(', '));
+      // last one: "Ver estadísticas" (14/11/2026)
+      const stats = tabs[tabs.length - 1];
+      check('pestañas de comunidad', 'la última es "Ver estadísticas"', stats?.text === 'Ver estadísticas'
+        && stats.href === `/statistics/communities/${await uuidOf(COMMUNITY)}`, JSON.stringify(stats));
+      for (const tab of tabs.slice(1, -1)) {
         label = `"${tab.text}" de comunidad (${dev})`;
         p = await open(browser, tab.href, width);
         await common(label, p);
@@ -629,6 +633,19 @@ async function run() {
       await common(label, p);
       await comcolHeader(label, p.page, { title, icon });
       await browseList(label, p.page, url, mobile);
+      // "Ver estadísticas" in the bar (a select on the phone), to the statistics of this community or collection
+      const statsHref = `/statistics/${name === 'colección' ? 'collections' : 'communities'}/${url.split('scope=')[1]}`;
+      if (mobile) {
+        const option = await p.page.evaluate(() => [...document.querySelectorAll('.comcol-browse select option')].pop()?.textContent.trim());
+        check(label, 'opción "Ver estadísticas"', option === 'Ver estadísticas', option);
+        await p.page.selectOption('.comcol-browse select', { label: 'Ver estadísticas' });
+        await p.page.waitForURL((u) => u.pathname === statsHref, { timeout: 15000 }).catch(() => {});
+        check(label, 'la opción lleva a las estadísticas', new URL(p.page.url()).pathname === statsHref, p.page.url());
+      } else {
+        const tab = await p.page.evaluate(() => { const a = [...document.querySelectorAll('.comcol-browse .list-group-item')].pop();
+          return a && { text: a.textContent.trim(), href: a.getAttribute('href') }; });
+        check(label, 'pestaña "Ver estadísticas"', tab?.text === 'Ver estadísticas' && tab.href === statsHref, JSON.stringify(tab));
+      }
       await p.page.close();
     }
     // Accessibility page (footer link "Accesibilidad"): in Spanish (7.4, 09/11/2026)
@@ -794,6 +811,81 @@ async function run() {
     await common(label, p);
     check(label, 'sin encabezado de comunidad', !(await p.page.$('ds-uncp-comcol-header')));
     await browseList(label, p.page, '/browse/author', mobile);
+    await p.page.close();
+
+    // Statistics pages (14/11/2026): header with the green rule and a button back to the object, cards, chart of the
+    // visits per month in Spanish with its table, ranked lists; breadcrumbs with the object
+    for (const [kind, url, title, back, backHref] of [
+      ['ítem', `/statistics/items/${await uuidOf(ITEM)}`, null, 'Ver ítem', `/items/${await uuidOf(ITEM)}`],
+      ['comunidad', `/statistics/communities/${await uuidOf(COMMUNITY)}`, 'Arquitectura e Ingenierías', 'Ver la comunidad',
+        `/communities/${await uuidOf(COMMUNITY)}`],
+    ]) {
+      label = `estadísticas de ${kind} (${dev})`;
+      p = await open(browser, url, width);
+      await common(label, p);
+      await p.page.waitForSelector('.uncp-stats-kpi', { timeout: 30000 }).catch(() => {});
+      const st = await p.page.evaluate(() => ({
+        eyebrow: document.querySelector('.uncp-stats-eyebrow')?.textContent.trim(),
+        title: document.querySelector('.uncp-stats-title')?.textContent.trim(),
+        back: (() => { const a = document.querySelector('a.uncp-stats-back'); return a && { text: a.textContent.trim(), href: a.getAttribute('href'), outline: a.classList.contains('btn-outline-primary') }; })(),
+        kpis: [...document.querySelectorAll('.uncp-stats-kpi')].map((k) => k.querySelector('.uncp-stats-kpi-label').textContent.trim()),
+        bars: document.querySelectorAll('.uncp-stats-bar').length,
+        values: document.querySelectorAll('.uncp-stats-value').length,
+        axis: [...document.querySelectorAll('.uncp-stats-axis span')].map((x) => x.textContent.trim()),
+        rows: document.querySelectorAll('.uncp-stats-table tbody tr').length,
+        tableHidden: document.querySelector('.uncp-stats-table')?.classList.contains('sr-only'),
+        lists: [...document.querySelectorAll('.uncp-stats-card h2')].map((h) => h.textContent.trim()),
+        english: /\bviews\b|January|February|March|April|June|July|August|September|October|November|December/.test(document.querySelector('#main-content').innerText),
+        crumbs: [...document.querySelectorAll('.breadcrumb-item')].map((li) => li.textContent.trim()),
+        barColor: (() => { const b = document.querySelector('.uncp-stats-bar'); return b && getComputedStyle(b).backgroundColor; })(),
+        widths: (() => {
+          // a plain .container in the main area, as on the other pages
+          const probe = document.createElement('div');
+          probe.className = 'container';
+          document.querySelector('#main-content').appendChild(probe);
+          const w = [document.querySelector('.container.uncp-stats')?.getBoundingClientRect().width, probe.getBoundingClientRect().width].map(Math.round);
+          probe.remove();
+          return w;
+        })(),
+      }));
+      const itemTitle = kind === 'ítem' ? st.crumbs[st.crumbs.length - 2] : title;
+      check(label, 'encabezado con nombre', st.eyebrow && st.title && (!title || st.title === title), `${st.eyebrow} / ${st.title}`);
+      check(label, `botón "${back}" como el de vista sencilla`, st.back?.text === back && st.back.href === backHref && st.back.outline, JSON.stringify(st.back));
+      check(label, '3 tarjetas', st.kpis.length === 3 && st.kpis[0] === 'Visitas totales'
+        && st.kpis[1] === (kind === 'ítem' ? 'Descargas' : 'Mes con más visitas') && st.kpis[2] === 'Este mes', st.kpis.join(', '));
+      check(label, 'gráfico por mes en verde, con su tabla', st.bars > 0 && st.values === 1 && st.rows === st.bars && st.tableHidden
+        && st.barColor === GREEN, JSON.stringify({ bars: st.bars, values: st.values, rows: st.rows, color: st.barColor }));
+      check(label, 'mismo ancho que las demás páginas', st.widths[0] === st.widths[1], st.widths.join(' / '));
+      check(label, 'sin textos en inglés', !st.english && st.axis.every((m) => /^[a-zñé]{3,4}$/.test(m)), st.axis.join(' '));
+      if (kind === 'ítem') {
+        check(label, 'descargas por archivo', st.lists.includes('Descargas por archivo'), st.lists.join(', '));
+      }
+      check(label, 'migas de pan con el objeto', st.crumbs[0] === 'Inicio' && st.crumbs[st.crumbs.length - 1] === 'Estadísticas'
+        && st.crumbs.length >= 3 && (kind !== 'comunidad' || st.crumbs.includes(title)) && itemTitle === st.title, st.crumbs.join(' | '));
+      if (!mobile) {
+        await p.page.click('.uncp-stats-table-toggle');
+        const shown = await p.page.evaluate(() => !document.querySelector('.uncp-stats-table').classList.contains('sr-only'));
+        check(label, '"Ver como tabla" muestra la tabla', shown);
+      }
+      await p.page.close();
+    }
+    label = `estadísticas generales (${dev})`;
+    p = await open(browser, '/statistics', width);
+    await common(label, p);
+    await p.page.waitForSelector('.uncp-stats-rank li', { timeout: 30000 }).catch(() => {});
+    const rank = await p.page.evaluate(() => ({
+      title: document.querySelector('.uncp-stats-title')?.textContent.trim(),
+      rows: [...document.querySelectorAll('.uncp-stats-rank li')].map((li) => ({
+        pos: li.querySelector('.uncp-stats-pos').textContent.trim(), bg: getComputedStyle(li.querySelector('.uncp-stats-pos')).backgroundColor,
+        href: li.querySelector('a.uncp-stats-name')?.getAttribute('href'), width: li.querySelector('.uncp-stats-meter > div').style.width,
+      })),
+      english: /\bviews\b/.test(document.querySelector('#main-content').innerText),
+    }));
+    check(label, 'título "Documentos más visitados"', rank.title === 'Documentos más visitados', rank.title);
+    check(label, 'ranking de 10 con enlaces a los ítems', rank.rows.length === 10 && rank.rows.every((r, i) => r.pos === String(i + 1) && /^\/items\//.test(r.href))
+      && rank.rows[0].width === '100%', JSON.stringify(rank.rows.slice(0, 2)));
+    check(label, 'los 3 primeros en verde', rank.rows.slice(0, 3).every((r) => r.bg === GREEN) && rank.rows[3]?.bg !== GREEN, rank.rows.map((r) => r.bg).slice(0, 4).join(' '));
+    check(label, 'sin "views"', !rank.english);
     await p.page.close();
 
     // Item page and full item page

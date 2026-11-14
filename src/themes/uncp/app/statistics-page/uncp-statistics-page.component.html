@@ -1,0 +1,83 @@
+<!-- UNCP statistics page of an item, community or collection (14/11/2026); "kind" says which -->
+<div class="container uncp-stats">
+  <ng-container *ngVar="(scope$ | async) as scope">
+    <ng-container *ngIf="scope">
+      <p class="uncp-stats-eyebrow">{{ 'uncp.statistics.eyebrow.' + kind | translate }}</p>
+      <h1 class="uncp-stats-title" id="{{ scope.id }}">{{ displayName(scope) }}</h1>
+      <hr class="uncp-stats-rule">
+      <a class="btn btn-outline-primary uncp-stats-back" [routerLink]="backRoute(scope)">{{ 'uncp.statistics.back.' + kind | translate }}</a>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngVar="(view$ | async) as view">
+    <ds-themed-loading *ngIf="!view"></ds-themed-loading>
+    <ng-container *ngIf="view">
+      <div class="uncp-stats-kpis">
+        <div class="uncp-stats-kpi">
+          <span class="uncp-stats-kpi-label"><i class="fas fa-eye" aria-hidden="true"></i>{{ 'uncp.statistics.total-visits' | translate }}</span>
+          <span class="uncp-stats-kpi-value">{{ view.total | number:'1.0-0':'es-PE' }}</span>
+          <span class="uncp-stats-kpi-note">&nbsp;</span>
+        </div>
+        <div *ngIf="view.downloads !== undefined" class="uncp-stats-kpi">
+          <span class="uncp-stats-kpi-label"><i class="fas fa-download" aria-hidden="true"></i>{{ 'uncp.statistics.downloads' | translate }}</span>
+          <span class="uncp-stats-kpi-value">{{ view.downloads | number:'1.0-0':'es-PE' }}</span>
+          <span class="uncp-stats-kpi-note">{{ (view.files === 1 ? 'uncp.statistics.file' : 'uncp.statistics.files') | translate: { count: view.files } }}</span>
+        </div>
+        <div *ngIf="view.downloads === undefined && view.peak" class="uncp-stats-kpi">
+          <span class="uncp-stats-kpi-label"><i class="fas fa-arrow-trend-up" aria-hidden="true"></i>{{ 'uncp.statistics.peak-month' | translate }}</span>
+          <span class="uncp-stats-kpi-value">{{ view.peak.views | number:'1.0-0':'es-PE' }}</span>
+          <span class="uncp-stats-kpi-note">{{ view.peak.long }}</span>
+        </div>
+        <div *ngIf="view.current" class="uncp-stats-kpi">
+          <span class="uncp-stats-kpi-label"><i class="fas fa-calendar" aria-hidden="true"></i>{{ 'uncp.statistics.this-month' | translate }}</span>
+          <span class="uncp-stats-kpi-value">{{ view.current.views | number:'1.0-0':'es-PE' }}</span>
+          <span class="uncp-stats-kpi-note">{{ 'uncp.statistics.so-far' | translate: { month: view.current.long } }}</span>
+        </div>
+      </div>
+
+      <section *ngIf="view.months.length > 0" class="uncp-stats-card">
+        <h2>{{ 'uncp.statistics.per-month' | translate }}</h2>
+        <!-- the chart is for sighted readers; the table below has the same numbers (always there for screen readers) -->
+        <div class="uncp-stats-chart" aria-hidden="true">
+          <div *ngFor="let month of view.months" class="uncp-stats-col">
+            <span class="uncp-stats-tip">{{ 'uncp.statistics.visits-tip' | translate: { month: month.long, count: (month.views | number:'1.0-0':'es-PE') } }}</span>
+            <div class="uncp-stats-bar" [style.height.%]="month.height">
+              <span *ngIf="month.peak" class="uncp-stats-value">{{ month.views | number:'1.0-0':'es-PE' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="uncp-stats-axis" aria-hidden="true">
+          <span *ngFor="let month of view.months">{{ month.short }}</span>
+        </div>
+        <button type="button" class="btn btn-link uncp-stats-table-toggle" [attr.aria-expanded]="showTable" (click)="showTable = !showTable">
+          {{ (showTable ? 'uncp.statistics.hide-table' : 'uncp.statistics.show-table') | translate }}
+        </button>
+        <table class="table uncp-stats-table" [class.sr-only]="!showTable">
+          <caption class="sr-only">{{ 'uncp.statistics.per-month' | translate }}</caption>
+          <thead>
+            <tr><th scope="col">{{ 'uncp.statistics.table.month' | translate }}</th><th scope="col">{{ 'uncp.statistics.table.visits' | translate }}</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let month of view.months"><td>{{ month.long }}</td><td>{{ month.views | number:'1.0-0':'es-PE' }}</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section *ngFor="let list of view.lists" class="uncp-stats-card">
+        <h2>{{ 'statistics.table.title.' + list.type | translate }}</h2>
+        <ul class="uncp-stats-list">
+          <li *ngFor="let row of list.rows">
+            <i *ngIf="list.type === 'TotalDownloads'" class="fas fa-file-lines uncp-stats-file" aria-hidden="true"></i>
+            <div class="uncp-stats-grow">
+              <span class="uncp-stats-name">{{ row.label }}</span>
+              <div class="uncp-stats-meter" aria-hidden="true"><div [style.width.%]="row.width"></div></div>
+            </div>
+            <span class="uncp-stats-count">{{ row.views | number:'1.0-0':'es-PE' }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <p *ngIf="view.total === 0 && view.months.length === 0 && view.lists.length === 0">{{ 'statistics.page.no-data' | translate }}</p>
+    </ng-container>
+  </ng-container>
+</div>

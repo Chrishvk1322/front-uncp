@@ -86,6 +86,11 @@ import { ForbiddenComponent } from './app/forbidden/forbidden.component';
 import { PageInternalServerErrorComponent } from './app/page-internal-server-error/page-internal-server-error.component';
 import { CommunityListPageComponent } from './app/community-list-page/community-list-page.component';
 import { CommunityListComponent } from './app/community-list-page/community-list/community-list.component';
+import { ItemStatisticsPageComponent } from './app/statistics-page/item-statistics-page/item-statistics-page.component';
+import { CommunityStatisticsPageComponent } from './app/statistics-page/community-statistics-page/community-statistics-page.component';
+import { CollectionStatisticsPageComponent } from './app/statistics-page/collection-statistics-page/collection-statistics-page.component';
+import { SiteStatisticsPageComponent } from './app/statistics-page/site-statistics-page/site-statistics-page.component';
+import { ComcolPageBrowseByComponent } from './app/shared/comcol-page-browse-by/comcol-page-browse-by.component';
 
 const DECLARATIONS = [
   HomePageComponent,
@@ -112,6 +117,11 @@ const DECLARATIONS = [
   PageInternalServerErrorComponent,
   CommunityListPageComponent,
   CommunityListComponent,
+  ItemStatisticsPageComponent,
+  CommunityStatisticsPageComponent,
+  CollectionStatisticsPageComponent,
+  SiteStatisticsPageComponent,
+  ComcolPageBrowseByComponent,
 ];
 
 @NgModule({
