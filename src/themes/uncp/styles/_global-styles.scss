@@ -1318,3 +1318,109 @@ ds-browse-entry-list-element > div {
     }
   }
 }
+
+// UNCP info pages (14/11/2026): privacy statement, end user agreement and feedback. The title with the short green
+// rule of the other pages; the width of the theme's container like every other page (user request, 14/11/2026: a
+// reading column looked narrow); smaller section headings; the acceptance of the agreement in a light box; the
+// feedback form with the fields of the login form.
+.uncp-info {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+
+  h1 {
+    margin: 0 0 .75rem;
+    font-size: 2.1rem;
+    font-weight: 600;
+    color: #1f2d28;
+
+    // the short green rule under the title, as on the error, community and statistics pages
+    &::after {
+      content: '';
+      display: block;
+      width: 56px;
+      margin-top: .75rem;
+      border-top: 3px solid #067a5a;
+    }
+  }
+
+  h2 {
+    margin: 2rem 0 .6rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2d28;
+  }
+
+  p,
+  li {
+    line-height: 1.65;
+    color: #3d4a45;
+  }
+
+  ul {
+    padding-left: 1.25rem;
+  }
+
+  li {
+    margin-bottom: .3rem;
+  }
+
+  // long URLs in the text (the DSpace license link) break instead of widening the page on the phone
+  a {
+    color: #1f4e79;
+    overflow-wrap: anywhere;
+  }
+
+  .uncp-info-accept {
+    margin-top: 2.5rem;
+    padding: 1.25rem 1.5rem;
+    background: #f3f6f5;
+    border: 1px solid #e4e7e6;
+    border-radius: 14px;
+
+    .custom-control-label {
+      font-weight: 600;
+      color: #1f2d28;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+      background-color: #067a5a;
+      border-color: #067a5a;
+    }
+
+    .uncp-info-submit {
+      margin-top: 0;
+      padding: .45rem 1.5rem;
+    }
+  }
+}
+
+// feedback: the fields in a white card
+.uncp-info.uncp-info-form {
+
+  .uncp-info-lead {
+    margin-bottom: 1.5rem;
+    color: #5b6b65;
+  }
+
+  .uncp-info-card {
+    padding: 1.5rem;
+    background: #fff;
+    border: 1px solid #e4e7e6;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(31, 45, 40, .04), 0 6px 16px rgba(31, 45, 40, .05);
+  }
+
+  textarea.form-control {
+    resize: vertical;
+  }
+
+  .form-control[readonly] {
+    color: #5b6b65;
+    background-color: #f3f6f5;
+  }
+
+  .uncp-info-error {
+    margin: -.4rem 0 .75rem;
+    font-size: .85rem;
+  }
+}

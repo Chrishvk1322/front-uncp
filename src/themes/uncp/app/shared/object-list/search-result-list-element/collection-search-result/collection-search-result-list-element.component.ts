@@ -10,7 +10,7 @@ import {
 } from '../../../../../../../app/shared/object-list/search-result-list-element/collection-search-result/collection-search-result-list-element.component';
 import { LinkService } from '../../../../../../../app/core/cache/builders/link.service';
 import { Community } from '../../../../../../../app/core/shared/community.model';
-import { uncpCareer, uncpCareerStyle, uncpDisplayName } from '../../../uncp-communities';
+import { uncpCareerStyle, uncpDisplayName, uncpInheritedCareer } from '../../../uncp-communities';
 import { uncpCollectionCard } from '../../../uncp-collection-cards';
 import { uncpParent$ } from '../../../uncp-parent';
 
@@ -40,7 +40,7 @@ export class CollectionSearchResultListElementComponent extends BaseComponent im
     this.icon = uncpCollectionCard(this.dso.uuid, this.dsoNameService.getName(this.dso)).icon;
     this.title = uncpDisplayName(this.dsoTitle);
     this.parent$ = uncpParent$(this.dso, this.linkService);
-    this.careerStyle$ = this.parent$.pipe(map((parent) => uncpCareerStyle(parent ? uncpCareer(parent.uuid) : null)));
+    this.careerStyle$ = this.parent$.pipe(map((parent) => uncpCareerStyle(parent ? uncpInheritedCareer(parent.uuid) : null)));
   }
 
   parentName(parent: Community | null): string | null {

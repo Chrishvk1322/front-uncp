@@ -119,7 +119,7 @@ export interface UncpCareer {
 /**
  * The professional careers (subcommunities) with an official color, by UUID. Colors given by the repository
  * team (faculty 1 on 27/10/2026, faculties 2 to 5 on 28/10/2026); icons chosen with them (design A, 28/10/2026).
- * Not listed yet (color pending): the faculties 6, 7 and 8, which have no careers. Shown as a solid circle in the official
+ * The faculties 6, 7 and 8 have no careers: see UNCP_FACULTY_COLLECTION_COLORS. Shown as a solid circle in the official
  * color with the career icon, on the career card and on the header of the career pages (and of its
  * collections). Careers not listed keep the icon of their faculty on the neutral circle.
  */
@@ -224,6 +224,26 @@ export function uncpCareer(uuid: string): UncpCareer | undefined {
 }
 
 /**
+ * The faculties without careers (6, 7 and 8), whose collections hang directly from them: the color of their
+ * original production icon (assets/icons/6.png, 7.png, 8.png; user request 14/11/2026) and the faculty icon.
+ * Only their collections (cards, headers, community list, search results) take it: the faculty itself keeps the
+ * solid green circle of every faculty.
+ */
+export const UNCP_FACULTY_COLLECTION_COLORS: Record<string, UncpCareer> = {
+  'f1b1550f-8be8-4f7d-bfe9-57686478ac3c': { color: '#615FFF', icon: 'fa-graduation-cap' }, // 6. Tesis de pre y posgrado para Evaluación
+  'b352a329-fe14-4186-b024-8e882173205a': { color: '#F6339A', icon: 'fa-book' }, // 7. Libros de investigación
+  'dd970c15-b58a-4c5e-b75a-d4e4e736d43c': { color: '#00BBA7', icon: 'fa-newspaper' }, // 8. Artículos Científicos en Revistas Indizadas
+};
+
+/**
+ * The color a collection takes from a community above it: the community's career, or the color of a faculty
+ * without careers (6, 7 and 8)
+ */
+export function uncpInheritedCareer(uuid: string): UncpCareer | undefined {
+  return UNCP_CAREERS[uuid] ?? UNCP_FACULTY_COLLECTION_COLORS[uuid];
+}
+
+/**
  * The career a community or collection belongs to (the career itself, or the career in its breadcrumbs), or
  * null when it doesn't belong to one with an official color
  * @param uuid         UUID of the community or collection of the current page
@@ -231,8 +251,10 @@ export function uncpCareer(uuid: string): UncpCareer | undefined {
  */
 export function uncpCareer$(uuid: string, breadcrumbs$: Observable<Breadcrumb[]>): Observable<UncpCareer | null> {
   const own = uncpCareer(uuid);
+  // the communities above it (not itself, so a faculty 6-8 keeps the green faculty circle on its own page)
   return own ? of(own) : breadcrumbCommunities$(uuid, breadcrumbs$).pipe(
-    map((uuids) => uuids.map((communityUuid) => uncpCareer(communityUuid)).find((career) => !!career) ?? null),
+    map((uuids) => uuids.filter((communityUuid) => communityUuid !== uuid)
+      .map((communityUuid) => uncpInheritedCareer(communityUuid)).find((career) => !!career) ?? null),
     startWith(null),
   );
 }

@@ -1,0 +1,27 @@
+<div class="uncp-info uncp-info-form">
+  <h1>{{ 'info.feedback.head' | translate }}</h1>
+  <p class="uncp-info-lead">{{ 'info.feedback.info' | translate }}</p>
+  <form [formGroup]="feedbackForm" (ngSubmit)="createFeedback()" class="uncp-auth-form uncp-info-card">
+    <label class="uncp-auth-label" for="email">{{ 'info.feedback.email-label' | translate }}</label>
+    <input id="email" class="form-control" name="email" type="email" value="" formControlName="email" autocomplete="email"
+           [class.is-invalid]="feedbackForm.controls.email.invalid && (feedbackForm.controls.email.dirty || feedbackForm.controls.email.touched)">
+    <p class="uncp-auth-hint">{{ 'info.feedback.email_help' | translate }}</p>
+    <div *ngIf="feedbackForm.controls.email.invalid && (feedbackForm.controls.email.dirty || feedbackForm.controls.email.touched)" class="uncp-info-error">
+      <ds-error *ngIf="feedbackForm.controls.email.errors?.required" message="{{'info.feedback.error.email.required' | translate}}"></ds-error>
+      <ds-error *ngIf="feedbackForm.controls.email.errors?.pattern" message="{{'info.feedback.error.email.required' | translate}}"></ds-error>
+    </div>
+
+    <label class="uncp-auth-label" for="comments">{{ 'info.feedback.comments' | translate }}</label>
+    <textarea id="comments" formControlName="message" class="form-control" name="message" rows="6"
+              [class.is-invalid]="feedbackForm.controls.message.invalid && (feedbackForm.controls.message.dirty || feedbackForm.controls.message.touched)"></textarea>
+    <div *ngIf="feedbackForm.controls.message.invalid && (feedbackForm.controls.message.dirty || feedbackForm.controls.message.touched)" class="uncp-info-error">
+      <ds-error *ngIf="feedbackForm.controls.message.errors?.required" message="{{'info.feedback.error.message.required' | translate}}"></ds-error>
+    </div>
+
+    <label class="uncp-auth-label" for="page">{{ 'info.feedback.page-label' | translate }}</label>
+    <input id="page" readonly class="form-control" name="page" type="text" value="" formControlName="page">
+    <p class="uncp-auth-hint">{{ 'info.feedback.page_help' | translate }}</p>
+
+    <button [dsBtnDisabled]="!feedbackForm.valid" class="btn btn-block uncp-auth-submit" name="submit" type="submit">{{ 'info.feedback.send' | translate }}</button>
+  </form>
+</div>

@@ -91,6 +91,9 @@ import { CommunityStatisticsPageComponent } from './app/statistics-page/communit
 import { CollectionStatisticsPageComponent } from './app/statistics-page/collection-statistics-page/collection-statistics-page.component';
 import { SiteStatisticsPageComponent } from './app/statistics-page/site-statistics-page/site-statistics-page.component';
 import { ComcolPageBrowseByComponent } from './app/shared/comcol-page-browse-by/comcol-page-browse-by.component';
+import { PrivacyComponent } from './app/info/privacy/privacy.component';
+import { EndUserAgreementComponent } from './app/info/end-user-agreement/end-user-agreement.component';
+import { FeedbackFormComponent } from './app/info/feedback/feedback-form/feedback-form.component';
 
 const DECLARATIONS = [
   HomePageComponent,
@@ -122,6 +125,9 @@ const DECLARATIONS = [
   CollectionStatisticsPageComponent,
   SiteStatisticsPageComponent,
   ComcolPageBrowseByComponent,
+  PrivacyComponent,
+  EndUserAgreementComponent,
+  FeedbackFormComponent,
 ];
 
 @NgModule({

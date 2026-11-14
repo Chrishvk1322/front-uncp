@@ -35,6 +35,8 @@ const BASE = process.env.BASE || 'http://localhost:8080';
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.31 Safari/537.36';
 const SERVER_IP = '38.43.155.155';
 const GREEN = 'rgb(6, 122, 90)';
+// collections of the faculties without careers (6-8): color of their original icon (14/11/2026)
+const FACULTY_COLLECTION_COLORS = { libros: 'rgb(246, 51, 154)' };
 const BLUE = 'rgb(31, 78, 121)';
 // Careers (UNCP_CAREERS): solid circle in the official color, own icon, white or charcoal glyph
 const WHITE = 'rgb(255, 255, 255)';
@@ -762,6 +764,73 @@ async function run() {
     check(label, 'colecciones con su icono de nivel en el color de la carrera', collections.length > 0
       && collections.some((c) => c.name === 'Pregrado' && /fa-graduation-cap/.test(c.glyph))
       && collections.every((c) => c.bg === CAREER['Ingeniería de Sistemas'].tint), JSON.stringify(collections));
+    // in the order of the career page: Pregrado first, then the postgraduate levels (14/11/2026)
+    const levels = collections.map((c) => c.name);
+    const at = (name) => levels.indexOf(name);
+    check(label, 'colecciones: Pregrado primero, luego posgrado', at('Pregrado') === 0
+      && (at('Doctorado') < 0 || at('Doctorado') > Math.max(0, at('Maestría'))), levels.join(', '));
+    // faculties without careers (6-8): their collections in the color of the original icon (14/11/2026)
+    await (await p.page.$$('.uncp-tree-level-0'))[6].$eval(':scope > .uncp-tree-row .uncp-tree-toggle', (t) => t.click());
+    await settle(p.page);
+    const books = (await rowLook('.uncp-tree-level-1')).filter((c) => c.bg === FACULTY_COLLECTION_COLORS.libros);
+    check(label, 'colecciones de "Libros de investigación" en rosa', books.length > 0, JSON.stringify(books.map((b) => b.name)));
+    await p.page.close();
+
+    // Collections of a faculty without careers (7. Libros de investigación): cards in pink, faculty header not
+    label = `facultad sin carreras (${dev})`;
+    p = await open(browser, '/communities/b352a329-fe14-4186-b024-8e882173205a', width);
+    await common(label, p);
+    const facultyColors = await p.page.evaluate(() => ({
+      header: (() => { const i = document.querySelector('.uncp-comcol-icon'); return i && getComputedStyle(i).backgroundColor; })(),
+      cards: [...document.querySelectorAll('.uncp-comcol-card .uncp-community-icon')].map((i) => getComputedStyle(i).backgroundColor),
+    }));
+    check(label, 'tarjetas de colección en el color original (rosa)', facultyColors.cards.length > 0
+      && facultyColors.cards.every((c) => c === FACULTY_COLLECTION_COLORS.libros), JSON.stringify(facultyColors.cards));
+    check(label, 'la facultad mantiene su círculo sin el color', facultyColors.header !== FACULTY_COLLECTION_COLORS.libros, facultyColors.header);
+    await p.page.close();
+
+    // Info pages (14/11/2026): title with the green rule, reading column; feedback with the login fields
+    for (const [path, title] of [['/info/privacy', 'Declaración de privacidad'], ['/info/end-user-agreement', 'Acuerdo de usuario final']]) {
+      label = `página ${path} (${dev})`;
+      p = await open(browser, path, width);
+      await common(label, p);
+      const info = await p.page.evaluate(() => {
+        const h1 = document.querySelector('.uncp-info h1');
+        const text = document.querySelector('.uncp-info ds-privacy-content, .uncp-info ds-end-user-agreement-content');
+        // a plain .container in the main area, as on the other pages
+        const probe = document.createElement('div');
+        probe.className = 'container';
+        document.querySelector('#main-content').appendChild(probe);
+        const container = Math.round(probe.getBoundingClientRect().width - parseFloat(getComputedStyle(probe).paddingLeft) * 2);
+        probe.remove();
+        const save = document.querySelector('#button-save');
+        return { title: h1?.textContent.trim(), rule: h1 && getComputedStyle(h1, '::after').borderTopColor,
+          width: text && Math.round(text.getBoundingClientRect().width), container, save: save && getComputedStyle(save).backgroundColor };
+      });
+      check(label, `título "${title}" con línea verde`, info.title === title && info.rule === GREEN, JSON.stringify(info));
+      check(label, 'mismo ancho que las demás páginas', info.width > 0 && Math.abs(info.width - info.container) <= 1, `${info.width}px / ${info.container}px`);
+      if (path === '/info/end-user-agreement') {
+        check(label, 'botón "Guardar" en verde', info.save === GREEN, info.save);
+      }
+      await p.page.close();
+    }
+    label = `sugerencias (${dev})`;
+    p = await open(browser, '/info/feedback', width);
+    await common(label, p);
+    const fb = await p.page.evaluate(() => {
+      const button = document.querySelector('.uncp-info form .uncp-auth-submit');
+      return { title: document.querySelector('.uncp-info h1')?.textContent.trim(),
+        labels: [...document.querySelectorAll('.uncp-info .uncp-auth-label')].map((l) => l.textContent.trim()),
+        text: button?.textContent.trim(), opacity: button && getComputedStyle(button).opacity, bg: button && getComputedStyle(button).backgroundColor };
+    });
+    check(label, 'título y etiquetas', fb.title === 'Sugerencias' && fb.labels.join('|') === 'Su correo electrónico|Comentarios|Página', JSON.stringify(fb));
+    check(label, 'botón "Enviar sugerencia" verde y atenuado mientras falta llenar', fb.text === 'Enviar sugerencia' && fb.bg === GREEN && fb.opacity === '0.45', JSON.stringify(fb));
+    // filled in, never sent (the read-only proxy blocks it anyway): full green
+    await p.page.fill('#email', 'prueba@example.com');
+    await p.page.fill('#comments', 'Comentario de prueba');
+    await p.page.waitForTimeout(300);
+    const ready = await p.page.$eval('.uncp-info form .uncp-auth-submit', (b) => getComputedStyle(b).opacity);
+    check(label, 'con los datos llenos, el botón pasa a verde intenso', ready === '1', ready);
     await p.page.close();
 
     // Error pages 404, 403 and 500: option C without the code label (10/11/2026). They answer with their own status.

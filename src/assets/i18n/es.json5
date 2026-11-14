@@ -3022,13 +3022,13 @@
   "info.end-user-agreement.hosting-country": "los Estados Unidos de América",
 
   // "info.privacy.breadcrumbs": "Privacy Statement",
-  "info.privacy.breadcrumbs": "Declaracion de privacidad",
+  "info.privacy.breadcrumbs": "Declaración de privacidad",
 
   // "info.privacy.head": "Privacy Statement",
-  "info.privacy.head": "Declaracion de privacidad",
+  "info.privacy.head": "Declaración de privacidad",
 
   // "info.privacy.title": "Privacy Statement",
-  "info.privacy.title": "Declaracion de privacidad",
+  "info.privacy.title": "Declaración de privacidad",
 
   // "info.feedback.breadcrumbs": "Feedback",
   "info.feedback.breadcrumbs": "Sugerencias",
@@ -3046,7 +3046,7 @@
   "info.feedback.email_help": "Esta dirección se usará para el seguimiento de su sugerencia.",
 
   // "info.feedback.send": "Send Feedback",
-  "info.feedback.send": "Envíar sugerencia",
+  "info.feedback.send": "Enviar sugerencia",
 
   // "info.feedback.comments": "Comments",
   "info.feedback.comments": "Comentarios",
@@ -3058,7 +3058,7 @@
   "info.feedback.create.success": "Envío exitoso de sugerencia",
 
   // "info.feedback.error.email.required": "A valid email address is required",
-  "info.feedback.error.email.required": "se requiere una dirección válida de correo electrónico",
+  "info.feedback.error.email.required": "Se requiere una dirección válida de correo electrónico",
 
   // "info.feedback.error.message.required": "A comment is required",
   "info.feedback.error.message.required": "Se requiere un comentario",

@@ -6,7 +6,7 @@ import { fadeIn } from '../../../../../app/shared/animations/fade';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { Collection } from '../../../../../app/core/shared/collection.model';
 import { BreadcrumbsService } from '../../../../../app/breadcrumbs/breadcrumbs.service';
-import { uncpCareer$, uncpCareerStyle } from '../../shared/uncp-communities';
+import { uncpCareer$, uncpCareerStyle, UNCP_FACULTY_COLLECTION_COLORS } from '../../shared/uncp-communities';
 import { UncpCollectionCard, uncpCollectionCard } from '../../shared/uncp-collection-cards';
 import { UNCP_COMCOL_PAGE_SIZE } from '../sub-community-list/community-page-sub-community-list.component';
 
@@ -44,6 +44,9 @@ export class CommunityPageSubCollectionListComponent extends BaseComponent imple
   ngOnInit(): void {
     this.pageSize = this.pageSize ?? UNCP_COMCOL_PAGE_SIZE;
     super.ngOnInit();
-    this.careerStyle$ = uncpCareer$(this.community.uuid, this.breadcrumbsService.breadcrumbs$).pipe(map(uncpCareerStyle));
+    // the career of this community, or the color of a faculty without careers (6-8) whose collections these are
+    this.careerStyle$ = uncpCareer$(this.community.uuid, this.breadcrumbsService.breadcrumbs$).pipe(
+      map((career) => uncpCareerStyle(career ?? UNCP_FACULTY_COLLECTION_COLORS[this.community.uuid])),
+    );
   }
 }

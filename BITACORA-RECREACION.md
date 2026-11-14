@@ -391,7 +391,10 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
             - Sociología: `fa-users`;
             - Trabajo Social: `fa-hands-holding-child`.
         - **Icono en carbón** (el blanco no llega a 3:1): `#FCDD18`, `#F9C114`, `#E37909`, `#F07F06`, `#63B23F`, `#55A5A6`, `#5FC3EE`, `#53C9E3`. Todos los demás llevan el icono en blanco.
-        - **Pendientes de color**: las facultades 6, 7 y 8 no tienen carreras, solo colecciones, y quedan con el aspecto neutro. Las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. Los textos en inglés de serie de "Por categoría" se tradujeron el 09/11/2026 (ver 7.4).
+        - **Facultades 6, 7 y 8** (14/11/2026, pedido del usuario): no tienen carreras, solo colecciones. Sus colecciones toman el color del icono PNG original de producción: 6 → `#615FFF` (índigo), 7 → `#F6339A` (rosa), 8 → `#00BBA7` (turquesa), en `UNCP_FACULTY_COLLECTION_COLORS` (`uncp-communities.ts`).
+          - Se aplica a las tarjetas de la página de la facultad, al encabezado de sus colecciones, a la lista de comunidades y a los resultados de búsqueda; para eso se usa `uncpInheritedCareer()`.
+          - La facultad conserva su círculo de facultad: `uncpCareer$` ya no mira la propia comunidad entre sus ancestros, y estas facultades no se agregaron a `UNCP_CAREERS`.
+        - **Siguen sin color:** las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. Los textos en inglés de serie de "Por categoría" se tradujeron el 09/11/2026 (ver 7.4).
     - **búsqueda, filtros laterales** (05/11/2026). Se mostraron dos opciones: tarjetas (A) y panel único (B), con vistas previas en `pwtool/filtersopts.js`. El usuario no eligió ninguna; se mantuvo el diseño de serie con 3 ajustes, en `styles/_global-styles.scss`:
       - **foco**: al abrir un filtro con el "+" (o con el teclado), la tarjeta muestra un **contorno verde suave** `rgba(6,122,90,.35)` en lugar del gris de serie. Primero se había quitado el contorno; el usuario aclaró que lo que quería era cambiarlo a verde;
       - **"Mostrar más/menos"**: azul `#1F4E79` y sin subrayado, que solo aparece al pasar el mouse. Lleva `!important`, porque los componentes de filtro lo imponen con selectores encapsulados más específicos;
@@ -460,13 +463,21 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
       - Facultades (nivel 0): filas tipo tarjeta blancas con borde `#e4e7e6`, círculo verde sólido con el icono de `UNCP_TOP_COMMUNITIES`, nombre sin número y la descripción breve (2 líneas como máximo); borde verde y sombra al pasar el mouse.
       - Carreras y colecciones: sangradas con una guía vertical suave (`border-left` 2px), fondo `#f3f6f5` al pasar el mouse. Las carreras tienen el color oficial (`UNCP_CAREERS`) o, si no lo tienen, el icono de su facultad. Las colecciones muestran el nivel ("Pregrado", con el nombre completo debajo, de `uncpCollectionCard`) y su icono en el color de la carrera más cercana.
       - Flechas que giran 90° al abrir (sin el recuadro negro de serie), enlaces en azul `#1f4e79`, `aria-expanded`, y "Desplegar/Contraer {{ name }}" traducidos en `es.json5`.
-      - Estilos `.uncp-tree*` en `_global-styles.scss`. Las colecciones salen en el orden del árbol de serie (alfabético: Doctorado, Maestría, Pregrado), no en el de la página de la carrera.
+      - Estilos `.uncp-tree*` en `_global-styles.scss`. **Orden de las colecciones** (14/11/2026, pedido del usuario): como en la página de la carrera, Pregrado primero y luego los posgrados (Segunda Especialidad, Maestría, Doctorado); el resto va después, alfabéticamente. El servicio de serie las entrega en orden alfabético. `uncpSortTreeCollections()` reordena solo las colecciones consecutivas de un mismo padre, envolviendo el `connect` de la fuente de datos del árbol en `ngOnInit`: `expandedNodes` es privado en la clase base, así que su `ngOnInit` no se puede reescribir.
       - Pruebas: "lista de comunidades" (escritorio y celular): las 8 facultades sin número y con icono verde, enlaces azules, botón en español, flecha que gira, colores de Sistemas y Civil, y colecciones de Sistemas con su icono en el color de la carrera.
       - **Portada y lista unificadas** (13/11/2026, pedido del usuario):
         - **Color:** el círculo verde sólido de las facultades se define una sola vez, en `.uncp-community-icon.uncp-faculty-icon` (`_global-styles.scss`). Lo usan las tarjetas de la portada y las filas de facultad del árbol; se quitaron las dos reglas duplicadas.
         - **Nombres:** las tarjetas de la portada toman el nombre de DSpace sin número (`names$` en `top-level-community-list.component.ts`, con `findTop` de hasta 50 comunidades). Un cambio de nombre hecho desde la administración de DSpace se ve en la portada y en la lista. El `title` de `UNCP_TOP_COMMUNITIES` queda solo como respaldo mientras llega el nombre, y se igualó a los nombres actuales de DSpace ("Arquitectura e Ingenierías", "Ciencias Administrativas, Contables y Económicas", "Libros de investigación").
         - Pruebas: "nombres de DSpace sin número" (portada), "mismos nombres que las tarjetas de la portada" y "mismo color de círculo que la portada" (lista).
-    - **páginas informativas** (`/info/privacy`, `/info/end-user-agreement`, `/info/feedback`; ver 7.10);
+    - **páginas informativas** (hechas el 14/11/2026; `/info/privacy`, `/info/end-user-agreement`, `/info/feedback`; ver 7.10):
+      - `app/info/privacy/`, `app/info/end-user-agreement/` y `app/info/feedback/feedback-form/`, declarados en `lazy-theme.module.ts`. Estilos en `.uncp-info` (`_global-styles.scss`).
+      - **Privacidad y acuerdo de usuario:**
+        - el título con la línea verde corta (un `::after` sobre el `h1` del contenido de serie), subtítulos más chicos y el interlineado amplio;
+        - el ancho del contenedor del tema, como las demás páginas (pedido del usuario, 14/11/2026). Al principio tenían una columna de lectura de 50rem, y el formulario de sugerencias una de 40rem;
+        - en el acuerdo, la aceptación va en un recuadro gris claro, con la casilla verde y los botones "Cancelar" (`btn-outline-primary`) y "Guardar" (verde, atenuado hasta marcar la casilla).
+      - **Sugerencias** ("Contacto", "Soporte Técnico" y "FAQ" del pie): el título con la línea verde y el formulario en una tarjeta blanca, con los campos y el botón del inicio de sesión (`.uncp-auth-form`, `.uncp-auth-submit`), atenuado mientras falta llenar. Con el proxy en solo lectura el envío se bloquea, así que en local solo se revisa cómo se ve.
+      - **Textos:** "Declaracion" → "Declaración", "Envíar" → "Enviar", y el error del correo con mayúscula inicial.
+      - **Pendiente de contenido:** los textos de privacidad y del acuerdo son los de ejemplo de DSpace, en inglés y escritos para una empresa genérica ("Company", "los Estados Unidos de América"). La UNCP debe entregar sus textos reales; no se tradujeron porque no son su política.
     - **inicio de sesión, registro y recuperación de clave** (hechos el 09/11/2026):
       - Elegida la opción A (tarjeta centrada) con las etiquetas de la opción C y el foco verde suave de la vista "A-foco"; vistas previas en `pwtool/loginopts.js`.
       - **Estilos compartidos** `.uncp-auth-*` en `_global-styles.scss` (tarjeta, logo, título, subtítulo, formulario, etiqueta, ayuda, botón y enlaces). El botón deshabilitado necesita su propio color de fondo, porque `.btn-primary.disabled` de serie lo pintaba gris oscuro.
@@ -583,7 +594,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - **Requiere el servidor con `DSPACE_UI_RATELIMITER_MAX=10000`** (ver "Compilar y levantar"); si no, aparecen 429.
   - Verificada con cuatro corridas seguidas: 744/744 en todas.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 14/11/2026: **861/861 correctas** (antes 850, 778, 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 14/11/2026: **933/933 correctas** (antes 861, 850, 778, 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash
@@ -612,7 +623,7 @@ rm -rf dist .angular/cache
 NODE_OPTIONS="--max-old-space-size=10240" yarn run build:prod     # build:prod, NO build:ssr directo
 
 # en llamadas separadas:
-node ~/.local/dspace-dev-proxy/proxy.js &
+REMOTE=https://repositorio.uncp.edu.pe READ_ONLY=1 setsid nohup node ~/.local/dspace-dev-proxy/proxy.js > ~/.local/dspace-dev-proxy/logs/proxy.log 2>&1 < /dev/null &   # producción, solo lectura (ver más abajo); sin REMOTE apunta a demo.dspace.org
 DSPACE_UI_RATELIMITER_MAX=10000 DSPACE_REST_SSL=false DSPACE_REST_HOST=localhost DSPACE_REST_PORT=8080 DSPACE_REST_NAMESPACE=/server \
   NODE_OPTIONS="--max-old-space-size=4096" setsid nohup node dist/server/main > ~/.local/dspace-dev-proxy/logs/ssr.log 2>&1 < /dev/null &
 # abrir http://localhost:8080  (no el 4000)
