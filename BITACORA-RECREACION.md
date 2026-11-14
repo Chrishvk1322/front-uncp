@@ -421,7 +421,19 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
       - **Corrección**: `#main-content { min-height: calc(100vh - 150px) }` (header y migas de pan). En páginas cortas, el pie queda justo debajo del borde de la pantalla.
       - **Verificación**: la suite graba la carga de 4 páginas (home, búsqueda, comunidad, ítem) y cuenta los cuadros con la mitad superior oscura (`darkFlashFrames`). Con la corrección hay 0; sin ella, 6 a 8 por carga.
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
-    - **navegación** (`/browse/...`: por autor, materia, fecha, título);
+    - **navegación** (`/browse/...`: por autor, materia, fecha, título), hecha el 14/11/2026:
+      - **Decisión del usuario:** no se agregan enlaces a la navegación general (ni en el pie ni en el menú). La búsqueda (`/search`) ya filtra por autor, fecha y materia, y cada comunidad o colección tiene su propio "Examinar por…". Las páginas `/browse/*` siguen existiendo para quien llegue desde Google o un enlace antiguo. Se descartaron el encabezado "Explorar el repositorio" y las pestañas generales (vistas previas en `pwtool/browseopts.js`).
+      - **Lista de valores** (por autor y por materia; general y dentro de comunidades y colecciones, que usan el mismo componente). Estilos en `_global-styles.scss`, vista previa en `pwtool/browsescope.js`:
+        - filas compactas con una línea fina `#edf1ef`;
+        - nombres en azul `#1f4e79`;
+        - la cantidad en una pastilla gris `#f1f4f3` a la derecha;
+        - en escritorio, dos columnas que se leen de arriba abajo (`column-count: 2`, como un índice impreso); en celular, una sola.
+      - **Especificidad:** la regla de margen 0 de las filas usa `li[class]`. Sin una clase, pierde contra `.mt-4`/`.mb-4` de Bootstrap, que también son `!important`.
+      - **Textos del campo:**
+        - `app/shared/starts-with/text/` (en `ENTRY_COMPONENTS`) reemplaza al campo de serie con `@renderStartsWithFor(StartsWithType.text)`. Toma el índice de la ruta `/browse/:id` y usa `uncp.browse.startsWith.<author|title|subject|default>.placeholder/.hint`, por ejemplo "Primeras letras del autor" y "Por ejemplo: «Quis» para Quispe".
+        - En la fecha, `browse.startsWith.type_date` dice "o escriba un año, por ejemplo 2019".
+        - Las tarjetas de ítem de fecha y título no cambian.
+      - **Pruebas:** en las pestañas de comunidad, la subcomunidad, la colección y la navegación general se comprueba el texto del campo. En autor y materia se comprueban además la pastilla gris, las filas compactas y dos columnas de arriba abajo en escritorio (una en celular).
     - **lista de comunidades** (`/community-list`, hecha el 12/11/2026; el usuario pidió aplicarla sin vistas previas):
       - `app/community-list-page/` (página: título "Comunidades" con la línea verde corta de las páginas de error) y `app/community-list-page/community-list/` (árbol), declarados en `lazy-theme.module.ts`. El árbol extiende la clase de serie: conserva la carga por partes, "Mostrar más" y el estado de nodos abiertos.
       - Facultades (nivel 0): filas tipo tarjeta blancas con borde `#e4e7e6`, círculo verde sólido con el icono de `UNCP_TOP_COMMUNITIES`, nombre sin número y la descripción breve (2 líneas como máximo); borde verde y sombra al pasar el mouse.
@@ -550,7 +562,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - **Requiere el servidor con `DSPACE_UI_RATELIMITER_MAX=10000`** (ver "Compilar y levantar"); si no, aparecen 429.
   - Verificada con cuatro corridas seguidas: 744/744 en todas.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 13/11/2026: **750/750 correctas** (antes 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 14/11/2026: **778/778 correctas** (antes 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

@@ -1353,7 +1353,7 @@
   "browse.startsWith.submit": "Examinar",
 
   // "browse.startsWith.type_date": "Filter results by date",
-  "browse.startsWith.type_date": "Resultados por fecha",
+  "browse.startsWith.type_date": "o escriba un año, por ejemplo 2019",
 
   // "browse.startsWith.type_date.label": "Or type in a date (year-month) and click on the Browse button",
   "browse.startsWith.type_date.label": "O escriba una fecha (año-mes) y haga clic en el botón Examinar",
@@ -8386,6 +8386,16 @@
   "uncp.error.search-placeholder": "Buscar tesis, artículos, autores…",
   "uncp.error.home": "Volver al inicio",
   "uncp.error.communities": "Explorar comunidades",
+
+  // UNCP: "starts with" field of the browse pages, per index (14/11/2026)
+  "uncp.browse.startsWith.author.placeholder": "Primeras letras del autor",
+  "uncp.browse.startsWith.author.hint": "Por ejemplo: «Quis» para Quispe",
+  "uncp.browse.startsWith.title.placeholder": "Primeras letras del título",
+  "uncp.browse.startsWith.title.hint": "Por ejemplo: «Dise» para Diseño",
+  "uncp.browse.startsWith.subject.placeholder": "Primeras letras de la materia",
+  "uncp.browse.startsWith.subject.hint": "Por ejemplo: «Agua» para Agua potable",
+  "uncp.browse.startsWith.default.placeholder": "Primeras letras",
+  "uncp.browse.startsWith.default.hint": "Escriba las primeras letras y pulse Examinar",
 
   // "search-facet-option.update.announcement": "The page will be reloaded. Filter {{ filter }} is selected.",
   "search-facet-option.update.announcement": "La página será recargada. Filtro {{ filter }} seleccionado.",

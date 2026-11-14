@@ -877,7 +877,7 @@
 
   "browse.startsWith.submit": "Browse",
 
-  "browse.startsWith.type_date": "Filter results by date",
+  "browse.startsWith.type_date": "or type a year, for example 2019",
 
   "browse.startsWith.type_date.label": "Or type in a date (year-month) and click on the Browse button",
 
@@ -5500,6 +5500,15 @@
   "uncp.error.search-placeholder": "Search theses, articles, authors…",
   "uncp.error.home": "Back to home",
   "uncp.error.communities": "Explore communities",
+
+  "uncp.browse.startsWith.author.placeholder": "First letters of the author",
+  "uncp.browse.startsWith.author.hint": "For example: «Quis» for Quispe",
+  "uncp.browse.startsWith.title.placeholder": "First letters of the title",
+  "uncp.browse.startsWith.title.hint": "For example: «Dise» for Diseño",
+  "uncp.browse.startsWith.subject.placeholder": "First letters of the subject",
+  "uncp.browse.startsWith.subject.hint": "For example: «Agua» for Agua potable",
+  "uncp.browse.startsWith.default.placeholder": "First letters",
+  "uncp.browse.startsWith.default.hint": "Type the first letters and press Browse",
 
   "search-facet-option.update.announcement": "The page will be reloaded. Filter {{ filter }} is selected.",
 

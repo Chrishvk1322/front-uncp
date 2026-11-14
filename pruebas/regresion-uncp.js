@@ -70,6 +70,39 @@ function check(page, name, ok, detail = '') {
  * changes for 400ms, at most 10s; attribute changes such as the home carousel do not count). It replaced fixed waits
  * of 5-6s that made the suite take 12 minutes.
  */
+
+// Browse field and list of values (14/11/2026): placeholder per index; author/subject lists with gray count pills, in
+// two columns read top to bottom on desktop and one column on the phone
+const PLACEHOLDERS = {
+  author: 'Primeras letras del autor', title: 'Primeras letras del título', subject: 'Primeras letras de la materia',
+  dateissued: 'o escriba un año, por ejemplo 2019',
+};
+async function browseList(label, page, url, mobile) {
+  const id = (url.match(/\/browse\/([^?]+)/) || [])[1];
+  if (!PLACEHOLDERS[id]) {
+    return;
+  }
+  const r = await page.evaluate(() => {
+    const input = document.querySelector('ds-starts-with-text input, ds-starts-with-date input[type=text]');
+    const ul = document.querySelector('ds-browse-by ds-object-list ul:has(ds-browse-entry-list-element)');
+    const lis = ul ? [...ul.children] : [];
+    const xs = lis.slice(0, 2).map((li) => Math.round(li.getBoundingClientRect().left));
+    const badge = ul?.querySelector('.badge');
+    const margin = lis[0] && getComputedStyle(lis[0]).marginTop;
+    return { placeholder: input?.getAttribute('placeholder'), entries: lis.length, columns: ul && getComputedStyle(ul).columnCount,
+      xs, lastX: lis.length ? Math.round(lis[lis.length - 1].getBoundingClientRect().left) : null,
+      pill: badge && getComputedStyle(badge).backgroundColor, margin };
+  });
+  check(label, `texto del campo "${PLACEHOLDERS[id]}"`, r.placeholder === PLACEHOLDERS[id], r.placeholder);
+  if (id === 'author' || id === 'subject') {
+    check(label, 'lista de valores con pastilla gris', r.entries > 0 && r.pill === 'rgb(241, 244, 243)', JSON.stringify(r));
+    check(label, 'filas compactas', r.margin === '0px', r.margin);
+    check(label, mobile ? 'una columna' : 'dos columnas de arriba abajo', mobile
+      ? r.columns === 'auto' && r.xs[0] === r.lastX
+      : r.columns === '2' && (r.entries < 2 || r.xs[0] === r.xs[1]) && (r.entries < 4 || r.lastX > r.xs[0]), JSON.stringify(r));
+  }
+}
+
 async function settle(page) {
   await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
   // pages drawn only in the browser (/search) can pause while Angular boots: wait for content and no spinners left
@@ -572,6 +605,7 @@ async function run() {
           return b && getComputedStyle(b).backgroundColor;
         });
         check(label, 'botón en verde', button === GREEN, button);
+        await browseList(label, p.page, tab.href, mobile);
         if (/srsc/.test(tab.href)) {
           // texts in Spanish (7.4, 09/11/2026)
           const t = await p.page.evaluate(() => ({
@@ -594,6 +628,7 @@ async function run() {
       p = await open(browser, url, width);
       await common(label, p);
       await comcolHeader(label, p.page, { title, icon });
+      await browseList(label, p.page, url, mobile);
       await p.page.close();
     }
     // Accessibility page (footer link "Accesibilidad"): in Spanish (7.4, 09/11/2026)
@@ -758,6 +793,7 @@ async function run() {
     p = await open(browser, '/browse/author', width);
     await common(label, p);
     check(label, 'sin encabezado de comunidad', !(await p.page.$('ds-uncp-comcol-header')));
+    await browseList(label, p.page, '/browse/author', mobile);
     await p.page.close();
 
     // Item page and full item page
