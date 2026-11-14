@@ -305,6 +305,13 @@ ds-browse-by-taxonomy-page .btn-primary {
   background: #e3f5ec;
 }
 
+// Faculty (top-level community) circle: solid UNCP green with a white icon. The single place for this color, used
+// by the home cards and the community list (13/11/2026)
+.uncp-community-icon.uncp-faculty-icon {
+  color: #fff;
+  background: #067a5a;
+}
+
 // Subcommunity and collection cards of a community page (community-page/sub-*-list): white (28/10/2026, design A,
 // so the career colors stand out), icon circle, green border on hover; compact, in a
 // 1/2/3 column grid
@@ -818,6 +825,181 @@ ds-search-facet-selected-option .break-facet {
 
     .uncp-error-title {
       font-size: 1.6rem;
+    }
+  }
+}
+
+// UNCP: community list (/community-list, 12/11/2026). The stock tree with the look of the community pages:
+//  - faculties (level 0): white card rows with their icon and short description, green border on hover
+//  - careers and collections: lighter rows, indented, with a soft vertical guide; careers in their official color,
+//    collections with their level icon in the color of their career
+//  - chevrons that turn when open, links in deep blue
+.uncp-tree-page .uncp-tree-title {
+  margin: 0 0 .75rem;
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: #1f2d28;
+}
+.uncp-tree-page .uncp-error-rule {
+  width: 56px;
+  margin: 0 0 1.5rem;
+  border: 0;
+  border-top: 3px solid #067a5a;
+  opacity: 1;
+}
+
+.uncp-tree {
+  display: block;
+  margin-bottom: 2rem;
+
+  .uncp-tree-node {
+    display: block;
+    position: relative;
+  }
+
+  .uncp-tree-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  // faculties: card rows
+  .uncp-tree-level-0 {
+    margin-top: .75rem;
+
+    > .uncp-tree-row {
+      padding: .75rem 1rem;
+      background: #fff;
+      border: 1px solid #e4e7e6;
+      border-radius: 12px;
+      transition: border-color .2s ease, box-shadow .2s ease;
+
+      &:hover,
+      &:focus-within {
+        border-color: #067a5a;
+        box-shadow: 0 2px 4px rgba(31, 45, 40, .05), 0 8px 20px rgba(6, 122, 90, .12);
+      }
+    }
+
+    .uncp-community-icon {
+      --uncp-icon-size: 44px;
+    }
+
+    .uncp-tree-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  // careers and collections: indented under their parent, with a soft vertical guide
+  @for $level from 1 through 4 {
+    .uncp-tree-level-#{$level} {
+      margin-left: calc(1.75rem * #{$level} + .25rem);
+      padding-left: 1rem;
+      border-left: 2px solid #e4e7e6;
+
+      > .uncp-tree-row {
+        padding: .4rem .75rem;
+        border-radius: 8px;
+
+        &:hover,
+        &:focus-within {
+          background: #f3f6f5;
+        }
+      }
+    }
+  }
+  .uncp-tree-level-1 .uncp-community-icon { --uncp-icon-size: 36px; }
+  .uncp-tree-level-2 .uncp-community-icon,
+  .uncp-tree-level-3 .uncp-community-icon { --uncp-icon-size: 30px; }
+  // the last child of an open faculty ends with a little air before the next faculty
+  .uncp-tree-level-0 + .uncp-tree-level-1 { padding-top: .5rem; }
+
+  .uncp-tree-toggle,
+  .uncp-tree-toggle-space {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+  }
+  .uncp-tree-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #5b6b65;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+
+    i {
+      transition: transform .2s ease;
+    }
+    &:hover {
+      color: #067a5a;
+      background: #e3f5ec;
+    }
+    &:focus-visible {
+      outline: 2px solid #067a5a;
+      outline-offset: 1px;
+    }
+  }
+  .uncp-tree-expanded > .uncp-tree-row .uncp-tree-toggle i {
+    transform: rotate(90deg);
+  }
+
+  .uncp-tree-link {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: .75rem;
+    min-width: 0;
+    color: #1f4e79;
+    text-decoration: none;
+
+    &:hover .uncp-tree-name,
+    &:focus .uncp-tree-name {
+      text-decoration: underline;
+    }
+  }
+  .uncp-tree-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .uncp-tree-name {
+    overflow-wrap: anywhere;
+  }
+  .uncp-tree-detail,
+  .uncp-tree-description {
+    font-size: .85rem;
+    color: #5b6b65;
+  }
+  .uncp-tree-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .uncp-tree-more-button {
+    color: #067a5a;
+    background: #fff;
+    border: 1px solid #067a5a;
+    border-radius: 6px;
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background: #067a5a;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    @for $level from 1 through 4 {
+      .uncp-tree-level-#{$level} {
+        margin-left: calc(.75rem * #{$level} + .25rem);
+        padding-left: .5rem;
+      }
     }
   }
 }

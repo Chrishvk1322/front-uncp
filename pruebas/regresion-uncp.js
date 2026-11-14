@@ -63,6 +63,36 @@ function check(page, name, ok, detail = '') {
   results.push({ page, name, ok: !!ok, detail });
 }
 
+/**
+ * Waits just enough for the page to settle after loading or after a click (12/11/2026): until it stops asking the
+ * server for data (no requests for 500ms, at most 30s), until the main area has content and no loading spinners
+ * (at most 30s), and then until Angular stops adding or removing content (no
+ * changes for 400ms, at most 10s; attribute changes such as the home carousel do not count). It replaced fixed waits
+ * of 5-6s that made the suite take 12 minutes.
+ */
+async function settle(page) {
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+  // pages drawn only in the browser (/search) can pause while Angular boots: wait for content and no spinners left
+  await page.waitForFunction(() => {
+    const main = document.querySelector('#main-content');
+    return main && main.querySelector('ds-themed-loading, ds-loading') === null && main.innerText.trim().length > 0;
+  }, null, { timeout: 30000 }).catch(() => {});
+  await page.evaluate(() => new Promise((resolve) => {
+    let quiet;
+    const observer = new MutationObserver(() => {
+      clearTimeout(quiet);
+      quiet = setTimeout(done, 400);
+    });
+    const done = () => {
+      observer.disconnect();
+      resolve();
+    };
+    observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+    quiet = setTimeout(done, 400);
+    setTimeout(done, 10000);
+  })).catch(() => {});
+}
+
 /** The cookie notice (Klaro), option B: dark background, gold links, UNCP green "Aceptar" (05/11/2026) */
 async function cookieNotice(label, page) {
   const n = await page.evaluate(() => {
@@ -178,8 +208,10 @@ async function open(browser, url, width, keepCookieNotice = false) {
       problems.push(`HTTP ${r.status()} ${r.request().method()} ${r.url().replace(BASE, '')}`);
     }
   });
-  const response = await page.goto(BASE + url, { waitUntil: 'load', timeout: 60000 });
-  await page.waitForTimeout(6000);
+  // one retry: with both widths at the same time, a slow answer of the production API can stall a load
+  const response = await page.goto(BASE + url, { waitUntil: 'load', timeout: 60000 })
+    .catch(() => page.goto(BASE + url, { waitUntil: 'load', timeout: 60000 }));
+  await settle(page);
   if (!keepCookieNotice) {
     await page.evaluate(() => document.querySelectorAll('.klaro').forEach((e) => e.remove()));
   }
@@ -268,7 +300,9 @@ async function activeTab(label, page, expected) {
 async function run() {
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
 
-  for (const width of [1366, 390]) {
+  // desktop and phone run at the same time, each in its own tabs of the same browser (12/11/2026)
+  const homeCards = {};
+  const runWidth = async (width) => {
     const dev = width > 600 ? 'escritorio' : 'celular';
     const mobile = width <= 600;
 
@@ -284,8 +318,13 @@ async function run() {
       glyph: getComputedStyle(e.querySelector('.uncp-community-icon i'), '::before').content,
       count: e.querySelector('.card-count')?.textContent.trim(),
       link: e.querySelector('.card-link')?.textContent.trim(),
+      name: e.querySelector('.card-title')?.textContent.trim(),
+      circle: getComputedStyle(e.querySelector('.uncp-community-icon')).backgroundColor,
     })));
+    homeCards[dev] = cards;
     check(label, '8 tarjetas de comunidades', cards.length === 8, `${cards.length}`);
+    check(label, 'nombres de DSpace sin número', cards.map((c) => c.name).slice(0, 2).join('|') === 'Arquitectura e Ingenierías|Ciencias Administrativas, Contables y Económicas'
+      && cards.every((c) => c.name && !/^\d+\./.test(c.name)), JSON.stringify(cards.map((c) => c.name)));
     check(label, 'tarjetas con icono y cifra', cards.every((c) => c.icon && /^\d[\d,]* documentos$/.test(c.count)), JSON.stringify(cards[0]));
     check(label, 'iconos dibujados (Font Awesome)', cards.every((c) => c.glyph && c.glyph !== 'none' && c.glyph !== 'normal'), cards.map((c) => c.glyph).join(' '));
     check(label, '8 iconos distintos', new Set(cards.map((c) => c.icon)).size === 8, cards.map((c) => c.icon).join(' '));
@@ -327,9 +366,12 @@ async function run() {
     // Search
     label = `búsqueda (${dev})`;
     p = await open(browser, '/search?spc.page=1&spc.sf=dc.date.accessioned&spc.sd=DESC', width);
+    // the search of the production API can take more than 15s: wait for the results themselves
+    await p.page.waitForSelector('ds-item-search-result-list-element', { timeout: 30000 }).catch(() => {});
+    await settle(p.page);
     await common(label, p);
     const items = await p.page.$$eval('ds-item-search-result-list-element', (els) => els.map((e) => e.querySelectorAll('.badge, .rounded-pill').length));
-    check(label, 'resultados de ítems', items.length >= 5, `${items.length}`);
+    check(label, 'resultados de ítems', items.length >= 5, `${items.length} · ${p.page.url()} · ${JSON.stringify(await p.page.evaluate(() => document.querySelector('#main-content')?.innerText.slice(0, 200)))}`);
     check(label, 'insignias de tipo y acceso', items.length && items.every((n) => n >= 2), items.join(','));
     check(label, 'sin "Más..." visible', !(await p.page.evaluate(() => [...document.querySelectorAll('ds-truncatable-part button, ds-truncatable-part a')]
       .some((e) => e.offsetParent !== null && /más/i.test(e.textContent)))));
@@ -342,7 +384,7 @@ async function run() {
     const toggle = await p.page.$('ds-search-filter .filter-name');
     if (toggle && !mobile) {
       await toggle.click();
-      await p.page.waitForTimeout(2500);
+      await settle(p.page);
       const f = await p.page.evaluate(() => {
         const box = document.querySelector('ds-search-filter .facet-filter');
         const more = document.querySelector('ds-search-filter .toggle-more-filters a');
@@ -623,6 +665,53 @@ async function run() {
       check(label, 'mismo formulario en el menú', menu.labels.length === 2 && menu.button === GREEN, JSON.stringify(menu));
       await p.page.close();
     }
+    // Community list: the stock tree with the look of the community pages (12/11/2026)
+    label = `lista de comunidades (${dev})`;
+    p = await open(browser, '/community-list', width);
+    await common(label, p);
+    const rowLook = (sel) => p.page.$$eval(sel, (rows) => rows.map((row) => {
+      const icon = row.querySelector(':scope > .uncp-tree-row .uncp-community-icon');
+      const link = row.querySelector(':scope > .uncp-tree-row .uncp-tree-link');
+      return {
+        name: row.querySelector(':scope > .uncp-tree-row .uncp-tree-name')?.textContent.trim(),
+        bg: icon && getComputedStyle(icon).backgroundColor,
+        ink: icon && getComputedStyle(icon).color,
+        glyph: icon?.querySelector('i')?.className,
+        link: link && getComputedStyle(link).color,
+        toggle: row.querySelector(':scope > .uncp-tree-row .uncp-tree-toggle')?.getAttribute('aria-label'),
+      };
+    }));
+    const faculties = await rowLook('.uncp-tree-level-0');
+    // same names (from DSpace) and same faculty circle color as the home cards (13/11/2026)
+    const homeNames = (homeCards[dev] ?? []).map((c) => c.name);
+    check(label, 'mismos nombres que las tarjetas de la portada', homeNames.length === 8 && faculties.map((f) => f.name).join('|') === homeNames.join('|'),
+      JSON.stringify({ portada: homeNames, lista: faculties.map((f) => f.name) }));
+    check(label, 'mismo color de círculo que la portada', (homeCards[dev] ?? []).length === 8 && homeCards[dev].every((c) => c.circle === GREEN),
+      JSON.stringify((homeCards[dev] ?? []).map((c) => c.circle)));
+    check(label, '8 facultades con su icono en círculo verde, sin número', faculties.length === 8
+      && faculties.every((f) => f.name && !/^\d+\./.test(f.name) && f.bg === GREEN && f.ink === WHITE && /fa-/.test(f.glyph)), JSON.stringify(faculties.map((f) => f.name)));
+    check(label, 'enlaces azules', faculties.every((f) => f.link === BLUE), JSON.stringify(faculties.map((f) => f.link)));
+    check(label, 'botón de desplegar en español', faculties.every((f) => /^Desplegar /.test(f.toggle || '')), faculties[0]?.toggle);
+    await p.page.click('.uncp-tree-level-0 .uncp-tree-toggle');
+    await settle(p.page);
+    const opened = await p.page.$eval('.uncp-tree-level-0 .uncp-tree-toggle', (t) => ({ expanded: t.getAttribute('aria-expanded'), label: t.getAttribute('aria-label'),
+      rotate: getComputedStyle(t.querySelector('i')).transform }));
+    check(label, 'al desplegar, la flecha gira y el botón dice "Contraer"', opened.expanded === 'true' && /^Contraer /.test(opened.label) && opened.rotate !== 'none', JSON.stringify(opened));
+    const careers = await rowLook('.uncp-tree-level-1');
+    const sistemas = careers.find((c) => c.name === 'Ingeniería de Sistemas');
+    const civil = careers.find((c) => c.name === 'Ingeniería Civil');
+    check(label, 'carreras con su color oficial (Sistemas, Civil)', sistemas && civil
+      && sistemas.bg === CAREER['Ingeniería de Sistemas'].tint && civil.bg === CAREER['Ingeniería Civil'].tint && civil.ink === CAREER['Ingeniería Civil'].ink,
+      JSON.stringify({ sistemas, civil }));
+    const index = careers.findIndex((c) => c.name === 'Ingeniería de Sistemas');
+    await (await p.page.$$('.uncp-tree-level-1'))[index].$eval('.uncp-tree-toggle', (t) => t.click());
+    await settle(p.page);
+    const collections = await rowLook('.uncp-tree-level-2');
+    check(label, 'colecciones con su icono de nivel en el color de la carrera', collections.length > 0
+      && collections.some((c) => c.name === 'Pregrado' && /fa-graduation-cap/.test(c.glyph))
+      && collections.every((c) => c.bg === CAREER['Ingeniería de Sistemas'].tint), JSON.stringify(collections));
+    await p.page.close();
+
     // Error pages 404, 403 and 500: option C without the code label (10/11/2026). They answer with their own status.
     for (const [path, status, title, search] of [
       ['/pagina-que-no-existe', 404, 'No encontramos la página que buscas', true],
@@ -651,12 +740,15 @@ async function run() {
       });
       check(label, `título "${title}" con línea verde y sin etiqueta del código`, err && err.title === title && err.rule === GREEN && !err.code, JSON.stringify(err));
       check(label, search ? 'buscador del repositorio con botón verde' : 'sin buscador', err && (search ? err.search && err.searchButton === GREEN : !err.search), JSON.stringify(err));
-      check(label, 'enlaces azules, el primero "Volver al inicio"', err && err.links.length >= 2 && /Volver al inicio/.test(err.links[0][0]) && err.links.every(([, c]) => c === BLUE), JSON.stringify(err?.links));
+      check(label, 'enlaces azules, el primero "Volver al inicio"', err && err.links.length >= 1 && /Volver al inicio/.test(err.links[0][0]) && err.links.every(([, c]) => c === BLUE), JSON.stringify(err?.links));
+      // the user guide link was removed from the error pages (12/11/2026); it stays in the Tutoriales menu
+      check(label, 'sin enlace "Guía de usuario"', err && !err.links.some(([t]) => /Guía de usuario/.test(t)), JSON.stringify(err?.links));
       check(label, 'ancho de lectura (máx. 680px)', err && err.width <= 680, err && `${err.width}px`);
       if (path === '/pagina-que-no-existe' && !mobile) {
         await p.page.fill('.uncp-error-search input', 'agua potable');
         await p.page.click('.uncp-error-search .search-button');
-        await p.page.waitForTimeout(6000);
+        await p.page.waitForURL(/\/search\?/, { timeout: 15000 }).catch(() => {});
+        await settle(p.page);
         check(label, 'el buscador lleva a los resultados', /\/search\?.*query=agua%20potable/.test(p.page.url()), p.page.url());
       }
       await p.page.close();
@@ -699,7 +791,8 @@ async function run() {
     await common(label, p);
     check(label, 'bloque de estadísticas', (await p.page.$$('.uncp-stat-card')).length === 2);
     await p.page.close();
-  }
+  };
+  await Promise.all([1366, 390].map(runWidth));
 
   // No dark flash of the footer while the page loads
   for (const url of ['/home', '/search', COMMUNITY, ITEM]) {
@@ -726,8 +819,11 @@ async function uuidOf(handleUrl) {
 }
 
 run().then(() => {
+  // both widths run at the same time: group the report by device, keeping the order of the checks
+  const rank = (r) => (r.page.endsWith('(escritorio)') ? 0 : r.page.endsWith('(celular)') ? 1 : 2);
+  const ordered = results.map((r, i) => ({ r, i })).sort((a, b) => rank(a.r) - rank(b.r) || a.i - b.i).map(({ r }) => r);
   let lastPage = '';
-  for (const r of results) {
+  for (const r of ordered) {
     if (r.page !== lastPage) {
       console.log(`\n${r.page}`);
       lastPage = r.page;

@@ -1818,18 +1818,16 @@
   "communityList.tabTitle": "Lista de comunidades",
 
   // "communityList.title": "List of Communities",
-  "communityList.title": "Lista de Comunidades",
+  "communityList.title": "Comunidades",
 
   // "communityList.showMore": "Show More",
   "communityList.showMore": "Mostrar más",
 
   // "communityList.expand": "Expand {{ name }}",
-  // TODO New key - Add a translation
-  "communityList.expand": "Expand {{ name }}",
+  "communityList.expand": "Desplegar {{ name }}",
 
   // "communityList.collapse": "Collapse {{ name }}",
-  // TODO New key - Add a translation
-  "communityList.collapse": "Collapse {{ name }}",
+  "communityList.collapse": "Contraer {{ name }}",
 
   // "community.browse.logo": "Browse for a community logo",
   // TODO New key - Add a translation
@@ -8388,7 +8386,6 @@
   "uncp.error.search-placeholder": "Buscar tesis, artículos, autores…",
   "uncp.error.home": "Volver al inicio",
   "uncp.error.communities": "Explorar comunidades",
-  "uncp.error.guide": "Guía de usuario",
 
   // "search-facet-option.update.announcement": "The page will be reloaded. Filter {{ filter }} is selected.",
   "search-facet-option.update.announcement": "La página será recargada. Filtro {{ filter }} seleccionado.",

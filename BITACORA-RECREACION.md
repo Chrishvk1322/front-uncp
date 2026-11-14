@@ -422,7 +422,17 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
       - **Verificación**: la suite graba la carga de 4 páginas (home, búsqueda, comunidad, ítem) y cuenta los cuadros con la mitad superior oscura (`darkFlashFrames`). Con la corrección hay 0; sin ella, 6 a 8 por carga.
     - **estadísticas**: del ítem `/statistics/items/{uuid}` (enlazada desde el bloque "Estadísticas" de la ficha), de comunidad y colección, y la general `/statistics`;
     - **navegación** (`/browse/...`: por autor, materia, fecha, título);
-    - **lista de comunidades** (`/community-list`);
+    - **lista de comunidades** (`/community-list`, hecha el 12/11/2026; el usuario pidió aplicarla sin vistas previas):
+      - `app/community-list-page/` (página: título "Comunidades" con la línea verde corta de las páginas de error) y `app/community-list-page/community-list/` (árbol), declarados en `lazy-theme.module.ts`. El árbol extiende la clase de serie: conserva la carga por partes, "Mostrar más" y el estado de nodos abiertos.
+      - Facultades (nivel 0): filas tipo tarjeta blancas con borde `#e4e7e6`, círculo verde sólido con el icono de `UNCP_TOP_COMMUNITIES`, nombre sin número y la descripción breve (2 líneas como máximo); borde verde y sombra al pasar el mouse.
+      - Carreras y colecciones: sangradas con una guía vertical suave (`border-left` 2px), fondo `#f3f6f5` al pasar el mouse. Las carreras tienen el color oficial (`UNCP_CAREERS`) o, si no lo tienen, el icono de su facultad. Las colecciones muestran el nivel ("Pregrado", con el nombre completo debajo, de `uncpCollectionCard`) y su icono en el color de la carrera más cercana.
+      - Flechas que giran 90° al abrir (sin el recuadro negro de serie), enlaces en azul `#1f4e79`, `aria-expanded`, y "Desplegar/Contraer {{ name }}" traducidos en `es.json5`.
+      - Estilos `.uncp-tree*` en `_global-styles.scss`. Las colecciones salen en el orden del árbol de serie (alfabético: Doctorado, Maestría, Pregrado), no en el de la página de la carrera.
+      - Pruebas: "lista de comunidades" (escritorio y celular): las 8 facultades sin número y con icono verde, enlaces azules, botón en español, flecha que gira, colores de Sistemas y Civil, y colecciones de Sistemas con su icono en el color de la carrera.
+      - **Portada y lista unificadas** (13/11/2026, pedido del usuario):
+        - **Color:** el círculo verde sólido de las facultades se define una sola vez, en `.uncp-community-icon.uncp-faculty-icon` (`_global-styles.scss`). Lo usan las tarjetas de la portada y las filas de facultad del árbol; se quitaron las dos reglas duplicadas.
+        - **Nombres:** las tarjetas de la portada toman el nombre de DSpace sin número (`names$` en `top-level-community-list.component.ts`, con `findTop` de hasta 50 comunidades). Un cambio de nombre hecho desde la administración de DSpace se ve en la portada y en la lista. El `title` de `UNCP_TOP_COMMUNITIES` queda solo como respaldo mientras llega el nombre, y se igualó a los nombres actuales de DSpace ("Arquitectura e Ingenierías", "Ciencias Administrativas, Contables y Económicas", "Libros de investigación").
+        - Pruebas: "nombres de DSpace sin número" (portada), "mismos nombres que las tarjetas de la portada" y "mismo color de círculo que la portada" (lista).
     - **páginas informativas** (`/info/privacy`, `/info/end-user-agreement`, `/info/feedback`; ver 7.10);
     - **inicio de sesión, registro y recuperación de clave** (hechos el 09/11/2026):
       - Elegida la opción A (tarjeta centrada) con las etiquetas de la opción C y el foco verde suave de la vista "A-foco"; vistas previas en `pwtool/loginopts.js`.
@@ -441,7 +451,7 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
     - **páginas de error 404, 403 y 500** (hechas el 10/11/2026):
       - Propuestas A (tarjeta), B (dividida con facultades) y C (minimalista) en `pwtool/erroropts.js`. Elegida la C sin la etiqueta verde del código ("ERROR 404", "ACCESO RESTRINGIDO").
       - `app/pagenotfound/`, `app/forbidden/` y `app/page-internal-server-error/` (declarados en `lazy-theme.module.ts`). Extienden las clases de serie, así que conservan el código HTTP de respuesta (404, 403 y 500).
-      - Diseño (`.uncp-error*` en `_global-styles.scss`): ancho de lectura de 680px, título de 2,1rem con una línea verde corta, texto en gris, buscador real del repositorio (`ds-themed-search-form` sin la caja de la portada, botón verde) y enlaces de texto azules: "← Volver al inicio", "Explorar comunidades" (`/community-list`) y "Guía de usuario" (la misma guía del menú Tutoriales).
+      - Diseño (`.uncp-error*` en `_global-styles.scss`): ancho de lectura de 680px, título de 2,1rem con una línea verde corta, texto en gris, buscador real del repositorio (`ds-themed-search-form` sin la caja de la portada, botón verde) y enlaces de texto azules: "← Volver al inicio" y "Explorar comunidades" (`/community-list`; no en la 500). El enlace "Guía de usuario" se retiró de las páginas de error el 12/11/2026, a pedido del usuario; sigue en el menú Tutoriales.
       - Selector `.container.uncp-error, #main-content .container.uncp-error`: la regla del 80% de ancho (`#main-content .container`) le ganaba a la clase sola.
       - 500: sin buscador (depende del mismo servidor) y con enlaces de carga completa (`href`), como en la plantilla de serie.
       - Textos nuevos `uncp.error.*` en `es.json5`/`en.json5`, en el tono de las vistas aprobadas.
@@ -532,8 +542,15 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - que no muestre la IP del servidor;
   - los elementos propios de esa página.
 - No genera estadísticas ni descarga archivos. Termina con código 1 si algo falla.
+- **Suite rápida** (12/11/2026, pedido del usuario: siempre la suite completa, pero sin esperas de más). Antes tardaba unos 12 minutos; ahora tarda de 3 a 5.
+  - **Espera justa:** `settle()` reemplaza las esperas fijas de 5-6s. Espera a que la página deje de pedir datos (`networkidle`, como máximo 30s), a que el área principal tenga contenido y ningún indicador de carga, y a que Angular deje de agregar o quitar contenido durante 400ms (como máximo 10s).
+  - **Escritorio y celular a la vez:** cada ancho corre en sus propias pestañas del mismo navegador (`Promise.all`). El reporte se agrupa por dispositivo.
+  - **Un reintento por carga**, por si la API de producción se demora.
+  - **Las páginas `/search` se dibujan solo en el navegador:** durante el arranque de Angular hay pausas sin red. Por eso se espera a que no queden indicadores de carga, y en la búsqueda, a los resultados mismos.
+  - **Requiere el servidor con `DSPACE_UI_RATELIMITER_MAX=10000`** (ver "Compilar y levantar"); si no, aparecen 429.
+  - Verificada con cuatro corridas seguidas: 744/744 en todas.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 10/11/2026: **712/712 correctas** (antes 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 13/11/2026: **750/750 correctas** (antes 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash
@@ -563,11 +580,11 @@ NODE_OPTIONS="--max-old-space-size=10240" yarn run build:prod     # build:prod, 
 
 # en llamadas separadas:
 node ~/.local/dspace-dev-proxy/proxy.js &
-DSPACE_REST_SSL=false DSPACE_REST_HOST=localhost DSPACE_REST_PORT=8080 DSPACE_REST_NAMESPACE=/server \
-  NODE_OPTIONS="--max-old-space-size=4096" node dist/server/main &
+DSPACE_UI_RATELIMITER_MAX=10000 DSPACE_REST_SSL=false DSPACE_REST_HOST=localhost DSPACE_REST_PORT=8080 DSPACE_REST_NAMESPACE=/server \
+  NODE_OPTIONS="--max-old-space-size=4096" setsid nohup node dist/server/main > ~/.local/dspace-dev-proxy/logs/ssr.log 2>&1 < /dev/null &
 # abrir http://localhost:8080  (no el 4000)
 ```
-Las variables `DSPACE_REST_*` hacen que la app use el proxy sin tocar `config.yml`. Logs en `~/.local/dspace-dev-proxy/logs/` (`proxy.log`, `ssr.log`).
+Las variables `DSPACE_REST_*` hacen que la app use el proxy sin tocar `config.yml`. `DSPACE_UI_RATELIMITER_MAX=10000` sube **solo en local** el límite de 500 solicitudes por minuto del servidor SSR (`ui.rateLimiter`): con la suite rápida (12/11/2026) se superaba y el servidor respondía 429. En producción queda el valor de serie. `setsid` desacopla el servidor de la terminal que lo lanza. Logs en `~/.local/dspace-dev-proxy/logs/` (`proxy.log`, `ssr.log`).
 
 **Modo producción (solo lectura), en uso desde el 2026-10-24.** Para ver la reconstrucción con los datos reales, se arranca el proxy así:
 `REMOTE=https://repositorio.uncp.edu.pe READ_ONLY=1 node ~/.local/dspace-dev-proxy/proxy.js &`

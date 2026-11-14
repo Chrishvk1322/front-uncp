@@ -84,6 +84,8 @@ import { RegisterEmailFormComponent } from './app/register-email-form/register-e
 import { PageNotFoundComponent } from './app/pagenotfound/pagenotfound.component';
 import { ForbiddenComponent } from './app/forbidden/forbidden.component';
 import { PageInternalServerErrorComponent } from './app/page-internal-server-error/page-internal-server-error.component';
+import { CommunityListPageComponent } from './app/community-list-page/community-list-page.component';
+import { CommunityListComponent } from './app/community-list-page/community-list/community-list.component';
 
 const DECLARATIONS = [
   HomePageComponent,
@@ -108,6 +110,8 @@ const DECLARATIONS = [
   PageNotFoundComponent,
   ForbiddenComponent,
   PageInternalServerErrorComponent,
+  CommunityListPageComponent,
+  CommunityListComponent,
 ];
 
 @NgModule({

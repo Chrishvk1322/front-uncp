@@ -27,11 +27,8 @@
   box-shadow: 0 2px 4px rgba(31, 45, 40, .05), 0 12px 28px rgba(6, 122, 90, .14);
   outline: none;
 }
-.contenido-comunidades .community-card .uncp-community-icon {
-  color: #fff;
-  background: #067a5a;
-}
-// the circle is the global .uncp-community-icon (size, shape); here solid green with a white icon
+// the circle is the global .uncp-community-icon.uncp-faculty-icon (size, shape and its solid green, shared with the
+// community list)
 .contenido-comunidades .community-card .card-icon {
   display: flex;
   justify-content: center;

@@ -1,0 +1,41 @@
+<ds-themed-loading *ngIf="(dataSource.loading$ | async) && !loadingNode" class="ds-themed-loading"></ds-themed-loading>
+<cdk-tree class="uncp-tree" [dataSource]="dataSource" [treeControl]="treeControl" [trackBy]="trackBy">
+  <!-- "Mostrar más" node -->
+  <cdk-tree-node *cdkTreeNodeDef="let node; when: isShowMore" class="uncp-tree-node uncp-tree-level-{{ node.level }}">
+    <div class="uncp-tree-row uncp-tree-more">
+      <span class="uncp-tree-toggle-space" aria-hidden="true"></span>
+      <button *ngIf="!(dataSource.loading$ | async)" (click)="getNextPage(node)" class="btn btn-sm uncp-tree-more-button" type="button">
+        <i class="fas fa-angle-down" aria-hidden="true"></i> {{ 'communityList.showMore' | translate }}
+      </button>
+      <ds-themed-loading *ngIf="node===loadingNode && dataSource.loading$ | async" class="ds-themed-loading"></ds-themed-loading>
+    </div>
+  </cdk-tree-node>
+  <!-- Communities and collections, with or without children -->
+  <cdk-tree-node *cdkTreeNodeDef="let node; when: !isShowMore" class="uncp-tree-node uncp-tree-level-{{ node.level }}"
+                 [class.uncp-tree-expanded]="node.isExpanded">
+    <ng-container *ngVar="look(node) as look">
+      <div class="uncp-tree-row">
+        <button *ngIf="hasChild(null, node) | async; else noToggle" type="button" class="uncp-tree-toggle" cdkTreeNodeToggle
+                [attr.aria-expanded]="!!node.isExpanded"
+                [attr.aria-label]="(node.isExpanded ? 'communityList.collapse' : 'communityList.expand') | translate:{ name: look.name }"
+                (click)="toggleExpanded(node)"
+                data-test="expand-button">
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
+        <ng-template #noToggle><span class="uncp-tree-toggle-space" aria-hidden="true"></span></ng-template>
+        <a [routerLink]="node.route" class="uncp-tree-link">
+          <span class="uncp-community-icon" [class.uncp-faculty-icon]="node.level === 0" [class.uncp-career-icon]="look.careerStyle" [ngStyle]="look.careerStyle"
+                aria-hidden="true"><i class="fa-solid {{ look.icon }}"></i></span>
+          <span class="uncp-tree-text">
+            <span class="uncp-tree-name">{{ look.name }}</span>
+            <span *ngIf="look.detail" class="uncp-tree-detail">{{ look.detail }}</span>
+            <span *ngIf="node.level === 0 && node.payload.shortDescription" class="uncp-tree-description">{{ node.payload.shortDescription }}</span>
+          </span>
+        </a>
+      </div>
+      <div class="uncp-tree-row uncp-tree-loading" *ngIf="node===loadingNode && dataSource.loading$ | async">
+        <ds-themed-loading class="ds-themed-loading"></ds-themed-loading>
+      </div>
+    </ng-container>
+  </cdk-tree-node>
+</cdk-tree>
