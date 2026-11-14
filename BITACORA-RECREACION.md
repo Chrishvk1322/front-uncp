@@ -249,7 +249,7 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
      - tooltip i18n `uncp.item-stats.link-title`;
      - verificado: tarjetas de 168×67px a 1366px y 153×67px a 1024px; el clic abre la página de estadísticas del ítem.
 10. **Pie de página, enlaces** (FP §5.3):
-    - redes sociales con `href="#"`: poner las direcciones reales o quitar los iconos;
+    - ~~redes sociales con `href="#"`~~ **Hecho el 14/11/2026** con las cuentas oficiales que dio el usuario: Facebook `https://www.facebook.com/UNCPoficial`, YouTube `https://www.youtube.com/@UNCPvideos`, **Instagram** `https://www.instagram.com/uncp_oficial` (reemplaza a Twitter, con el degradado de la marca) y TikTok `https://www.tiktok.com/@uncp.oficial`. Se abren en una pestaña nueva; la suite comprueba las cuatro direcciones;
     - enlaces `/info/policies`, `/rights`, `/faq`, `/support`, `/terms`, `/accessibility` y `/contact`, que probablemente no existen: crear las páginas o redirigir, y quitar `href="#"`;
     - comprobar que los bloques "Acceso rápido" y "Recursos" lleven a páginas o búsquedas reales.
 11. ~~**Medidas contra rastreadores en el tema**~~ **Hecho el 26/10/2026** (FP §10.4). Beneficia tanto en estático como con SSR; con SSR es más importante, porque los enlaces de filtros quedan en el HTML para todos los bots.
@@ -289,7 +289,7 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
           
           Están en `shared/uncp-communities.ts`. Las tarjetas dicen ahora **"Explorar comunidad"** en lugar de "Explorar colección".
         - **Tarjetas de la home con fondo uniforme** (27/10/2026, opción B elegida por el usuario frente a la A, blanco; las dos se probaron antes con `pwtool/cardopts.js`). Se quitaron los degradados pastel por facultad de producción y el campo `cardClass`.
-          - **Degradados originales de vuelta** (14/11/2026, a prueba, pedido del usuario): cada tarjeta lleva otra vez el degradado pastel de producción de su facultad, en `UNCP_TOP_COMMUNITIES.background` (`uncp-communities.ts`) aplicado en línea. Se conservan el borde, la sombra, el círculo verde sólido y el borde verde al pasar el mouse. Los degradados, recuperados del commit `24bace4`, van de 135°:
+          - **Degradados originales de vuelta** (14/11/2026, pedido del usuario; aprobado tras probarlo): cada tarjeta lleva otra vez el degradado pastel de producción de su facultad, en `UNCP_TOP_COMMUNITIES.background` (`uncp-communities.ts`) aplicado en línea. Se conservan el borde, la sombra, el círculo verde sólido y el borde verde al pasar el mouse. Los degradados, recuperados del commit `24bace4`, van de 135°:
             - 1, Arquitectura: `#e8f4fd` → `#f0f8ff` (celeste);
             - 2, Administrativas: `#f3e5ff` → `#faf0ff` (lila);
             - 3, Agrarias: `#e8f5e8` → `#f0fff0` (verde);
@@ -299,11 +299,10 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
             - 7, Libros: `#ffe8f7` → `#fff0fc` (fucsia claro);
             - 8, Artículos: `#e8fffa` → `#f0fffe` (aguamarina).
           - Para volver al blanco basta con quitar el `[style.background]` de la plantilla de la home.
-          - **Color de cada facultad en su círculo** (14/11/2026, a prueba, pedido del usuario): el color del círculo de su icono PNG original, en `UNCP_TOP_COMMUNITIES.color`. Lo toma el círculo de la facultad en todas partes: tarjetas de la home, lista de comunidades, encabezado de su página y resultados de búsqueda. Antes era verde UNCP en todas.
+          - **Color de cada facultad en su círculo** (14/11/2026, pedido del usuario; aprobado tras probarlo: "se ve mucho mejor"): el color del círculo de su icono PNG original, en `UNCP_TOP_COMMUNITIES.color`. Lo toma el círculo de la facultad en todas partes: tarjetas de la home, lista de comunidades, encabezado de su página y resultados de búsqueda. Antes era verde UNCP en todas.
             - Colores: 1 `#2B7FFF`, 2 `#AD46FF`, 3 `#00BC7D`, 4 `#FF6900`, 5 `#FB2C36`, 6 `#615FFF`, 7 `#F6339A`, 8 `#00BBA7`.
             - **Herencia:** las carreras con color oficial (`UNCP_CAREERS`) lo conservan. Las carreras sin color y las colecciones que no son de una carrera toman el de su facultad (`uncpInheritedCareer`, `uncpFaculty$`, y `uncpCareer$`, que busca primero el ancestro más cercano). Reemplaza a `UNCP_FACULTY_COLLECTION_COLORS`, que solo cubría las facultades 6 a 8.
             - El icono va en blanco o, si el blanco no llega a contraste 3:1, en el gris carbón del escudo (`uncpIconColorOn`), como en las carreras amarillas. Ocurre en Agrarias, Salud y Artículos.
-            - **Respaldo previo** de la versión anterior (tema, suite, bitácora y traducciones) en el scratchpad de la sesión del 14/11/2026 (`respaldo-antes-colores/`), por si el usuario decide volver.
           - **Normal**: fondo verde muy claro `#f4faf7`, borde `#e1efe8`, sombra suave, y el círculo del icono en blanco.
           - **Al pasar el mouse o con foco de teclado** (ajustado el 27/10/2026, variante 1 elegida por el usuario):
             - la tarjeta sube 4px;
@@ -609,7 +608,7 @@ LD_LIBRARY_PATH=~/.local/chromium-libs/root/usr/lib/x86_64-linux-gnu node prueba
   - **Requiere el servidor con `DSPACE_UI_RATELIMITER_MAX=10000`** (ver "Compilar y levantar"); si no, aparecen 429.
   - Verificada con cuatro corridas seguidas: 744/744 en todas.
 - Al agregar una personalización, **sumar sus comprobaciones a la suite**.
-- Resultado al 14/11/2026: **933/933 correctas** (antes 861, 850, 778, 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
+- Resultado al 14/11/2026: **935/935 correctas** (antes 933, 861, 850, 778, 750, 744, 720, 712, 631, 625, 593, 570, 553, 549, 545, 521, 518, 515, 483, 481, 477, 475, 451, 403, 401, 357, 351 y 327; esta última, en dos ejecuciones seguidas). Incluye ahora el menú correcto en cada página: ☰ en celular y el de escritorio en escritorio.
 - **Pruebas unitarias de DSpace (Karma)** de los archivos del núcleo que se toquen. Se ejecutan con el Chromium de Playwright, sin sandbox, mediante `pruebas/karma-headless.js`, que extiende el `karma.conf` del repo con un lanzador `ChromeHeadless` y `--no-sandbox`:
 
   ```bash

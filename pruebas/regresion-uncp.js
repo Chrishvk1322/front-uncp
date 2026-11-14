@@ -397,6 +397,11 @@ async function run() {
     const linkColor = await link.evaluate((a) => ({ text: getComputedStyle(a).color, arrow: getComputedStyle(a.querySelector('i')).color }));
     check(label, 'hover en "Explorar comunidad": texto y flecha en azul', linkColor.text === 'rgb(31, 78, 121)' && linkColor.arrow === 'rgb(31, 78, 121)', JSON.stringify(linkColor));
     check(label, 'publicaciones recientes', (await p.page.$$('ds-item-search-result-list-element')).length > 0);
+    // social links: the official UNCP accounts, Instagram instead of Twitter (14/11/2026)
+    const social = await p.page.$$eval('.social-links a', (els) => els.map((a) => [a.getAttribute('aria-label'), a.getAttribute('href'), a.target]));
+    check(label, 'redes sociales con sus direcciones', JSON.stringify(social) === JSON.stringify([
+      ['Facebook', 'https://www.facebook.com/UNCPoficial', '_blank'], ['YouTube', 'https://www.youtube.com/@UNCPvideos', '_blank'],
+      ['Instagram', 'https://www.instagram.com/uncp_oficial', '_blank'], ['TikTok', 'https://www.tiktok.com/@uncp.oficial', '_blank']]), JSON.stringify(social));
     const footer = await p.page.$$eval('.stat-number', (els) => els.map((e) => e.textContent.trim()));
     check(label, 'cifras del pie', footer.length === 4 && footer.every((n) => /^\d[\d,]*$/.test(n)), footer.join(' '));
     await p.page.close();

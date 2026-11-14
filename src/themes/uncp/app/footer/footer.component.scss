@@ -193,11 +193,12 @@
 :host .modern-footer .footer-main .footer-section .social-section .social-links .social-link.youtube:hover {
   box-shadow:0 5px 15px #f006;
 }
-:host .modern-footer .footer-main .footer-section .social-section .social-links .social-link.twitter {
-  background:linear-gradient(135deg,#1da1f2,#0d8bd9);
+// Instagram (replaces Twitter, 14/11/2026): the brand gradient, yellow to purple
+:host .modern-footer .footer-main .footer-section .social-section .social-links .social-link.instagram {
+  background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
 }
-:host .modern-footer .footer-main .footer-section .social-section .social-links .social-link.twitter:hover {
-  box-shadow:0 5px 15px #1da1f266;
+:host .modern-footer .footer-main .footer-section .social-section .social-links .social-link.instagram:hover {
+  box-shadow:0 5px 15px #dc274366;
 }
 :host .modern-footer .footer-main .footer-section .social-section .social-links .social-link.tiktok {
   background:linear-gradient(135deg,#000000,#333333);
