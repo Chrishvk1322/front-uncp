@@ -1,8 +1,10 @@
 .contenido-comunidades {
   padding: 2rem 1rem;
 }
-// White cards with a solid green icon circle and a green border on hover (28/10/2026, example 1): the same look
-// as the subcommunity and collection cards of the community pages. Same size as before (padding, min-height)
+// Cards with a solid green icon circle and a green border on hover (28/10/2026, example 1): the same look as the
+// subcommunity and collection cards of the community pages. Same size as before (padding, min-height). The white
+// below is only the fallback: each card has the pastel gradient of the original design as background
+// (UNCP_TOP_COMMUNITIES.background, inline; restored on 14/11/2026)
 .contenido-comunidades .community-card {
   width: 100%;
   background: #fff;

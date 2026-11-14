@@ -289,6 +289,21 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
           
           Están en `shared/uncp-communities.ts`. Las tarjetas dicen ahora **"Explorar comunidad"** en lugar de "Explorar colección".
         - **Tarjetas de la home con fondo uniforme** (27/10/2026, opción B elegida por el usuario frente a la A, blanco; las dos se probaron antes con `pwtool/cardopts.js`). Se quitaron los degradados pastel por facultad de producción y el campo `cardClass`.
+          - **Degradados originales de vuelta** (14/11/2026, a prueba, pedido del usuario): cada tarjeta lleva otra vez el degradado pastel de producción de su facultad, en `UNCP_TOP_COMMUNITIES.background` (`uncp-communities.ts`) aplicado en línea. Se conservan el borde, la sombra, el círculo verde sólido y el borde verde al pasar el mouse. Los degradados, recuperados del commit `24bace4`, van de 135°:
+            - 1, Arquitectura: `#e8f4fd` → `#f0f8ff` (celeste);
+            - 2, Administrativas: `#f3e5ff` → `#faf0ff` (lila);
+            - 3, Agrarias: `#e8f5e8` → `#f0fff0` (verde);
+            - 4, Salud: `#fff2e6` → `#fff8f0` (durazno);
+            - 5, Sociales: `#fde8e8` → `#fff0f0` (rosa);
+            - 6, Tesis: `#e8f0ff` → `#f0f6ff` (azul);
+            - 7, Libros: `#ffe8f7` → `#fff0fc` (fucsia claro);
+            - 8, Artículos: `#e8fffa` → `#f0fffe` (aguamarina).
+          - Para volver al blanco basta con quitar el `[style.background]` de la plantilla de la home.
+          - **Color de cada facultad en su círculo** (14/11/2026, a prueba, pedido del usuario): el color del círculo de su icono PNG original, en `UNCP_TOP_COMMUNITIES.color`. Lo toma el círculo de la facultad en todas partes: tarjetas de la home, lista de comunidades, encabezado de su página y resultados de búsqueda. Antes era verde UNCP en todas.
+            - Colores: 1 `#2B7FFF`, 2 `#AD46FF`, 3 `#00BC7D`, 4 `#FF6900`, 5 `#FB2C36`, 6 `#615FFF`, 7 `#F6339A`, 8 `#00BBA7`.
+            - **Herencia:** las carreras con color oficial (`UNCP_CAREERS`) lo conservan. Las carreras sin color y las colecciones que no son de una carrera toman el de su facultad (`uncpInheritedCareer`, `uncpFaculty$`, y `uncpCareer$`, que busca primero el ancestro más cercano). Reemplaza a `UNCP_FACULTY_COLLECTION_COLORS`, que solo cubría las facultades 6 a 8.
+            - El icono va en blanco o, si el blanco no llega a contraste 3:1, en el gris carbón del escudo (`uncpIconColorOn`), como en las carreras amarillas. Ocurre en Agrarias, Salud y Artículos.
+            - **Respaldo previo** de la versión anterior (tema, suite, bitácora y traducciones) en el scratchpad de la sesión del 14/11/2026 (`respaldo-antes-colores/`), por si el usuario decide volver.
           - **Normal**: fondo verde muy claro `#f4faf7`, borde `#e1efe8`, sombra suave, y el círculo del icono en blanco.
           - **Al pasar el mouse o con foco de teclado** (ajustado el 27/10/2026, variante 1 elegida por el usuario):
             - la tarjeta sube 4px;
@@ -391,9 +406,9 @@ Reconstrucción del frontend de producción y mejoras sobre él. "FP §n" = secc
             - Sociología: `fa-users`;
             - Trabajo Social: `fa-hands-holding-child`.
         - **Icono en carbón** (el blanco no llega a 3:1): `#FCDD18`, `#F9C114`, `#E37909`, `#F07F06`, `#63B23F`, `#55A5A6`, `#5FC3EE`, `#53C9E3`. Todos los demás llevan el icono en blanco.
-        - **Facultades 6, 7 y 8** (14/11/2026, pedido del usuario): no tienen carreras, solo colecciones. Sus colecciones toman el color del icono PNG original de producción: 6 → `#615FFF` (índigo), 7 → `#F6339A` (rosa), 8 → `#00BBA7` (turquesa), en `UNCP_FACULTY_COLLECTION_COLORS` (`uncp-communities.ts`).
+        - **Facultades 6, 7 y 8** (14/11/2026, pedido del usuario): no tienen carreras, solo colecciones. Sus colecciones toman el color del icono PNG original de producción: 6 → `#615FFF` (índigo), 7 → `#F6339A` (rosa), 8 → `#00BBA7` (turquesa). Desde la misma fecha se generalizó a las 8 facultades (ver "Color de cada facultad en su círculo").
           - Se aplica a las tarjetas de la página de la facultad, al encabezado de sus colecciones, a la lista de comunidades y a los resultados de búsqueda; para eso se usa `uncpInheritedCareer()`.
-          - La facultad conserva su círculo de facultad: `uncpCareer$` ya no mira la propia comunidad entre sus ancestros, y estas facultades no se agregaron a `UNCP_CAREERS`.
+          - Al principio la facultad conservaba su círculo verde; luego tomó también su color.
         - **Siguen sin color:** las colecciones que cuelgan directamente de una facultad tampoco tienen color, porque no pertenecen a una carrera: "Educación Secundaria", "Educación, Matemática y Física" y "Posgrado Derecho", en Sociales y Educación. El botón "Buscar" de "Por categoría" también es verde. Los textos en inglés de serie de "Por categoría" se tradujeron el 09/11/2026 (ver 7.4).
     - **búsqueda, filtros laterales** (05/11/2026). Se mostraron dos opciones: tarjetas (A) y panel único (B), con vistas previas en `pwtool/filtersopts.js`. El usuario no eligió ninguna; se mantuvo el diseño de serie con 3 ajustes, en `styles/_global-styles.scss`:
       - **foco**: al abrir un filtro con el "+" (o con el teclado), la tarjeta muestra un **contorno verde suave** `rgba(6,122,90,.35)` en lugar del gris de serie. Primero se había quitado el contorno; el usuario aclaró que lo que quería era cambiarlo a verde;

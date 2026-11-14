@@ -4,6 +4,6 @@
                        typeKey="community.listelement.badge"
                        [parentName]="parentName(parent)"
                        [icon]="icon$ | async"
-                       [careerStyle]="careerStyle"
+                       [careerStyle]="careerStyle$ | async"
                        [description]="dso.shortDescription">
 </ds-uncp-comcol-result>

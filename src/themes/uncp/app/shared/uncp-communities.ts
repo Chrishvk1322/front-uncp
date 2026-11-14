@@ -39,17 +39,32 @@ export interface UncpTopCommunity {
   /** Fallback name, shown until the name in DSpace arrives (the home cards take it from DSpace) */
   title: string;
   count: number;
+  /**
+   * Color of the faculty: the circle of its original production icon (assets/icons/1-8.png), restored on 14/11/2026
+   * at the user's request. Its icon circle takes it everywhere (home cards, community list, community pages, search
+   * results), and so do the careers without an official color and the collections that don't belong to a career
+   * (uncpInheritedCareer)
+   */
+  color: string;
+  /**
+   * Background of the home card: the pastel gradient of the original production design (cardClass of the first
+   * theme, removed on 27/10/2026 and restored on 14/11/2026 at the user's request)
+   */
+  background: string;
 }
 
+/** The pastel gradient of the original home cards, from one color to a lighter one */
+const pastel = (from: string, to: string) => `linear-gradient(135deg, ${from} 0%, ${to} 100%)`;
+
 export const UNCP_TOP_COMMUNITIES: UncpTopCommunity[] = [
-  { uuid: '3ab747e7-e5e3-45f3-b947-d3ae80e507d8', icon: 'fa-gears', title: 'Arquitectura e Ingenierías', count: 3525 },
-  { uuid: 'a24e4817-4cff-4c9c-b0bd-fcef79473277', icon: 'fa-chart-column', title: 'Ciencias Administrativas, Contables y Económicas', count: 1598 },
-  { uuid: 'a51150e5-83e6-4f09-bb12-8f2412f768ad', icon: 'fa-seedling', title: 'Ciencias Agrarias', count: 1714 },
-  { uuid: 'c9e7a303-9874-44b9-bf51-280646e192eb', icon: 'fa-stethoscope', title: 'Ciencias de la Salud', count: 780 },
-  { uuid: '3222eea9-3c3c-45ff-bbed-7a444937ba8d', icon: 'fa-chalkboard-user', title: 'Ciencias Sociales y Educación', count: 3370 },
-  { uuid: 'f1b1550f-8be8-4f7d-bfe9-57686478ac3c', icon: 'fa-graduation-cap', title: 'Tesis de pre y posgrado para Evaluación', count: 3559 },
-  { uuid: 'b352a329-fe14-4186-b024-8e882173205a', icon: 'fa-book', title: 'Libros de investigación', count: 57 },
-  { uuid: 'dd970c15-b58a-4c5e-b75a-d4e4e736d43c', icon: 'fa-newspaper', title: 'Artículos Científicos en Revistas Indizadas', count: 23 },
+  { uuid: '3ab747e7-e5e3-45f3-b947-d3ae80e507d8', icon: 'fa-gears', title: 'Arquitectura e Ingenierías', count: 3525, color: '#2B7FFF', background: pastel('#e8f4fd', '#f0f8ff') },
+  { uuid: 'a24e4817-4cff-4c9c-b0bd-fcef79473277', icon: 'fa-chart-column', title: 'Ciencias Administrativas, Contables y Económicas', count: 1598, color: '#AD46FF', background: pastel('#f3e5ff', '#faf0ff') },
+  { uuid: 'a51150e5-83e6-4f09-bb12-8f2412f768ad', icon: 'fa-seedling', title: 'Ciencias Agrarias', count: 1714, color: '#00BC7D', background: pastel('#e8f5e8', '#f0fff0') },
+  { uuid: 'c9e7a303-9874-44b9-bf51-280646e192eb', icon: 'fa-stethoscope', title: 'Ciencias de la Salud', count: 780, color: '#FF6900', background: pastel('#fff2e6', '#fff8f0') },
+  { uuid: '3222eea9-3c3c-45ff-bbed-7a444937ba8d', icon: 'fa-chalkboard-user', title: 'Ciencias Sociales y Educación', count: 3370, color: '#FB2C36', background: pastel('#fde8e8', '#fff0f0') },
+  { uuid: 'f1b1550f-8be8-4f7d-bfe9-57686478ac3c', icon: 'fa-graduation-cap', title: 'Tesis de pre y posgrado para Evaluación', count: 3559, color: '#615FFF', background: pastel('#e8f0ff', '#f0f6ff') },
+  { uuid: 'b352a329-fe14-4186-b024-8e882173205a', icon: 'fa-book', title: 'Libros de investigación', count: 57, color: '#F6339A', background: pastel('#ffe8f7', '#fff0fc') },
+  { uuid: 'dd970c15-b58a-4c5e-b75a-d4e4e736d43c', icon: 'fa-newspaper', title: 'Artículos Científicos en Revistas Indizadas', count: 23, color: '#00BBA7', background: pastel('#e8fffa', '#f0fffe') },
 ];
 
 /**
@@ -119,7 +134,7 @@ export interface UncpCareer {
 /**
  * The professional careers (subcommunities) with an official color, by UUID. Colors given by the repository
  * team (faculty 1 on 27/10/2026, faculties 2 to 5 on 28/10/2026); icons chosen with them (design A, 28/10/2026).
- * The faculties 6, 7 and 8 have no careers: see UNCP_FACULTY_COLLECTION_COLORS. Shown as a solid circle in the official
+ * Careers not listed take the color of their faculty (uncpInheritedCareer). Shown as a solid circle in the official
  * color with the career icon, on the career card and on the header of the career pages (and of its
  * collections). Careers not listed keep the icon of their faculty on the neutral circle.
  */
@@ -224,36 +239,44 @@ export function uncpCareer(uuid: string): UncpCareer | undefined {
 }
 
 /**
- * The faculties without careers (6, 7 and 8), whose collections hang directly from them: the color of their
- * original production icon (assets/icons/6.png, 7.png, 8.png; user request 14/11/2026) and the faculty icon.
- * Only their collections (cards, headers, community list, search results) take it: the faculty itself keeps the
- * solid green circle of every faculty.
+ * A faculty (top-level community) as a color and icon for its circle, or undefined if the UUID is not a faculty
  */
-export const UNCP_FACULTY_COLLECTION_COLORS: Record<string, UncpCareer> = {
-  'f1b1550f-8be8-4f7d-bfe9-57686478ac3c': { color: '#615FFF', icon: 'fa-graduation-cap' }, // 6. Tesis de pre y posgrado para Evaluación
-  'b352a329-fe14-4186-b024-8e882173205a': { color: '#F6339A', icon: 'fa-book' }, // 7. Libros de investigación
-  'dd970c15-b58a-4c5e-b75a-d4e4e736d43c': { color: '#00BBA7', icon: 'fa-newspaper' }, // 8. Artículos Científicos en Revistas Indizadas
-};
-
-/**
- * The color a collection takes from a community above it: the community's career, or the color of a faculty
- * without careers (6, 7 and 8)
- */
-export function uncpInheritedCareer(uuid: string): UncpCareer | undefined {
-  return UNCP_CAREERS[uuid] ?? UNCP_FACULTY_COLLECTION_COLORS[uuid];
+export function uncpFacultyCareer(uuid: string): UncpCareer | undefined {
+  const faculty = getTopCommunity(uuid);
+  return faculty ? { color: faculty.color, icon: faculty.icon } : undefined;
 }
 
 /**
- * The career a community or collection belongs to (the career itself, or the career in its breadcrumbs), or
- * null when it doesn't belong to one with an official color
+ * The color a community or collection gives to what is below it: its official career color, or its faculty color
+ */
+export function uncpInheritedCareer(uuid: string): UncpCareer | undefined {
+  return UNCP_CAREERS[uuid] ?? uncpFacultyCareer(uuid);
+}
+
+/**
+ * The faculty a community or collection belongs to (itself, or the faculty in its breadcrumbs), as color and icon
+ * @param uuid         UUID of the community or collection of the current page
+ * @param breadcrumbs$ BreadcrumbsService.breadcrumbs$
+ */
+export function uncpFaculty$(uuid: string, breadcrumbs$: Observable<Breadcrumb[]>): Observable<UncpCareer | null> {
+  const own = uncpFacultyCareer(uuid);
+  return own ? of(own) : breadcrumbCommunities$(uuid, breadcrumbs$).pipe(
+    map((uuids) => uuids.map((communityUuid) => uncpFacultyCareer(communityUuid)).find((faculty) => !!faculty) ?? null),
+    startWith(null),
+  );
+}
+
+/**
+ * The color of a community or collection: its own (a career or a faculty), or the one of the closest community above
+ * it in the breadcrumbs (its career, or else its faculty); null until the breadcrumbs arrive or if none
  * @param uuid         UUID of the community or collection of the current page
  * @param breadcrumbs$ BreadcrumbsService.breadcrumbs$
  */
 export function uncpCareer$(uuid: string, breadcrumbs$: Observable<Breadcrumb[]>): Observable<UncpCareer | null> {
-  const own = uncpCareer(uuid);
-  // the communities above it (not itself, so a faculty 6-8 keeps the green faculty circle on its own page)
+  const own = uncpInheritedCareer(uuid);
+  // closest first: a career before its faculty
   return own ? of(own) : breadcrumbCommunities$(uuid, breadcrumbs$).pipe(
-    map((uuids) => uuids.filter((communityUuid) => communityUuid !== uuid)
+    map((uuids) => [...uuids].reverse()
       .map((communityUuid) => uncpInheritedCareer(communityUuid)).find((career) => !!career) ?? null),
     startWith(null),
   );

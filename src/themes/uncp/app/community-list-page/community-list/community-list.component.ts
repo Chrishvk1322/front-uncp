@@ -94,8 +94,9 @@ export class CommunityListComponent extends BaseComponent implements OnInit {
         const card = uncpCollectionCard(node.id, name);
         look = { icon: card.icon, careerStyle: uncpCareerStyle(this.careerOf(node.parent)), name: card.title, detail: card.subtitle };
       } else {
-        const career = uncpCareer(node.id);
-        look = { icon: career?.icon ?? this.facultyIcon(node), careerStyle: uncpCareerStyle(career), name: uncpDisplayName(name) };
+        // the faculty in its color; a career in its official color, or else in its faculty's
+        look = { icon: uncpCareer(node.id)?.icon ?? this.facultyIcon(node), careerStyle: uncpCareerStyle(this.careerOf(node)),
+          name: uncpDisplayName(name) };
       }
       this.looks.set(node.id, look);
     }
@@ -103,7 +104,7 @@ export class CommunityListComponent extends BaseComponent implements OnInit {
   }
 
   /**
-   * The career of a node or of its closest ancestor, if any
+   * The color of a node or of its closest ancestor: a career with an official color, or else the faculty
    */
   private careerOf(node: FlatNode): ReturnType<typeof uncpCareer> {
     for (let current = node; current; current = current.parent) {

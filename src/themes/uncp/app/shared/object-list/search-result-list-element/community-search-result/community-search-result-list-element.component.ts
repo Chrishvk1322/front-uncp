@@ -10,7 +10,7 @@ import {
 } from '../../../../../../../app/shared/object-list/search-result-list-element/community-search-result/community-search-result-list-element.component';
 import { LinkService } from '../../../../../../../app/core/cache/builders/link.service';
 import { Community } from '../../../../../../../app/core/shared/community.model';
-import { getTopCommunity, uncpCareer, uncpCareerStyle, uncpDisplayName, UNCP_GENERIC_COMMUNITY_ICON } from '../../../uncp-communities';
+import { getTopCommunity, uncpCareer, uncpCareerStyle, uncpDisplayName, uncpFacultyCareer, uncpInheritedCareer, UNCP_GENERIC_COMMUNITY_ICON } from '../../../uncp-communities';
 import { uncpParent$ } from '../../../uncp-parent';
 
 /**
@@ -35,14 +35,20 @@ export class CommunitySearchResultListElementComponent extends BaseComponent imp
    */
   icon$: Observable<string> = of(UNCP_GENERIC_COMMUNITY_ICON);
 
-  careerStyle: Record<string, string> | null;
+  /**
+   * The circle in the color of the career or faculty; a career without an official color takes its faculty's
+   */
+  careerStyle$: Observable<Record<string, string> | null> = of(null);
 
   ngOnInit(): void {
     super.ngOnInit();
     this.title = uncpDisplayName(this.dsoTitle);
     const career = uncpCareer(this.dso.uuid);
-    this.careerStyle = uncpCareerStyle(career);
     this.parent$ = uncpParent$(this.dso, this.linkService);
+    const own = uncpInheritedCareer(this.dso.uuid);
+    this.careerStyle$ = own ? of(uncpCareerStyle(own)) : this.parent$.pipe(
+      map((parent) => uncpCareerStyle(parent ? uncpFacultyCareer(parent.uuid) : null)),
+    );
     const ownIcon = career?.icon ?? getTopCommunity(this.dso.uuid)?.icon;
     this.icon$ = ownIcon ? of(ownIcon) : this.parent$.pipe(
       map((parent) => (parent && getTopCommunity(parent.uuid)?.icon) ?? UNCP_GENERIC_COMMUNITY_ICON),

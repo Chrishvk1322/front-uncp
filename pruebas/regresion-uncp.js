@@ -35,8 +35,10 @@ const BASE = process.env.BASE || 'http://localhost:8080';
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.31 Safari/537.36';
 const SERVER_IP = '38.43.155.155';
 const GREEN = 'rgb(6, 122, 90)';
-// collections of the faculties without careers (6-8): color of their original icon (14/11/2026)
-const FACULTY_COLLECTION_COLORS = { libros: 'rgb(246, 51, 154)' };
+// color of each faculty, from its original production icon (14/11/2026), in the order of the home cards
+const FACULTY_COLORS = ['rgb(43, 127, 255)', 'rgb(173, 70, 255)', 'rgb(0, 188, 125)', 'rgb(255, 105, 0)', 'rgb(251, 44, 54)',
+  'rgb(97, 95, 255)', 'rgb(246, 51, 154)', 'rgb(0, 187, 167)'];
+const FACULTY_COLLECTION_COLORS = { libros: FACULTY_COLORS[6] };
 const BLUE = 'rgb(31, 78, 121)';
 // Careers (UNCP_CAREERS): solid circle in the official color, own icon, white or charcoal glyph
 const WHITE = 'rgb(255, 255, 255)';
@@ -369,14 +371,15 @@ async function run() {
       const r = e.getBoundingClientRect();
       return { bg: getComputedStyle(e).backgroundColor, img: getComputedStyle(e).backgroundImage, top: Math.round(r.top), h: Math.round(r.height) };
     }));
-    check(label, 'tarjetas blancas', look.every((c) => c.bg === 'rgb(255, 255, 255)' && c.img === 'none'), [...new Set(look.map((c) => c.bg))].join(' '));
+    // the pastel gradient of the original design, one per faculty (restored on 14/11/2026)
+    check(label, 'tarjetas con el degradado original, distinto por facultad', look.length === 8
+      && look.every((c) => /^linear-gradient\(135deg, /.test(c.img)) && new Set(look.map((c) => c.img)).size === 8
+      && /rgb\(232, 244, 253\)/.test(look[0].img), look[0]?.img);
     const sizes = look.map((c) => c.h);
     check(label, 'tamaño de tarjeta sin cambios (alto mínimo 220px)', sizes.every((h) => h >= 220), sizes.join(','));
-    const circle = await p.page.evaluate(() => {
-      const e = document.querySelector('.contenido-comunidades .uncp-community-icon');
-      return e && { bg: getComputedStyle(e).backgroundColor, fg: getComputedStyle(e).color };
-    });
-    check(label, 'círculo verde sólido con icono blanco', circle && circle.bg === GREEN && circle.fg === 'rgb(255, 255, 255)', JSON.stringify(circle));
+    const circles = await p.page.$$eval('.contenido-comunidades .uncp-community-icon', (els) => els.map((e) => getComputedStyle(e).backgroundColor));
+    check(label, 'círculo de cada facultad en el color de su icono original', circles.length === 8
+      && circles.every((c, i) => c === FACULTY_COLORS[i]), JSON.stringify(circles));
     const rows = {};
     look.forEach((c) => (rows[c.top] = rows[c.top] || []).push(c.h));
     check(label, 'misma altura por fila', Object.values(rows).every((hs) => Math.max(...hs) - Math.min(...hs) <= 1), JSON.stringify(rows));
@@ -387,7 +390,7 @@ async function run() {
     const hover = await card.evaluate((e) => ({
       border: getComputedStyle(e).borderTopColor, icon: getComputedStyle(e.querySelector('.uncp-community-icon')).backgroundColor,
     }));
-    check(label, 'hover: borde verde e icono en verde', hover.border === GREEN && hover.icon === GREEN, JSON.stringify(hover));
+    check(label, 'hover: borde verde y el círculo conserva su color', hover.border === GREEN && FACULTY_COLORS.includes(hover.icon), JSON.stringify(hover));
     const link = await card.$('.card-link');
     await link.hover();
     await p.page.waitForTimeout(400);
@@ -740,10 +743,11 @@ async function run() {
     const homeNames = (homeCards[dev] ?? []).map((c) => c.name);
     check(label, 'mismos nombres que las tarjetas de la portada', homeNames.length === 8 && faculties.map((f) => f.name).join('|') === homeNames.join('|'),
       JSON.stringify({ portada: homeNames, lista: faculties.map((f) => f.name) }));
-    check(label, 'mismo color de círculo que la portada', (homeCards[dev] ?? []).length === 8 && homeCards[dev].every((c) => c.circle === GREEN),
+    check(label, 'mismo color de círculo que la portada', (homeCards[dev] ?? []).length === 8 && faculties.length === 8
+      && homeCards[dev].every((c, i) => c.circle === faculties[i].bg),
       JSON.stringify((homeCards[dev] ?? []).map((c) => c.circle)));
-    check(label, '8 facultades con su icono en círculo verde, sin número', faculties.length === 8
-      && faculties.every((f) => f.name && !/^\d+\./.test(f.name) && f.bg === GREEN && f.ink === WHITE && /fa-/.test(f.glyph)), JSON.stringify(faculties.map((f) => f.name)));
+    check(label, '8 facultades con su icono en el color original, sin número', faculties.length === 8
+      && faculties.every((f, i) => f.name && !/^\d+\./.test(f.name) && f.bg === FACULTY_COLORS[i] && /fa-/.test(f.glyph)), JSON.stringify(faculties.map((f) => [f.name, f.bg])));
     check(label, 'enlaces azules', faculties.every((f) => f.link === BLUE), JSON.stringify(faculties.map((f) => f.link)));
     check(label, 'botón de desplegar en español', faculties.every((f) => /^Desplegar /.test(f.toggle || '')), faculties[0]?.toggle);
     await p.page.click('.uncp-tree-level-0 .uncp-tree-toggle');
@@ -786,7 +790,7 @@ async function run() {
     }));
     check(label, 'tarjetas de colección en el color original (rosa)', facultyColors.cards.length > 0
       && facultyColors.cards.every((c) => c === FACULTY_COLLECTION_COLORS.libros), JSON.stringify(facultyColors.cards));
-    check(label, 'la facultad mantiene su círculo sin el color', facultyColors.header !== FACULTY_COLLECTION_COLORS.libros, facultyColors.header);
+    check(label, 'el encabezado de la facultad en su color', facultyColors.header === FACULTY_COLLECTION_COLORS.libros, facultyColors.header);
     await p.page.close();
 
     // Info pages (14/11/2026): title with the green rule, reading column; feedback with the login fields

@@ -5,7 +5,7 @@ import { fadeIn } from '../../../../../app/shared/animations/fade';
 import { BreadcrumbsService } from '../../../../../app/breadcrumbs/breadcrumbs.service';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { Community } from '../../../../../app/core/shared/community.model';
-import { uncpCareer, uncpCareerStyle, uncpCommunityIcon$, uncpDisplayName, UNCP_GENERIC_COMMUNITY_ICON } from '../../shared/uncp-communities';
+import { uncpCareer, UncpCareer, uncpCareerStyle, uncpCommunityIcon$, uncpDisplayName, uncpFaculty$, UNCP_GENERIC_COMMUNITY_ICON } from '../../shared/uncp-communities';
 
 /**
  * Subcommunities per page: all of them in practice (the most a UNCP community has is 11)
@@ -39,20 +39,27 @@ export class CommunityPageSubCommunityListComponent extends BaseComponent implem
    */
   private careerStyles = new Map<string, Record<string, string> | null>();
 
+  /**
+   * The faculty these subcommunities belong to: the color of the careers without an official color
+   */
+  faculty$: Observable<UncpCareer | null> = of(null);
+
   ngOnInit(): void {
     this.pageSize = this.pageSize ?? UNCP_COMCOL_PAGE_SIZE;
     super.ngOnInit();
     this.icon$ = uncpCommunityIcon$(this.community.uuid, this.breadcrumbsService.breadcrumbs$);
+    this.faculty$ = uncpFaculty$(this.community.uuid, this.breadcrumbsService.breadcrumbs$);
   }
 
   /**
-   * The icon circle in the official color of the career, or null for the neutral look
+   * The icon circle in the official color of the career, or else in the color of the faculty (null until it is known)
    */
-  careerStyle(community: Community): Record<string, string> | null {
-    if (!this.careerStyles.has(community.uuid)) {
-      this.careerStyles.set(community.uuid, uncpCareerStyle(uncpCareer(community.uuid)));
+  careerStyle(community: Community, faculty: UncpCareer | null): Record<string, string> | null {
+    const key = `${community.uuid}|${faculty?.color ?? ''}`;
+    if (!this.careerStyles.has(key)) {
+      this.careerStyles.set(key, uncpCareerStyle(uncpCareer(community.uuid) ?? faculty));
     }
-    return this.careerStyles.get(community.uuid);
+    return this.careerStyles.get(key);
   }
 
   /**

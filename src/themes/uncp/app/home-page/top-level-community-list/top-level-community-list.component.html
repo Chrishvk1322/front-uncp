@@ -18,8 +18,8 @@
   <div class="container-fluid px-0">
     <div class="row g-3 justify-content-around">
       <div class="col-lg-3 col-md-4 col-sm-6 mb-md-4 mb-2 d-flex" *ngFor="let community of communityCards">
-        <div class="community-card" [routerLink]="['/communities', community.uuid]" style="cursor: pointer;" tabindex="0">
-          <div class="card-icon"><span class="uncp-community-icon uncp-faculty-icon" aria-hidden="true"><i class="fa-solid {{ community.icon }}"></i></span></div>
+        <div class="community-card" [routerLink]="['/communities', community.uuid]" [style.background]="community.background" style="cursor: pointer;" tabindex="0">
+          <div class="card-icon"><span class="uncp-community-icon uncp-faculty-icon uncp-career-icon" [ngStyle]="facultyStyles[community.uuid]" aria-hidden="true"><i class="fa-solid {{ community.icon }}"></i></span></div>
           <h5 class="card-title">{{ (names$ | async)?.[community.uuid] ?? community.title }}</h5>
           <div class="w-100 text-center">
             <p class="card-count">{{ ((counts$ | async)?.[community.uuid] ?? community.count) | number:'1.0-0':'es-PE' }} documentos</p>

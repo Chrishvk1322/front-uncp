@@ -4,7 +4,7 @@ import { map, startWith } from 'rxjs/operators';
 import { TopLevelCommunityListComponent as BaseComponent } from '../../../../../app/home-page/top-level-community-list/top-level-community-list.component';
 import { fadeInOut } from '../../../../../app/shared/animations/fade';
 import { UncpTotalesService } from '../../shared/uncp-totales.service';
-import { UNCP_TOP_COMMUNITIES, uncpDisplayName } from '../../shared/uncp-communities';
+import { UNCP_TOP_COMMUNITIES, uncpCareerStyle, uncpDisplayName, uncpFacultyCareer } from '../../shared/uncp-communities';
 import { CommunityDataService } from '../../../../../app/core/data/community-data.service';
 import { DSONameService } from '../../../../../app/core/breadcrumbs/dso-name.service';
 import { getFirstSucceededRemoteListPayload } from '../../../../../app/core/shared/operators';
@@ -27,6 +27,12 @@ export class TopLevelCommunityListComponent extends BaseComponent {
    * the fallback: the real figure comes from comunidades_inicio in uncp-totales.json (see counts$).
    */
   communityCards = UNCP_TOP_COMMUNITIES;
+
+  /**
+   * The icon circle of each card in the color of its faculty (the original icon color, 14/11/2026), by UUID
+   */
+  facultyStyles: Record<string, Record<string, string>> = UNCP_TOP_COMMUNITIES.reduce(
+    (styles, community) => ({ ...styles, [community.uuid]: uncpCareerStyle(uncpFacultyCareer(community.uuid)) }), {});
 
   /**
    * Documents per top-level community (by UUID) from uncp-totales.json, generated daily by the server cron.
